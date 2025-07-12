@@ -1,0 +1,6 @@
+secrets/
+config.env
+__pycache__/
+*.pyc
+.idea
+.DS_Store

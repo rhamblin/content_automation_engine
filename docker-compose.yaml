@@ -1,0 +1,13 @@
+services:
+  pin-generation:
+    build:
+      context: ./services/pin-generation-service
+      dockerfile: Dockerfile
+    secrets:
+      - open-ai-api-key
+    environment:
+      OPENAI_API_KEY: /run/secrets/open-ai-api-key
+
+secrets:
+  open-ai-api-key:
+    file: ./secrets/openai-apikey.txt
