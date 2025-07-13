@@ -8,6 +8,35 @@ services:
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
 
+  db:
+    image: postgres:16-alpine3.22
+    container_name: "${APP_NAME}_${APP_ENV}_db"
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB:       "${POSTGRES_DB}"
+      APP_DB_USER:       "${APP_DB_USER}"
+      APP_DB_PASSWORD:   "${APP_DB_PASSWORD}"
+      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
+      ANALYTICS_DB_PASSWORD: "${ANALYTICS_DB_PASSWORD}"
+
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    
 secrets:
   open-ai-api-key:
     file: ./secrets/openai-apikey.txt
+
+volumes:
+  db_data:
+    name: "${APP_NAME}_${APP_ENV}_db_data"
+
+networks:
+  backend:
