@@ -2,6 +2,6 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-@app.post("/dispatch")
+@app.post("/v1/dispatch")
 def dispatch():
     return {"Hello": "World"}
