@@ -12,10 +12,9 @@ def process_message():
             try:
                 data = json.loads(message)
                 job_id = data.get("job_id")
-                niche = data.get("niche")
                 payload = data.get("data", {})
 
-                print(f"[{job_id}] Processing pin for niche: {niche} with data: {payload}", flush=True)
+                print(f"[{job_id}] Processing job with data: {payload}", flush=True)
 
                 # Insert your pin generation logic here
                 # For example: generate_pin(niche=niche, data=payload)
