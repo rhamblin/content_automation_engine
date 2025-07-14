@@ -3,5 +3,5 @@
 Startup command is: 
 docker compose --env-file ./config/dev/variables.env up --build -d
 
-Tear down
+Tear down including volumes
 docker compose --env-file ./config/dev/variables.env down -v
