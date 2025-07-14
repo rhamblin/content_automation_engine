@@ -16,7 +16,7 @@ from app.schemas.schema import (
 router = APIRouter(prefix="/v1/niches", tags=["Niches"])
 
 # --- Healthcheck ----
-@router.get("/healthcheck")
+@router.head("/healthcheck")
 async def healthcheck():
     return "Alive!"
 
