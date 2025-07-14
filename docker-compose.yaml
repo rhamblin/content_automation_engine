@@ -13,7 +13,7 @@ services:
       - backend
     depends_on:
       - pin-dispatcher
-      
+
   pin-worker:
     build:
       context: ./services/pin-worker
@@ -76,6 +76,16 @@ services:
       - "5432:5432"
     networks:
       - database
+  
+  blob-storage:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: "azurite-blob --blobHost 0.0.0.0"
+    ports:
+      - "10000:10000"
+    volumes:
+      - blob_storage:/data
+    networks:
+      - database
     
 secrets:
   open-ai-api-key:
@@ -84,6 +94,8 @@ secrets:
 volumes:
   db_data:
     name: "${APP_NAME}_${APP_ENV}_db_data"
+  blob_storage:
+    name: "${APP_NAME}_${APP_ENV}_blob_storage"
 
 networks:
   database:
