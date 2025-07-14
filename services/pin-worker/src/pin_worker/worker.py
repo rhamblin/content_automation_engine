@@ -1,11 +1,12 @@
 from redis import Redis
+import time
 import json
 
-queue = Redis(host="redis", port=6379)
+broker = Redis(host="redis", port=6379)
 
 def process_message():
     while True:
-        result = queue.blpop("generate_pin_queue", timeout=0)  # 0 = wait forever
+        result = broker.blpop("generate_pin_queue", timeout=0)  # 0 = wait forever
 
         if result:
             queue_name, message = result
@@ -17,6 +18,9 @@ def process_message():
                 print(f"[{job_id}] Processing job with data: {payload}", flush=True)
 
                 generate_pins(job_id)
+
+                print(f"[{job_id}] Finished Processing job with data: {payload} \n\n", flush=True)
+
             except Exception as e:
                 print(f"[ERROR] Failed to process message: {message} - {e}", flush=True)
 
@@ -24,7 +28,7 @@ def generate_pins(job_id):
     niches = get_niches()
 
     for niche in niches:
-        keywords = niches.keywords
+        keywords = niche['keywords']
         for kw in keywords:
             asset = get_asset(kw)
             title = generate_pin_title(niche, kw)
@@ -32,11 +36,12 @@ def generate_pins(job_id):
             metadata = generate_metadata()
 
             save_pin(niche, kw, title, description, asset, metadata)
-            publish_event()
+            publish_event(job_id)
+
 def publish_event(job_id):
     payload = {"job_id": job_id}
     msg = json.dumps(payload)
-    queue.rpush("pin_events", msg)
+    broker.rpush("pin_events", msg)
 
 def get_niches():
     # e.g. fetch from DB or API
