@@ -45,11 +45,7 @@ services:
       context: ./services/niches-api
     restart: unless-stopped
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: "${APP_DB_USER}"
-      DB_PASSWORD: "${APP_DB_PASSWORD}"
-      DB_NAME: "${POSTGRES_DB}"
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
     ports:
       - "8002:80"
     networks:
