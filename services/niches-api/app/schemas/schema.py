@@ -27,6 +27,8 @@ class NicheCreate(BaseModel):
     name: str
     domain: str
     default_budget: int
+    keywords: Optional[List[KeywordCreate]] = []
+
 
 class NicheUpdate(BaseModel):
     name: Optional[str] = None

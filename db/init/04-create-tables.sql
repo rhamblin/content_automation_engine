@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS pins.pins (
   created_at        TIMESTAMPTZ  NOT NULL DEFAULT now(),
   title             TEXT         NOT NULL,
   description       TEXT         NOT NULL,
-  hashtags          TEXT[]       NOT NULL,
+  hashtags          TEXT[]       NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS analytics.metrics (
