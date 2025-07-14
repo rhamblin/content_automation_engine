@@ -1,23 +1,55 @@
 services:
+  redis:
+    image: redis:7-alpine3
+    restart: unless-stopped
+    networks: 
+      - backend
+
   pin-worker:
     build:
       context: ./services/pin-worker
+    restart: unless-stopped
     secrets:
       - open-ai-api-key
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
+    networks:
+      - backend
+      - database
+    depends_on:
+      - redis
 
   pin-dispatcher:
     build:
       context: ./services/pin-dispatcher
+    restart: unless-stopped
     ports:
       - "8001:80"
     networks:
       - backend
+    depends_on:
+      - redis
+      - pin-worker
 
+  niches-api:
+    build:
+      context: ./services/niches-api
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: "${APP_DB_USER}"
+      DB_PASSWORD: "${APP_DB_PASSWORD}"
+      DB_NAME: "${POSTGRES_DB}"
+    ports:
+      - "8002:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
   db:
     image: postgres:16-alpine3.22
-    container_name: "${APP_NAME}_${APP_ENV}_db"
     restart: unless-stopped
     environment:
       POSTGRES_USER:     "${POSTGRES_USER}"
@@ -27,11 +59,9 @@ services:
       APP_DB_PASSWORD:   "${APP_DB_PASSWORD}"
       ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
       ANALYTICS_DB_PASSWORD: "${ANALYTICS_DB_PASSWORD}"
-
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/postgresql/data
-
     ports:
       - "5432:5432"
     networks:
