@@ -1,12 +1,19 @@
 services:
-  pin-generation:
+  pin-worker:
     build:
-      context: ./services/pin-generation-service
-      dockerfile: Dockerfile
+      context: ./services/pin-worker
     secrets:
       - open-ai-api-key
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
+
+  pin-dispatcher:
+    build:
+      context: ./services/pin-dispatcher
+    ports:
+      - "8001:80"
+    networks:
+      - backend
 
   db:
     image: postgres:16-alpine3.22
@@ -28,7 +35,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - backend
+      - database
     
 secrets:
   open-ai-api-key:
@@ -39,4 +46,5 @@ volumes:
     name: "${APP_NAME}_${APP_ENV}_db_data"
 
 networks:
+  database:
   backend:

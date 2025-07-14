@@ -5,4 +5,4 @@ WORKDIR /services/pin-generation-service
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
-CMD ["python", "src/generate_pin.py"]
+CMD ["python", "src/pin_worker/worker.py"]
