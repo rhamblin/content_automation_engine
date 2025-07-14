@@ -15,4 +15,8 @@ class Niche(Base):
     default_budget: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # ORM-level relationship (does NOT handle deletion)
-    keywords: Mapped[List["Keyword"]] = relationship(back_populates="niche")
+    keywords: Mapped[List["Keyword"]] = relationship(
+        back_populates="niche",
+        cascade="all, delete",
+        lazy="selectin"
+    )

@@ -13,4 +13,7 @@ class Keyword(Base):
     niche_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("niches.niches.niche_id"), nullable=False)
     keyword: Mapped[str] = mapped_column(String, nullable=False)
 
-    niche: Mapped[Niche] = relationship(back_populates="keywords")
+    niche: Mapped[Niche] = relationship(
+        back_populates="keywords",
+        lazy="selectin"
+    )

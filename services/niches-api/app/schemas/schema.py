@@ -40,7 +40,7 @@ class NicheRead(BaseModel):
     name: str
     domain: str
     default_budget: int
-    keywords: List[KeywordRead] = []
+    keywords: List[KeywordRead]
 
     class Config:
         orm_mode = True
