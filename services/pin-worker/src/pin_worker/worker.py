@@ -22,17 +22,21 @@ def process_message():
                 job_id = data.get("job_id")
                 payload = data.get("data", {})
 
+                print(f"="*50, flush=True)
+
                 print(f"[{job_id}] Processing job with data: {payload}", flush=True)
 
                 generate_pins(job_id)
 
-                print(f"[{job_id}] Finished Processing job with data: {payload} \n\n", flush=True)
+                print(f"[{job_id}] Finished Processing job with data: {payload}", flush=True)
+
+                print(f"="*50, flush=True)
 
             except Exception as e:
                 print(f"[ERROR] Failed to process message: {message} - {e}", flush=True)
 
 def generate_pins(job_id):
-    niches = get_niches()
+    niches = get_all_niches()
 
     for niche in niches:
         keywords = niche.keywords
@@ -52,13 +56,9 @@ def publish_event(job_id):
     broker.rpush("pin_events", msg)
 
 def get_all_niches():
-    db = get_db_session()
-    result = db.execute(select(Niche).order_by(Niche.name).options(selectinload(Niche.keywords)))
-    return result.scalars().all()
-
-def get_niches():
-    # e.g. fetch from DB or API
-    return get_all_niches()
+    with get_db_session() as session:
+        result = session.execute(select(Niche).order_by(Niche.name).options(selectinload(Niche.keywords)))
+        return result.scalars().all()
 
 def get_asset(keyword):
     # lookup or generate image URL
