@@ -4,10 +4,12 @@ from sqlalchemy.orm import selectinload
 from db_core.db_sync import get_db_session
 from db_core.models.niche import Niche
 from db_core.models.keyword import Keyword
+from db_core.models.pin import Pin
+
+from call_to_gen_ai import generate_pin_title, generate_pin_description
+
 import time
 import json
-
-
 
 broker = Redis(host="redis", port=6379)
 
@@ -22,7 +24,7 @@ def process_message():
                 job_id = data.get("job_id")
                 payload = data.get("data", {})
 
-                print(f"="*50, flush=True)
+                print(f"*"*50, flush=True)
 
                 print(f"[{job_id}] Processing job with data: {payload}", flush=True)
 
@@ -30,7 +32,7 @@ def process_message():
 
                 print(f"[{job_id}] Finished Processing job with data: {payload}", flush=True)
 
-                print(f"="*50, flush=True)
+                print(f"*"*50, flush=True)
 
             except Exception as e:
                 print(f"[ERROR] Failed to process message: {message} - {e}", flush=True)
@@ -42,12 +44,22 @@ def generate_pins(job_id):
         keywords = niche.keywords
         for value in keywords:
             kw = value.keyword
-            asset = get_asset(kw)
+            asset_url = get_asset_url(kw)
             title = generate_pin_title(niche.name, kw)
             description = generate_pin_description(niche.name, kw)
-            metadata = generate_metadata()
 
-            save_pin(niche.name, kw, title, description, asset, metadata)
+            pin = Pin(
+                title=title,
+                description=description,
+                keyword_id=value.keyword_id,
+                asset_url=asset_url
+            )
+            print(f"="*50, flush=True)
+
+            save_pin(pin, kw, niche.name)
+
+            print(f"="*50, flush=True)
+
             publish_event(job_id)
 
 def publish_event(job_id):
@@ -60,21 +72,16 @@ def get_all_niches():
         result = session.execute(select(Niche).order_by(Niche.name).options(selectinload(Niche.keywords)))
         return result.scalars().all()
 
-def get_asset(keyword):
+def get_asset_url(keyword):
     # lookup or generate image URL
     return f"https://cdn.example.com/assets/{keyword}.jpg"
 
-def generate_pin_title(niche, keyword):
-    return f"{niche}: {keyword} Inspiration"
+def save_pin(pin: Pin, kw, niche: str):
+    print(f"\n\nFor niche -> {niche}\n\n", flush=True)
 
-def generate_pin_description(niche, keyword):
-    return f"Explore amazing {keyword} tips in our {niche} series."
+    print(f"\n\nFor keyword -> {kw}\n\n", flush=True)
 
-def generate_metadata():
-    return {"created_by": "worker-v1", "timestamp": time.time()}
-
-def save_pin(niche, keyword, title, desc, asset, metadata):
-    print(f"  · Saving pin [{niche}/{keyword}]", flush=True)
+    print(f"{pin.to_readable()}", flush=True)
 
 if __name__ == "__main__":
     process_message()

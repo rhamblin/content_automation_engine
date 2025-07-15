@@ -1,5 +1,7 @@
 from db_core.models.base import Base
 from db_core.models.niche import Niche
+from db_core.models.pin import Pin
+from typing import List
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,3 +19,31 @@ class Keyword(Base):
         back_populates="keywords",
         lazy="selectin"
     )
+
+    pins: Mapped[List["Pin"]] = relationship(
+        "Pin",
+        back_populates="keyword",
+        cascade="all, delete",
+        lazy="selectin"
+    )
+
+    def to_dict(self) -> dict:
+        """
+        Return a JSON-serializable dict representation of this Keyword.
+        """
+        return {
+            "keyword_id": str(self.keyword_id),
+            "niche_id": str(self.niche_id),
+            "keyword": self.keyword,
+        }
+
+    def to_readable(self) -> str:
+        """
+        Return a human-friendly string representation for logging.
+        """
+        niche_name = getattr(self.niche, "name", None)
+        niche_part = f" (niche='{niche_name}')" if niche_name else ""
+        return (
+            f"Keyword[{self.keyword_id}]: '{self.keyword}'"
+            f"{niche_part} | niche_id={self.niche_id}"
+        )
