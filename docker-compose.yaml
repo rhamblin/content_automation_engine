@@ -23,11 +23,13 @@ services:
       - open-ai-api-key
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
+      DB_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
     networks:
       - backend
       - database
     depends_on:
       - redis
+      - db
 
   pin-dispatcher:
     build:
