@@ -1,1 +1,2 @@
+-e db_core
 redis

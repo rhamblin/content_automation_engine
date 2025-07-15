@@ -1,5 +1,5 @@
-from app.models.base import Base
-from app.models.niche import Niche
+from db_core.models.base import Base
+from db_core.models.niche import Niche
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship

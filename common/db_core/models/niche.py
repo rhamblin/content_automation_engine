@@ -1,4 +1,4 @@
-from app.models.base import Base
+from db_core.models.base import Base
 from sqlalchemy import String, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship

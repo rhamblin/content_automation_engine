@@ -16,7 +16,8 @@ services:
 
   pin-worker:
     build:
-      context: ./services/pin-worker
+      context: .
+      dockerfile: services/pin-worker/Dockerfile
     restart: unless-stopped
     secrets:
       - open-ai-api-key
@@ -42,7 +43,8 @@ services:
 
   niches-api:
     build:
-      context: ./services/niches-api
+      context: .
+      dockerfile: services/niches-api/Dockerfile
     restart: unless-stopped
     environment:
       DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}

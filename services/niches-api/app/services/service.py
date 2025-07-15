@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from sqlalchemy.orm import selectinload
 from uuid import UUID
-from app.models.niche import Niche
-from app.models.keyword import Keyword
+from db_core.models.niche import Niche
+from db_core.models.keyword import Keyword
 from app.schemas.schema import (
     NicheCreate, NicheUpdate,
     KeywordCreate, KeywordUpdate
