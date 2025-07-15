@@ -3,7 +3,7 @@ import requests
 import threading
 from schedule import repeat, every, run_pending
 
-@repeat(every(30).seconds)
+@repeat(every(15).seconds)
 def fire_dispatcher_in_thread():
     t = threading.Thread(target=fire_dispatcher, daemon=True)
     t.start()
