@@ -8,6 +8,15 @@ A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post ge
 
 ### High-Level Relationships
 
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
 ```mermaid
 erDiagram
     identity.tenants ||--o{ identity.tenant_users : has
