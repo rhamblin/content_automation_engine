@@ -8,25 +8,16 @@ A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post ge
 
 ### High-Level Relationships
 
-
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
-
 ```mermaid
 erDiagram
-    identity.tenants ||--o{ identity.tenant_users : has
-    identity.users   ||--o{ identity.tenant_users : belongs_to
-    identity.tenants ||--o{ identity.projects    : owns
-    identity.projects ||--o{ integration_profiles : contains
-    niches.niches    ||--o{ niches.keywords      : defines
-    niches.niches    ||--o{ integration_profiles : referenced_by
-    integration_profiles ||--o{ posts.posts        : generates
-    posts.posts      ||--o{ analytics.metrics   : measured_by
+    tenants ||--o{ tenant_users : has
+    users   ||--o{ tenant_users : belongs_to
+    tenants ||--o{ projects    : owns
+    projects ||--o{ integration_profiles : contains
+    niches    ||--o{ keywords      : defines
+    niches    ||--o{ integration_profiles : referenced_by
+    integration_profiles ||--o{ posts        : generates
+    posts      ||--o{ analytics_metrics   : measured_by
 ```
 
 ## Data Objects
@@ -62,37 +53,37 @@ erDiagram
 
 ```mermaid
 erDiagram
-    identity.tenants {
+    tenants {
       UUID tenant_id PK
       TEXT name
       TIMESTAMPTZ created_at
     }
-    identity.users {
+    users {
       UUID user_id PK
       TEXT email
       TEXT provider
       TEXT provider_sub
       TIMESTAMPTZ created_at
     }
-    identity.tenant_users {
+    tenant_users {
       UUID tenant_id FK
       UUID user_id FK
       TEXT role
     }
-    identity.projects {
+    projects {
       UUID project_id PK
       UUID tenant_id FK
       TEXT name
       TIMESTAMPTZ created_at
     }
-    niches.niches {
+    niches {
       UUID niche_id PK
       TEXT name
       TEXT domain
       INTEGER default_budget
       TIMESTAMPTZ created_at
     }
-    niches.keywords {
+    keywords {
       UUID keyword_id PK
       UUID niche_id FK
       TEXT keyword
@@ -107,7 +98,7 @@ erDiagram
       JSONB settings
       TIMESTAMPTZ created_at
     }
-    posts.posts {
+    posts {
       UUID post_id PK
       UUID integration_profile_id FK
       TEXT asset_url
@@ -118,7 +109,7 @@ erDiagram
       TIMESTAMPTZ last_posted_at
       TIMESTAMPTZ created_at
     }
-    analytics.metrics {
+    analytics_metrics {
       SERIAL id PK
       UUID post_id FK
       DATE date
@@ -127,14 +118,14 @@ erDiagram
       BIGINT saves
     }
 
-    identity.tenants ||--o{ identity.tenant_users : ""
-    identity.users   ||--o{ identity.tenant_users : ""
-    identity.tenants ||--o{ identity.projects    : ""
-    identity.projects ||--o{ integration_profiles : ""
-    niches.niches    ||--o{ niches.keywords      : ""
-    niches.niches    ||--o{ integration_profiles : ""
-    integration_profiles ||--o{ posts.posts        : ""
-    posts.posts      ||--o{ analytics.metrics   : ""
+    tenants ||--o{ tenant_users : ""
+    users   ||--o{ tenant_users : ""
+    tenants ||--o{ projects    : ""
+    projects ||--o{ integration_profiles : ""
+    niches    ||--o{ keywords      : ""
+    niches    ||--o{ integration_profiles : ""
+    integration_profiles ||--o{ posts        : ""
+    posts      ||--o{ analytics_metrics   : ""
 ```
 
 ---
