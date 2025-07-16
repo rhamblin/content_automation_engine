@@ -3,11 +3,11 @@ from abc import ABC, abstractmethod
 
 class IImageProvider(ABC):
     @abstractmethod
-    def generate_image(self, prompt: str) -> str:
+    def generate_image(self) -> str:
         pass
 
 
-class IModelProvider(ABC):
+class ITextProvider(ABC):
     @abstractmethod
     def generate_text(self, prompt: str) -> str:
         pass

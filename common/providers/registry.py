@@ -1,16 +1,16 @@
 from typing import Type
 
-from .base import IImageProvider, IModelProvider, IChannel
-from .image.openai_image import OpenAIImageProvider
-from .model.openai_text import OpenAIModelProvider
+from .base import IImageProvider, ITextProvider, IChannel
+from .image.source_image import SourceImageProvider
+from .model.openai_text import OpenAITextProvider
 from .channel.pinterest import PinterestChannel
 
 _image_providers = {
-    "openai_image": OpenAIImageProvider,
+    "source_image": SourceImageProvider,
 }
 
-_model_providers = {
-    "openai_text": OpenAIModelProvider,
+_text_providers = {
+    "openai_text": OpenAITextProvider,
 }
 
 _channels = {
@@ -23,8 +23,8 @@ def get_image_provider(key: str) -> IImageProvider:
     return cls()
 
 
-def get_model_provider(key: str) -> IModelProvider:
-    cls: Type[IModelProvider] = _model_providers[key]
+def get_text_provider(key: str) -> ITextProvider:
+    cls: Type[ITextProvider] = _text_providers[key]
     return cls()
 
 
