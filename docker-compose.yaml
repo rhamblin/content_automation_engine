@@ -12,12 +12,12 @@ services:
     networks:
       - backend
     depends_on:
-      - pin-dispatcher
+      - post-dispatcher
 
-  pin-worker:
+  post-worker:
     build:
       context: .
-      dockerfile: services/pin-worker/Dockerfile
+      dockerfile: services/post-worker/Dockerfile
     restart: unless-stopped
     secrets:
       - open-ai-api-key
@@ -31,9 +31,9 @@ services:
       - redis
       - db
 
-  pin-dispatcher:
+  post-dispatcher:
     build:
-      context: ./services/pin-dispatcher
+      context: ./services/post-dispatcher
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -41,7 +41,7 @@ services:
       - backend
     depends_on:
       - redis
-      - pin-worker
+      - post-worker
 
   niches-api:
     build:
@@ -57,6 +57,90 @@ services:
       - database
     depends_on:
       - db
+
+  integration-profiles-api:
+    build:
+      context: .
+      dockerfile: services/integration-profiles-api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "8003:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  org-service:
+    build:
+      context: .
+      dockerfile: services/org-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "8004:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  projects-api:
+    build:
+      context: .
+      dockerfile: services/projects-api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "8005:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  poster-worker:
+    build:
+      context: .
+      dockerfile: services/poster-worker/Dockerfile
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - post-worker
+
+  ad-automation:
+    build:
+      context: .
+      dockerfile: services/ad-automation/Dockerfile
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - poster-worker
+
+  analytics-capture:
+    build:
+      context: .
+      dockerfile: services/analytics-capture/Dockerfile
+    restart: unless-stopped
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  pruner:
+    build:
+      context: .
+      dockerfile: services/pruner/Dockerfile
+    restart: unless-stopped
+    networks:
+      - backend
 
   db:
     image: postgres:16-alpine3.22

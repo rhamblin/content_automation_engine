@@ -1,6 +1,5 @@
 from db_core.models.base import Base
 from db_core.models.niche import Niche
-from db_core.models.pin import Pin
 from typing import List
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
@@ -20,12 +19,6 @@ class Keyword(Base):
         lazy="selectin"
     )
 
-    pins: Mapped[List["Pin"]] = relationship(
-        "Pin",
-        back_populates="keyword",
-        cascade="all, delete",
-        lazy="selectin"
-    )
 
     def to_dict(self) -> dict:
         """

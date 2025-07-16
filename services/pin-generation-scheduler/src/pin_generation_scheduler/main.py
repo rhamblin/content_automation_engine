@@ -1,4 +1,5 @@
 import time
+import os
 import requests
 import threading
 from schedule import repeat, every, run_pending
@@ -11,15 +12,17 @@ def fire_dispatcher_in_thread():
 def fire_dispatcher():
     print("Fired!", flush=True)
     
-    url = "http://pin-dispatcher:80/v1/generate/pin/dispatch"
+    project_id = os.getenv("DEFAULT_PROJECT_ID", "")
+    profile_id = os.getenv("DEFAULT_PROFILE_ID", "")
+    url = f"http://post-dispatcher:80/projects/{project_id}/integration_profiles/{profile_id}/generate"
     body = {}
     response = requests.post(url, json=body, timeout=5)
     response_data = response.json()
 
     if response.ok:
-        print(f'Fired a dispatcher call correctly: {response_data['job_id']}', flush=True)
+        print(f"Fired a dispatcher call correctly: {response_data['job_id']}", flush=True)
     else:
-        print('Fired a dispatcher call incorrectly', flush=True)
+        print("Fired a dispatcher call incorrectly", flush=True)
     
 while True:
     run_pending()

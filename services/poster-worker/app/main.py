@@ -1,0 +1,1 @@
+# skeleton poster worker

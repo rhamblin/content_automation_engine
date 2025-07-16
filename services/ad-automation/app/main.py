@@ -1,0 +1,1 @@
+# skeleton ad automation worker

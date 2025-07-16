@@ -6,13 +6,14 @@ import uuid
 app = FastAPI()
 queue = Redis(host="redis", port=6379)
 
-@app.post("/v1/generate/pin/dispatch")
-def dispatch(payload: dict):
+@app.post("/projects/{project_id}/integration_profiles/{profile_id}/generate")
+def dispatch(project_id: str, profile_id: str, payload: dict):
     job_payload = {
         "job_id": str(uuid.uuid4()),
         "data": payload.get("data", {})
     }
-    queue.lpush("generate_pin_queue", json.dumps(job_payload))
+    job_payload["integration_profile_id"] = profile_id
+    queue.lpush("generate_post_queue", json.dumps(job_payload))
     return {
         "status": "queued",
         "job_id": job_payload["job_id"]
