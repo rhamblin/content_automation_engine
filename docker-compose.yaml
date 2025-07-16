@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     restart: unless-stopped
-    networks: 
+    networks:
       - backend
 
   pin-generation-scheduler:
@@ -12,18 +12,21 @@ services:
     networks:
       - backend
     depends_on:
-      - pin-dispatcher
+      - post-dispatcher
 
-  pin-worker:
+  post-worker:
     build:
       context: .
-      dockerfile: services/pin-worker/Dockerfile
+      dockerfile: services/post-worker/Dockerfile
     restart: unless-stopped
     secrets:
       - open-ai-api-key
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
       DB_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+      DEFAULT_TENANT_ID: ${DEFAULT_TENANT_ID}
+      DEFAULT_PROJECT_ID: ${DEFAULT_PROJECT_ID}
+      DEFAULT_PROFILE_ID: ${DEFAULT_PROFILE_ID}
     networks:
       - backend
       - database
@@ -31,9 +34,9 @@ services:
       - redis
       - db
 
-  pin-dispatcher:
+  post-dispatcher:
     build:
-      context: ./services/pin-dispatcher
+      context: ./services/post-dispatcher
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -41,7 +44,91 @@ services:
       - backend
     depends_on:
       - redis
-      - pin-worker
+      - post-worker
+
+  integration-profiles-api:
+    build:
+      context: .
+      dockerfile: services/integration-profiles-api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "8003:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  org-service:
+    build:
+      context: .
+      dockerfile: services/org-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+      DEV_AUTH_BYPASS: ${DEV_AUTH_BYPASS}
+    ports:
+      - "8004:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  projects-api:
+    build:
+      context: .
+      dockerfile: services/projects-api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "8005:80"
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  poster-worker:
+    build:
+      context: ./services/poster-worker
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - post-worker
+
+  ad-automation:
+    build:
+      context: ./services/ad-automation
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - poster-worker
+
+  analytics-capture:
+    build:
+      context: ./services/analytics-capture
+    restart: unless-stopped
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
+
+  pruner:
+    build:
+      context: ./services/pruner
+    restart: unless-stopped
+    networks:
+      - backend
+      - database
+    depends_on:
+      - db
 
   niches-api:
     build:
@@ -76,7 +163,7 @@ services:
       - "5432:5432"
     networks:
       - database
-  
+
   blob-storage:
     image: mcr.microsoft.com/azure-storage/azurite
     command: "azurite-blob --blobHost 0.0.0.0"
@@ -86,7 +173,7 @@ services:
       - blob_storage:/data
     networks:
       - database
-    
+
 secrets:
   open-ai-api-key:
     file: ./secrets/openai-apikey.txt
