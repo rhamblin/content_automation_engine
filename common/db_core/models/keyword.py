@@ -6,6 +6,7 @@ from typing import Optional
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from constants import constants
 
 from db_core.models.base import Base
 
@@ -15,7 +16,7 @@ class Keyword(Base):
     __table_args__ = {"schema": "niches"}
 
     keyword_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("niches.niches.niche_id"), nullable=False)
+    niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey(constants.NICHE_ID_FULL_QUALIFIER), nullable=False)
     keyword: Mapped[str] = mapped_column(String, nullable=False)
 
     niche: Mapped["Niche"] = relationship(back_populates="keywords", lazy="selectin")
