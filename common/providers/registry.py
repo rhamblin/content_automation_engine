@@ -5,6 +5,7 @@ from .image.source_image import SourceImageProvider
 from .model.openai_text import OpenAITextProvider
 from .channel.pinterest import PinterestChannel
 
+
 _image_providers = {
     "source_image": SourceImageProvider,
 }

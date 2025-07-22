@@ -7,13 +7,14 @@ from sqlalchemy.orm import selectinload
 from db_core.db_sync import get_db_session
 from db_core.models import IntegrationProfile, Post, PostStatus, Niche, Keyword
 from common.providers import registry
+from common.constants import constants
 
 broker = Redis(host="redis", port=6379)
 
 
 def process_message() -> None:
     while True:
-        result = broker.blpop("generate_post_queue", timeout=0)
+        result = broker.blpop(constants.GENERATE_POST_QUEUE_NAME, timeout=0)
         if result:
             _, message = result
             try:
@@ -56,7 +57,7 @@ def generate_post(job_id: str, profile_id: str) -> None:
         session.commit()
         session.refresh(post)
 
-        broker.rpush("post_ready_events", json.dumps({"post_id": str(post.post_id)}))
+        broker.rpush(constants.POST_READY_BROKER_NAME, json.dumps({"post_id": str(post.post_id)}))
         print(f"[JOB {job_id}] Generated post {post.post_id}", flush=True)
 
 

@@ -11,7 +11,7 @@ def fire_dispatcher_in_thread():
 def fire_dispatcher():
     print("Fired!", flush=True)
     
-    url = "http://pin-dispatcher:80/v1/generate/pin/dispatch"
+    url = "http://post-dispatcher:80/v1/projects/00000000-0000-0000-0000-000000000003/integration_profiles/00000000-0000-0000-0000-000000000007/generate"
     body = {}
     response = requests.post(url, json=body, timeout=5)
     response_data = response.json()

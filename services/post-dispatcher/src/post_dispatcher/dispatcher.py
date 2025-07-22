@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from redis import Redis
 import json
 import uuid
+from common.constants import constants
 
 app = FastAPI()
 queue = Redis(host="redis", port=6379)
@@ -15,5 +16,5 @@ def dispatch(project_id: str, profile_id: str, payload: dict):
         "integration_profile_id": profile_id,
         "data": payload.get("data", {}),
     }
-    queue.lpush("generate_post_queue", json.dumps(job_payload))
+    queue.lpush(constants.GENERATE_POST_QUEUE_NAME, json.dumps(job_payload))
     return {"status": "queued", "job_id": job_payload["job_id"]}
