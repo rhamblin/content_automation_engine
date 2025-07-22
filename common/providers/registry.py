@@ -1,17 +1,17 @@
 from typing import Type
 
 from .base import IImageProvider, ITextProvider, IChannel
-from .image.source_image import SourceImageProvider
-from .model.openai_text import OpenAITextProvider
+from .image.unsplash import UnsplashImageProvider
+from .model.openai import OpenAITextProvider
 from .channel.pinterest import PinterestChannel
 
 
 _image_providers = {
-    "source_image": SourceImageProvider,
+    "unsplash": UnsplashImageProvider,
 }
 
 _text_providers = {
-    "openai_text": OpenAITextProvider,
+    "openai": OpenAITextProvider,
 }
 
 _channels = {

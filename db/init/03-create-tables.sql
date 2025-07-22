@@ -70,7 +70,7 @@ CREATE TABLE integration_profiles (
   project_id            UUID       NOT NULL REFERENCES identity.projects(project_id),
   niche_id              UUID       NOT NULL REFERENCES niches.niches(niche_id),
   image_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_image'
-  model_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_text'
+  text_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_text'
   channel_key           TEXT       NOT NULL,    -- e.g. 'pinterest'
   settings              JSONB,                 -- prompt templates, budgets, thresholds, schedule
   created_at            TIMESTAMPTZ NOT NULL DEFAULT now()

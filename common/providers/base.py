@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class IImageProvider(ABC):
     @abstractmethod
-    def generate_image(self) -> str:
+    def generate_image(self, keyword: str) -> str:
         pass
 
 

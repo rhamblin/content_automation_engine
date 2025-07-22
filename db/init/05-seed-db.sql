@@ -25,7 +25,7 @@ BEGIN
     -- 2. Domain Data: Niche & Keywords
     INSERT INTO niches.niches (niche_id, name, domain, default_budget, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000004', 'Sports Sneakers', 'shoes.example.com', 100, NOW());
+      ('00000000-0000-0000-0000-000000000004', 'Sports Sneakers', 'https://www.chefexotic.com', 100, NOW());
 
     INSERT INTO niches.keywords (keyword_id, niche_id, keyword)
     VALUES
@@ -39,7 +39,7 @@ BEGIN
       project_id,
       niche_id,
       image_provider_key,
-      model_provider_key,
+      text_provider_key,
       channel_key,
       settings,
       created_at
@@ -47,8 +47,8 @@ BEGIN
       '00000000-0000-0000-0000-000000000007',
       '00000000-0000-0000-0000-000000000003',
       '00000000-0000-0000-0000-000000000004',
-      'source_image',
-      'openai_text',
+      'unsplash',
+      'openai',
       'pinterest',
       '{"default_budget":50,"post_dimensions":"1000x1500"}',
       NOW()

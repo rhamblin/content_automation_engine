@@ -38,16 +38,16 @@ def generate_post(job_id: str, profile_id: str) -> None:
         profile = result.scalar_one()
 
         image_provider = registry.get_image_provider(profile.image_provider_key)
-        model_provider = registry.get_model_provider(profile.model_provider_key)
+        text_provider = registry.get_text_provider(profile.text_provider_key)
 
         keywords = ", ".join(kw.keyword for kw in profile.niche.keywords)
-        title = model_provider.generate_text(f"title for {profile.niche.name} {keywords}")
-        description = model_provider.generate_text(f"description for {profile.niche.name} {keywords}")
-        image_url = image_provider.generate_image(f"image for {profile.niche.name}")
+        title = text_provider.generate_text(f"title for {profile.niche.name} {keywords}")
+        description = text_provider.generate_text(f"description for {profile.niche.name} {keywords}")
+        # image_url = image_provider.generate_image(f"image for niche {profile.niche.name}")
 
         post = Post(
             integration_profile_id=profile.integration_profile_id,
-            asset_url=image_url,
+            asset_url="fdfd",#image_url,
             title=title,
             description=description,
             hashtags=[kw.keyword for kw in profile.niche.keywords],

@@ -4,9 +4,12 @@ import json
 import uuid
 from constants import constants
 
-app = FastAPI()
-queue = Redis(host="redis", port=6379)
+app = FastAPI(
+    title="Post Dispatcher",
+    description="This is what submits a job to the broker signalling a post should be generated",
+    )
 
+queue = Redis(host="redis", port=6379)
 
 @app.post("/v1/projects/{project_id}/integration_profiles/{profile_id}/generate")
 def dispatch(project_id: str, profile_id: str, payload: dict):

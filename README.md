@@ -93,7 +93,7 @@ erDiagram
       UUID project_id FK
       UUID niche_id FK
       TEXT image_provider_key
-      TEXT model_provider_key
+      TEXT text_provider_key
       TEXT channel_key
       JSONB settings
       TIMESTAMPTZ created_at
