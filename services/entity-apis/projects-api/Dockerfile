@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 FROM python:3.13.5-slim
 WORKDIR /app
 COPY common/db_core ./db_core

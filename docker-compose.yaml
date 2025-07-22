@@ -5,9 +5,10 @@ services:
     networks:
       - backend
 
-  pin-generation-scheduler:
+  post-generation-scheduler:
     build:
-      context: ./services/pin-generation-scheduler
+      context: .
+      dockerfile: services/post-generation-scheduler/Dockerfile
     restart: unless-stopped
     networks:
       - backend
@@ -33,7 +34,8 @@ services:
 
   post-dispatcher:
     build:
-      context: ./services/post-dispatcher
+      context: .
+      dockerfile: services/post-dispatcher/Dockerfile
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -118,20 +120,20 @@ services:
   #   depends_on:
   #     - db
 
-  niches-api:
-    build:
-      context: .
-      dockerfile: services/entity-apis/niches/Dockerfile
-    restart: unless-stopped
-    environment:
-      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
-    ports:
-      - "8002:80"
-    networks:
-      - backend
-      - database
-    depends_on:
-      - db
+  # niches-api:
+  #   build:
+  #     context: .
+  #     dockerfile: services/entity-apis/niches/Dockerfile
+  #   restart: unless-stopped
+  #   environment:
+  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+  #   ports:
+  #     - "8002:80"
+  #   networks:
+  #     - backend
+  #     - database
+  #   depends_on:
+  #     - db
 
   db:
     image: postgres:16-alpine3.22

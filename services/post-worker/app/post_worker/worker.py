@@ -6,8 +6,8 @@ from sqlalchemy.orm import selectinload
 
 from db_core.db_sync import get_db_session
 from db_core.models import IntegrationProfile, Post, PostStatus, Niche, Keyword
-from common.providers import registry
-from common.constants import constants
+from providers import registry
+from constants import constants
 
 broker = Redis(host="redis", port=6379)
 

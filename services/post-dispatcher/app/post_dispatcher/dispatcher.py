@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from redis import Redis
 import json
 import uuid
-from common.constants import constants
+from constants import constants
 
 app = FastAPI()
 queue = Redis(host="redis", port=6379)
