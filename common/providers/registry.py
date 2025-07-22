@@ -2,7 +2,7 @@ from typing import Type
 
 from .base import IImageProvider, ITextProvider, IChannel
 from .image.unsplash import UnsplashImageProvider
-from .model.openai import OpenAITextProvider
+from .text.openai import OpenAITextProvider
 from .channel.pinterest import PinterestChannel
 
 

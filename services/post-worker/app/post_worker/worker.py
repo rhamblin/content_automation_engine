@@ -11,7 +11,6 @@ from constants import constants
 
 broker = Redis(host="redis", port=6379)
 
-
 def process_message() -> None:
     while True:
         result = broker.blpop(constants.GENERATE_POST_QUEUE_NAME, timeout=0)
@@ -37,8 +36,9 @@ def generate_post(job_id: str, profile_id: str) -> None:
         )
         profile = result.scalar_one()
 
-        image_provider = registry.get_image_provider(profile.image_provider_key)
-        text_provider = registry.get_text_provider(profile.text_provider_key)
+        
+        image_provider = registry.get_image_provider(profile.image_provider_key) #
+        text_provider = registry.get_text_provider(profile.text_provider_key) #TODO: choose key based on provider
 
         keywords = ", ".join(kw.keyword for kw in profile.niche.keywords)
         title = text_provider.generate_text(f"title for {profile.niche.name} {keywords}")
@@ -59,7 +59,6 @@ def generate_post(job_id: str, profile_id: str) -> None:
 
         broker.rpush(constants.POST_READY_BROKER_NAME, json.dumps({"post_id": str(post.post_id)}))
         print(f"[JOB {job_id}] Generated post {post.post_id}", flush=True)
-
 
 if __name__ == "__main__":
     process_message()

@@ -24,6 +24,8 @@ services:
       - open-ai-api-key
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
+      UNSPLASH_ACCESSKEY: /run/secrets/unsplash-access-key
+      UNSPLASH_SECRETKEY: /run/secrets/unsplash-secret-key
       DB_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
     networks:
       - backend
@@ -167,6 +169,10 @@ services:
 secrets:
   open-ai-api-key:
     file: ./secrets/openai-apikey.txt
+  unsplash-access-key:
+    file: ./secrets/unsplash-accesskey.txt
+  unsplash-secret-key:
+    file: ./secrets/unsplash-secretkey.txt
 
 volumes:
   db_data:
