@@ -5,7 +5,7 @@ import os
 client = OpenAI()
 client.api_key = None  # will be set by get_api_key()
 
-def __get_api_key():
+def __get_api_key() -> str:
     secret_path = os.getenv('OPENAI_API_KEY')
     openai_api_key = ""
 
