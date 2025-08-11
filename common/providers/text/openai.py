@@ -14,8 +14,6 @@ def __get_api_key() -> str:
 
     return openai_api_key
 
-client.api_key = __get_api_key()
-
 class OpenAITextProvider(ITextProvider):
     
     def generate_text(self, prompt: str) -> str:
@@ -43,6 +41,8 @@ class OpenAITextProvider(ITextProvider):
                 "Task: Generate a clickable, under 50-character Pin title optimized for engagement and discovery."
             )}
         ]
+        client.api_key = __get_api_key()
+
         response = client.chat.completions.create(
             model="gpt-4.1",
             messages=messages,

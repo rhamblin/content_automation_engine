@@ -43,19 +43,19 @@ def generate_post(job_id: str, profile_id: str) -> None:
         keywords = ", ".join(kw.keyword for kw in profile.niche.keywords)
         title = text_provider.generate_text(f"title for {profile.niche.name} {keywords}")
         description = text_provider.generate_text(f"description for {profile.niche.name} {keywords}")
-        # image_url = image_provider.generate_image(f"image for niche {profile.niche.name}")
+        image = image_provider.generate_image(f"image for niche {profile.niche.name}")
 
-        post = Post(
-            integration_profile_id=profile.integration_profile_id,
-            asset_url="fdfd",#image_url,
-            title=title,
-            description=description,
-            hashtags=[kw.keyword for kw in profile.niche.keywords],
-            status=PostStatus.ready,
-        )
-        session.add(post)
-        session.commit()
-        session.refresh(post)
+        # post = Post(
+        #     integration_profile_id=profile.integration_profile_id,
+        #     asset_url="fdfd",#image_url,
+        #     title=title,
+        #     description=description,
+        #     hashtags=[kw.keyword for kw in profile.niche.keywords],
+        #     status=PostStatus.ready,
+        # )
+        # session.add(post)
+        # session.commit()
+        # session.refresh(post)
 
         broker.rpush(constants.POST_READY_BROKER_NAME, json.dumps({"post_id": str(post.post_id)}))
         print(f"[JOB {job_id}] Generated post {post.post_id}", flush=True)

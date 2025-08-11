@@ -22,6 +22,7 @@ services:
     restart: unless-stopped
     secrets:
       - open-ai-api-key
+      - unsplash-access-key
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
       UNSPLASH_ACCESSKEY: /run/secrets/unsplash-access-key
