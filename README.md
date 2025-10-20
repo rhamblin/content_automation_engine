@@ -148,8 +148,19 @@ erDiagram
     Tear down while keeping persisted volumes as the same
     docker compose --env-file ./config/dev/variables.env down
 
-2. **See db/init/05-seed-db.sql for sample data**  
+3. **See db/init/05-seed-db.sql for sample data**  
   
+---
+
+## Important Notes
+These are the services in order of dependency. This sequence is important when needing to start a dev container
+This should be kept up to date as new containers/services are added and removed
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps db
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps redis
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-worker
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-dispatcher
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-generation-scheduler
+
 ---
 
 ## Next Steps
