@@ -1,0 +1,45 @@
+{
+  "name": "Post Worker Dev Container For Development",
+  "build": {
+    "dockerfile": "../services/post-worker/Dockerfile",
+    "context": ".."
+  },
+
+  "workspaceFolder": "/app",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+
+  // Keep container alive for interactive dev
+  "overrideCommand": true,
+
+  // Join your compose network so hostnames like `db` / `redis` resolve
+  "runArgs": ["--env-file=./config/dev/variables.env", "--network=content_automation_engine_development"],
+
+  // Mount secret files exactly like Compose `/run/secrets/...`
+  "mounts": [
+    "source=${localWorkspaceFolder}/secrets/openai-apikey.txt,target=/run/secrets/open-ai-api-key,type=bind,readonly",
+    "source=${localWorkspaceFolder}/secrets/unsplash-accesskey.txt,target=/run/secrets/unsplash-access-key,type=bind,readonly"
+  ],
+
+  // Env vars inside the container
+  "containerEnv": {
+    "PYTHONPATH": "/app/services/post-worker/app:/app/common:/app",
+    // App expects envs to point at the mounted secret files (same as your Compose pattern)
+    "OPENAI_API_KEY": "/run/secrets/open-ai-api-key"
+    ,"UNSPLASHACCESSKEY": "/run/secrets/unsplash-access-key"
+    ,"DB_URL": "postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}"
+  },
+
+  "forwardPorts": [5678],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy"
+      ]
+    }
+  },
+
+  "postCreateCommand": "pip install debugpy"
+}

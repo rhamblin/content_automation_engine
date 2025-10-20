@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Attach to Container",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      // 👇 Updated so local “app/” matches remote “/app/app”
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/app",
+          "remoteRoot": "/app/app"
+        }
+      ],
+      "justMyCode": true
+    }
+  ]
+}
