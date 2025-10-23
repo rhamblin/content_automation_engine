@@ -28,7 +28,7 @@ services:
     environment:
       OPENAI_API_KEY: /run/secrets/open-ai-api-key
       UNSPLASH_ACCESSKEY: /run/secrets/unsplash-access-key
-      DB_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
     networks:
       - backend
       - database
@@ -147,7 +147,7 @@ services:
     environment:
       POSTGRES_USER:     "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB:       "${POSTGRES_DB}"
+      POSTGRES_DB:       "${POSTGRES_DB_NAME}"
       APP_DB_USER:       "${APP_DB_USER}"
       APP_DB_PASSWORD:   "${APP_DB_PASSWORD}"
       ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"

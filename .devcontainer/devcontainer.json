@@ -26,9 +26,13 @@
     // App expects envs to point at the mounted secret files (same as your Compose pattern)
     "OPENAI_API_KEY": "/run/secrets/open-ai-api-key"
     ,"UNSPLASHACCESSKEY": "/run/secrets/unsplash-access-key"
-    ,"DB_URL": "postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}"
   },
 
+  // Build DB_URL from variables loaded by env-file
+  "remoteEnv": {
+    "DB_URL": "postgresql+asyncpg://${containerEnv:APP_DB_USER}:${containerEnv:APP_DB_PASSWORD}@db:5432/${containerEnv:APP_NAME}_${containerEnv:APP_ENV}"
+  },
+  
   "forwardPorts": [5678],
 
   "customizations": {
