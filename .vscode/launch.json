@@ -12,8 +12,8 @@
       // 👇 Updated so local “app/” matches remote “/app/app”
       "pathMappings": [
         {
-          "localRoot": "${workspaceFolder}/app",
-          "remoteRoot": "/app/app"
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "/app"
         }
       ],
       "justMyCode": true
