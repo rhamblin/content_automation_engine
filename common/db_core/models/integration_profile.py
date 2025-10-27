@@ -18,6 +18,7 @@ from db_core.models.base import Base
 
 class IntegrationProfile(Base):
     __tablename__ = "integration_profiles"
+    __table_args__ = {'schema': 'public'}
 
     integration_profile_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("identity.projects.project_id", ondelete="CASCADE"), nullable=False)
