@@ -4,12 +4,11 @@ import uuid
 from datetime import datetime
 from typing import List
 
-import constants.constants
 from sqlalchemy import String, DateTime, ForeignKey, JSON
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
-from constants import constants
+from common.constants import constants
 
 
 from .base import Base

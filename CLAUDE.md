@@ -19,6 +19,12 @@ This is a modular, multi-tenant content automation platform built with microserv
   - `providers/`: Plugin-based provider system for AI services (text, image, channels)
   - `constants/`: Shared constants including Redis queue names
 
+- **Test Directory (`test/`)**: Containerized test suite
+  - Uses pytest with testcontainers for isolated PostgreSQL instances
+  - Self-contained test environment with separate dependencies (`test/requirements.txt`)
+  - Test fixtures in `test/conftest.py` provide database sessions and schema setup
+  - Tests run in Docker container via the `test` profile
+
 - **Database**: PostgreSQL with multi-schema design:
   - `identity` schema: tenants, users, projects
   - `niches` schema: content domains and keywords
@@ -51,6 +57,21 @@ docker compose --env-file ./config/dev/variables.env down -v
 docker compose --env-file ./config/dev/variables.env down
 ```
 
+### Testing
+```bash
+# Run all tests
+docker compose --profile test run --rm test-runner
+
+# Run specific test file
+docker compose --profile test run --rm test-runner pytest test/path/to/test.py -v
+
+# Run with pytest options (verbose, show print statements)
+docker compose --profile test run --rm test-runner pytest test/ -v -s
+
+# Rebuild test container after dependency changes
+docker compose --profile test build test-runner
+```
+
 ### Database
 - Database initialization scripts: `db/init/`
 - Sample data: `db/init/05-seed-db.sql`
@@ -69,6 +90,9 @@ docker compose --env-file ./config/dev/variables.env down
 - Provider interfaces: `common/providers/base.py`
 - Environment variables: `config/dev/variables.env`
 - API secrets: `secrets/` directory
+- Test dependencies: `test/requirements.txt`
+- Test fixtures: `test/conftest.py`
+- Test Dockerfile: `test/Dockerfile`
 
 ## Current Development Status
 
