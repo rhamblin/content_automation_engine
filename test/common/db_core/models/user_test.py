@@ -21,6 +21,6 @@ def test_user_persistence(db_session):
     db_session.add(user)
     db_session.commit()
 
-    retrieved = db_session.query(User).filter_by(email="test@example.com").first()
+    retrieved = db_session.query(User).filter_by(email="testemail@email.com").first()
     assert retrieved is not None
-    assert retrieved.user_id == 'user.user_id'
+    assert retrieved.user_id == user.user_id

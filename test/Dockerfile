@@ -2,11 +2,6 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install Docker CLI for testcontainers to work with mounted socket
-RUN apt-get update && apt-get install -y \
-    docker.io \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install test dependencies
 COPY test/requirements.txt /app/test/requirements.txt
 RUN pip install --no-cache-dir -r test/requirements.txt
