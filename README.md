@@ -148,8 +148,37 @@ erDiagram
     Tear down while keeping persisted volumes as the same
     docker compose --env-file ./config/dev/variables.env down
 
-3. **See db/init/05-seed-db.sql for sample data**  
-  
+3. **See db/init/05-seed-db.sql for sample data**
+
+---
+
+## Testing
+
+The project uses pytest with containerized dependencies for isolated test execution.
+
+### Running Tests
+
+```bash
+# Run all tests
+docker compose --env-file ./config/dev/variables.env --profile test run --rm test-runner
+
+# Run specific test file
+docker compose --env-file ./config/dev/variables.env --profile test run --rm test-runner pytest test/common/db_core/models/user_test.py -v
+
+# Rebuild test container after dependency changes
+docker compose --env-file ./config/dev/variables.env --profile test build test-runner
+```
+
+### Test Architecture
+
+- **Test fixtures**: `test/conftest.py` - Uses testcontainers to spin up isolated PostgreSQL instances
+- **Test dependencies**: `test/requirements.txt` - Isolated from service dependencies
+- **Test container**: `test/Dockerfile` - Self-contained test environment
+
+The test runner has access to:
+- All common modules (db_core, providers, etc.)
+- Docker socket for testcontainers
+
 ---
 
 ## Important Notes

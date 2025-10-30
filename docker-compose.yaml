@@ -51,6 +51,17 @@ services:
       - redis
       - post-worker
 
+  test-runner:
+    build:
+      context: .
+      dockerfile: test/Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Required for testcontainers
+    environment:
+      - TESTCONTAINERS_RYUK_DISABLED=true  # Disable Ryuk when running in Docker
+    profiles:
+      - test  # Only runs when explicitly requested
+
   # integration-profiles-api:
   #   build:
   #     context: .

@@ -6,7 +6,7 @@ from typing import Optional
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from constants import constants
+from common.constants import constants
 
 from .base import Base
 
