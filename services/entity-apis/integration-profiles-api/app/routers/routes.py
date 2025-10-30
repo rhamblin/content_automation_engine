@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from db_core.db_async import get_db_session
-from db_core.models import IntegrationProfile
+from common.db_core.db_async import get_db_session
+from common.db_core.models import IntegrationProfile
 
 router = APIRouter(prefix="/integration_profiles", tags=["Integration Profiles"])
 

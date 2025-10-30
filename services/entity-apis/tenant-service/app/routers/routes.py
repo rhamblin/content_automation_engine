@@ -4,8 +4,8 @@ from sqlalchemy import select
 from typing import List
 from uuid import UUID
 
-from db_core.db_async import get_db_session
-from db_core.models import Tenant
+from common.db_core.db_async import get_db_session
+from common.db_core.models import Tenant
 
 router = APIRouter(prefix="/tenants", tags=["Tenants"])
 

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from db_core.db_async import get_db_session
+from common.db_core.db_async import get_db_session
 import app.services.service as service
 from app.schemas.schema import (
     NicheCreate, NicheUpdate, NicheRead,
