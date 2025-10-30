@@ -58,7 +58,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Required for testcontainers
     environment:
-      - TESTCONTAINERS_RYUK_DISABLED=true  # Disable Ryuk when running in Docker
+      - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal  
     profiles:
       - test  # Only runs when explicitly requested
 

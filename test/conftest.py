@@ -1,5 +1,4 @@
 import pytest
-import time
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
@@ -19,25 +18,13 @@ def engine(postgres_container):
     connection_url = postgres_container.get_connection_url()
     engine = create_engine(connection_url, echo=False)
 
-    # Retry connection with exponential backoff
-    max_retries = 5
-    retry_delay = 1
-    for attempt in range(max_retries):
-        try:
-            # Create all schemas that your models use
-            with engine.connect() as conn:
-                conn.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
-                conn.execute(text("CREATE SCHEMA IF NOT EXISTS niches"))
-                conn.execute(text("CREATE SCHEMA IF NOT EXISTS posts"))
-                conn.execute(text("CREATE SCHEMA IF NOT EXISTS analytics"))
-                conn.commit()
-            break
-        except OperationalError as e:
-            if attempt < max_retries - 1:
-                time.sleep(retry_delay)
-                retry_delay *= 2
-            else:
-                raise
+    # Create all schemas that your models use
+    with engine.connect() as conn:
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS niches"))
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS posts"))
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS analytics"))
+        conn.commit()
 
     # Create all tables
     Base.metadata.create_all(engine)
