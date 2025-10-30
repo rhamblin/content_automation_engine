@@ -5,10 +5,10 @@ from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from db_core.db_async import get_db_session
-from db_core.models import IntegrationProfile, Post, PostStatus, Niche, Keyword
-from providers import registry
-from constants import constants
+from common.db_core.db_async import get_db_session
+from common.db_core.models import IntegrationProfile, Post, PostStatus, Niche, Keyword
+from common.providers import registry
+from common.constants import constants
 
 # Use async Redis client
 broker = Redis(host="redis", port=6379)

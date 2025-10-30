@@ -2,7 +2,7 @@ import pytest
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from db_core.models.base import Base
+from common.db_core.models.base import Base
 
 # Use SQLite in-memory database for fast testing
 TEST_DATABASE_URL = "sqlite:///:memory:"
