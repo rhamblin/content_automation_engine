@@ -12,7 +12,7 @@ from sqlalchemy.sql import func
 from constants import constants
 
 
-from db_core.models.base import Base
+from .base import Base
 # from 
 
 

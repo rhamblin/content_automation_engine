@@ -6,7 +6,7 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from db_core.models.base import Base
+from .base import Base
 
 
 class TenantUser(Base):
