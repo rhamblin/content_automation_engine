@@ -25,7 +25,7 @@ class Post(Base):
     __table_args__ = {"schema": "posts"}
 
     post_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    integration_profile_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("public.integration_profiles.integration_profile_id", ondelete="CASCADE"), nullable=False)
+    integration_profile_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("public.integration_profiles.integration_profile_id", ondelete="SET NULL"), nullable=True)
     asset_url: Mapped[str] = mapped_column(Text, nullable=False)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
@@ -34,5 +34,5 @@ class Post(Base):
     last_posted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
-    integration_profile: Mapped["IntegrationProfile"] = relationship("IntegrationProfile", back_populates="posts")
+    integration_profile: Mapped[Optional["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="posts")
     metrics: Mapped[List["Metric"]] = relationship("Metric", back_populates="post", cascade="all, delete", lazy="selectin")

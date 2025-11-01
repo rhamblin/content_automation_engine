@@ -710,3 +710,67 @@ def test_integration_profile_with_identical_provider_combinations(db_session):
 
     assert len(profiles) == 2
     assert profiles[0].settings != profiles[1].settings
+
+
+def test_delete_integration_profile_sets_null_on_posts(db_session):
+    """Test that deleting integration profile sets integration_profile_id to NULL on posts (ON DELETE SET NULL)"""
+    # Create dependencies
+    tenant = Tenant(name="Test Tenant")
+    db_session.add(tenant)
+    db_session.commit()
+
+    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
+    db_session.add(project)
+    db_session.commit()
+
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Create integration profile
+    profile = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="unsplash",
+        text_provider_key="openai",
+        channel_key="pinterest"
+    )
+    db_session.add(profile)
+    db_session.commit()
+
+    # Create posts associated with this profile
+    post1 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image1.jpg",
+        title="Test Post 1",
+        description="Description 1",
+        hashtags=["#test"]
+    )
+    post2 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image2.jpg",
+        title="Test Post 2",
+        description="Description 2",
+        hashtags=["#test"]
+    )
+    db_session.add_all([post1, post2])
+    db_session.commit()
+
+    # Store post IDs for later verification
+    post_ids = [post1.post_id, post2.post_id]
+
+    # Verify posts are linked to profile
+    assert db_session.query(Post).filter_by(integration_profile_id=profile.integration_profile_id).count() == 2
+
+    # Delete integration profile
+    db_session.delete(profile)
+    db_session.commit()
+
+    # Verify posts still exist but integration_profile_id is NULL
+    for post_id in post_ids:
+        post = db_session.query(Post).filter_by(post_id=post_id).first()
+        assert post is not None  # Post should still exist
+        assert post.integration_profile_id is None  # FK should be NULL
+
+    # Verify posts count remains the same
+    assert db_session.query(Post).filter(Post.post_id.in_(post_ids)).count() == 2
