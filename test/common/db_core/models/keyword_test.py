@@ -289,7 +289,7 @@ def test_keyword_to_readable_without_loaded_niche(db_session):
 # ============================================================================
 
 def test_keyword_empty_string(db_session):
-    """Test keyword with empty string"""
+    """Test keyword with empty string should be rejected"""
     # Create niche
     niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
     db_session.add(niche)
@@ -298,10 +298,12 @@ def test_keyword_empty_string(db_session):
     # Try to create keyword with empty string
     keyword = Keyword(niche_id=niche.niche_id, keyword="")
     db_session.add(keyword)
-    db_session.commit()
 
-    # Should be allowed by the model (no check constraint)
-    assert keyword.keyword == ""
+    # Should raise IntegrityError due to check constraint
+    with pytest.raises(IntegrityError) as exc_info:
+        db_session.commit()
+
+    assert "ck_keyword_not_empty" in str(exc_info.value).lower()
     db_session.rollback()
 
 
@@ -322,7 +324,6 @@ def test_keyword_very_long_text(db_session):
     retrieved = db_session.query(Keyword).filter_by(keyword_id=keyword.keyword_id).first()
     assert retrieved.keyword == long_keyword
     assert len(retrieved.keyword) == 500
-
 
 def test_keyword_special_characters(db_session):
     """Test keywords with special characters and unicode"""
@@ -360,28 +361,31 @@ def test_keyword_special_characters(db_session):
     retrieved_text = {kw.keyword for kw in retrieved}
     assert retrieved_text == set(special_keywords)
 
-
 def test_duplicate_keywords_in_same_niche(db_session):
-    """Test that duplicate keyword text is allowed in the same niche"""
+    """Test that duplicate keyword text is NOT allowed in the same niche"""
     # Create niche
     niche = Niche(name="Marketing", domain="marketing.com", default_budget=1500)
     db_session.add(niche)
     db_session.commit()
 
-    # Create duplicate keywords (same text, same niche)
-    keyword1 = Keyword(niche_id=niche.niche_id, keyword="SEO")
-    keyword2 = Keyword(niche_id=niche.niche_id, keyword="SEO")
-    db_session.add_all([keyword1, keyword2])
+    # Store niche_id before any potential rollback
+    niche_id = niche.niche_id
+
+    # Create first keyword
+    keyword1 = Keyword(niche_id=niche_id, keyword="SEO")
+    db_session.add(keyword1)
     db_session.commit()
 
-    # Should be allowed (no unique constraint on keyword text within niche)
-    keywords = db_session.query(Keyword).filter_by(
-        niche_id=niche.niche_id,
-        keyword="SEO"
-    ).all()
-    assert len(keywords) == 2
-    assert keyword1.keyword_id != keyword2.keyword_id
+    # Try to create duplicate keyword (same text, same niche)
+    keyword2 = Keyword(niche_id=niche_id, keyword="SEO")
+    db_session.add(keyword2)
 
+    # Should raise IntegrityError due to unique constraint
+    with pytest.raises(IntegrityError) as exc_info:
+        db_session.commit()
+
+    assert "uq_keyword_per_niche" in str(exc_info.value).lower()
+    db_session.rollback()
 
 def test_duplicate_keywords_across_niches(db_session):
     """Test that same keyword text can exist across different niches"""
