@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import String, DateTime
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
@@ -22,4 +21,4 @@ class User(Base):
     provider_sub: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
-    tenants: Mapped[List["TenantUser"]] = relationship("TenantUser", back_populates="user", cascade="all, delete", lazy="selectin")
+    tenant: Mapped["TenantUser"] = relationship("TenantUser", back_populates="user", cascade="all, delete", lazy="selectin", uselist=False)
