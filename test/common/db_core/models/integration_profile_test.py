@@ -666,7 +666,7 @@ def test_integration_profile_different_provider_combinations(db_session):
 
 
 def test_integration_profile_with_identical_provider_combinations(db_session):
-    """Test creating multiple profiles with identical provider combinations (should be allowed)"""
+    """Test that creating duplicate profiles with identical provider combinations raises IntegrityError"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
     db_session.add(tenant)
@@ -680,7 +680,7 @@ def test_integration_profile_with_identical_provider_combinations(db_session):
     db_session.add(niche)
     db_session.commit()
 
-    # Create two profiles with identical provider combinations but different settings
+    # Create first profile
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
@@ -689,6 +689,10 @@ def test_integration_profile_with_identical_provider_combinations(db_session):
         channel_key="pinterest",
         settings={"theme": "dark"}
     )
+    db_session.add(profile1)
+    db_session.commit()
+
+    # Try to create second profile with identical provider combination
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
@@ -697,19 +701,15 @@ def test_integration_profile_with_identical_provider_combinations(db_session):
         channel_key="pinterest",
         settings={"theme": "light"}
     )
-    db_session.add_all([profile1, profile2])
-    db_session.commit()
+    db_session.add(profile2)
 
-    # Verify both profiles exist with same provider combination
-    profiles = db_session.query(IntegrationProfile).filter_by(
-        project_id=project.project_id,
-        image_provider_key="unsplash",
-        text_provider_key="openai",
-        channel_key="pinterest"
-    ).all()
+    # Should raise IntegrityError due to unique constraint
+    with pytest.raises(IntegrityError) as exc_info:
+        db_session.commit()
 
-    assert len(profiles) == 2
-    assert profiles[0].settings != profiles[1].settings
+    # Verify it's a unique constraint violation
+    assert "unique constraint" in str(exc_info.value).lower() or "uq_integration_profile_combination" in str(exc_info.value).lower()
+    db_session.rollback()
 
 
 def test_delete_integration_profile_sets_null_on_posts(db_session):
