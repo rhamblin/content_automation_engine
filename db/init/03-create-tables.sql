@@ -17,7 +17,7 @@ CREATE TABLE identity.users (
 );
 
 CREATE TABLE identity.tenant_users (
-  tenant_id UUID REFERENCES identity.tenants(tenant_id),
+  tenant_id UUID REFERENCES identity.tenants(tenant_id) ON DELETE CASCADE,
   user_id   UUID REFERENCES identity.users(user_id),
   role      TEXT NOT NULL,                  -- admin, editor, viewer
   PRIMARY KEY (tenant_id, user_id),
