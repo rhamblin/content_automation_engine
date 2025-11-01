@@ -88,7 +88,7 @@ CREATE SCHEMA IF NOT EXISTS posts;
 
 CREATE TABLE posts.posts (
   post_id                UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  integration_profile_id UUID         NOT NULL REFERENCES integration_profiles(integration_profile_id),
+  integration_profile_id UUID         REFERENCES integration_profiles(integration_profile_id) ON DELETE SET NULL,
   asset_url              TEXT         NOT NULL,
   title                  TEXT         NOT NULL,
   description            TEXT         NOT NULL,

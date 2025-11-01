@@ -30,4 +30,4 @@ class IntegrationProfile(Base):
 
     project: Mapped["Project"] = relationship("Project", back_populates="integration_profiles")
     niche: Mapped["Niche"] = relationship("Niche", back_populates="integration_profiles")
-    posts: Mapped[List["Post"]] = relationship("Post", back_populates="integration_profile", cascade="all, delete", lazy="selectin")
+    posts: Mapped[List["Post"]] = relationship("Post", back_populates="integration_profile", lazy="selectin")
