@@ -11,7 +11,7 @@ A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post ge
 ```mermaid
 erDiagram
     tenants ||--o{ tenant_users : has
-    users   ||--o{ tenant_users : belongs_to
+    users   ||--|| tenant_users : belongs_to
     tenants ||--o{ projects    : owns
     projects ||--o{ integration_profiles : contains
     niches    ||--o{ keywords      : defines
