@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from testcontainers.postgres import PostgresContainer
 from common.db_core.models.base import Base
 
@@ -45,3 +46,34 @@ def db_session(engine):
     session.close()
     transaction.rollback()
     connection.close()
+
+@pytest.fixture(scope="session")
+def async_engine(postgres_container):
+    """Create an async database engine for testing async code"""
+    # Get connection URL from the container
+    connection_url = postgres_container.get_connection_url()
+
+    # Convert to async URL (replace psycopg2 driver with asyncpg)
+    async_url = connection_url.replace("postgresql+psycopg2://", "postgresql+asyncpg://")
+    if not async_url.startswith("postgresql+asyncpg://"):
+        async_url = connection_url.replace("postgresql://", "postgresql+asyncpg://")
+
+    async_engine = create_async_engine(async_url, echo=False)
+    yield async_engine
+
+    # Cleanup - note: sync_close() is deprecated, but dispose() works
+    async_engine.sync_engine.dispose()
+
+@pytest.fixture(scope="function")
+async def async_db_session(async_engine):
+    """Create a new async database session for each test"""
+    async_session_maker = async_sessionmaker(
+        bind=async_engine,
+        class_=AsyncSession,
+        expire_on_commit=False
+    )
+
+    async with async_session_maker() as session:
+        async with session.begin():
+            yield session
+            await session.rollback()
