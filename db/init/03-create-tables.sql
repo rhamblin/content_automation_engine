@@ -70,7 +70,8 @@ CREATE TABLE integration_profiles (
   text_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_text'
   channel_key           TEXT       NOT NULL,    -- e.g. 'pinterest'
   settings              JSONB,                 -- prompt templates, budgets, thresholds, schedule
-  created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uq_integration_profile_combination UNIQUE (project_id, niche_id, channel_key, image_provider_key, text_provider_key)
 );
 
 -- Indexes for common lookups
