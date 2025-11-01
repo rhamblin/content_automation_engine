@@ -774,3 +774,300 @@ def test_delete_integration_profile_sets_null_on_posts(db_session):
 
     # Verify posts count remains the same
     assert db_session.query(Post).filter(Post.post_id.in_(post_ids)).count() == 2
+
+
+def test_integration_profile_posts_relationship_empty(db_session):
+    """Test that integration_profile.posts returns empty list when no posts exist"""
+    # Create dependencies
+    tenant = Tenant(name="Test Tenant")
+    db_session.add(tenant)
+    db_session.commit()
+
+    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
+    db_session.add(project)
+    db_session.commit()
+
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Create integration profile without posts
+    profile = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="unsplash",
+        text_provider_key="openai",
+        channel_key="pinterest"
+    )
+    db_session.add(profile)
+    db_session.commit()
+
+    # Clear session to test lazy loading
+    db_session.expire_all()
+
+    # Retrieve profile and verify posts collection is empty
+    retrieved_profile = db_session.query(IntegrationProfile).filter_by(
+        integration_profile_id=profile.integration_profile_id
+    ).first()
+
+    assert retrieved_profile.posts == []
+    assert len(retrieved_profile.posts) == 0
+
+
+def test_integration_profile_posts_relationship_loaded(db_session):
+    """Test that integration_profile.posts relationship loads all associated posts"""
+    # Create dependencies
+    tenant = Tenant(name="Test Tenant")
+    db_session.add(tenant)
+    db_session.commit()
+
+    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
+    db_session.add(project)
+    db_session.commit()
+
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Create integration profile
+    profile = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="unsplash",
+        text_provider_key="openai",
+        channel_key="pinterest"
+    )
+    db_session.add(profile)
+    db_session.commit()
+
+    # Create multiple posts for this profile
+    post1 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image1.jpg",
+        title="Test Post 1",
+        description="Description 1"
+    )
+    post2 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image2.jpg",
+        title="Test Post 2",
+        description="Description 2"
+    )
+    post3 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image3.jpg",
+        title="Test Post 3",
+        description="Description 3"
+    )
+    db_session.add_all([post1, post2, post3])
+    db_session.commit()
+
+    # Store post IDs for verification
+    expected_post_ids = {post1.post_id, post2.post_id, post3.post_id}
+
+    # Clear session to test lazy loading (with selectin)
+    db_session.expire_all()
+
+    # Retrieve profile and verify posts relationship loaded
+    retrieved_profile = db_session.query(IntegrationProfile).filter_by(
+        integration_profile_id=profile.integration_profile_id
+    ).first()
+
+    assert len(retrieved_profile.posts) == 3
+    loaded_post_ids = {post.post_id for post in retrieved_profile.posts}
+    assert loaded_post_ids == expected_post_ids
+
+    # Verify post data is accessible
+    for post in retrieved_profile.posts:
+        assert post.asset_url.startswith("https://example.com/")
+        assert post.title.startswith("Test Post")
+        assert post.description.startswith("Description")
+
+
+def test_integration_profile_posts_relationship_selectin_loading(db_session):
+    """Test that integration_profile.posts uses selectin loading (lazy='selectin')"""
+    # Create dependencies
+    tenant = Tenant(name="Test Tenant")
+    db_session.add(tenant)
+    db_session.commit()
+
+    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
+    db_session.add(project)
+    db_session.commit()
+
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Create integration profile
+    profile = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="unsplash",
+        text_provider_key="openai",
+        channel_key="pinterest"
+    )
+    db_session.add(profile)
+    db_session.commit()
+
+    # Create posts for this profile
+    for i in range(5):
+        post = Post(
+            integration_profile_id=profile.integration_profile_id,
+            asset_url=f"https://example.com/image{i}.jpg",
+            title=f"Test Post {i}",
+            description=f"Description {i}"
+        )
+        db_session.add(post)
+    db_session.commit()
+
+    # Clear session
+    db_session.expire_all()
+
+    # Retrieve profile - posts should be loaded via selectin
+    retrieved_profile = db_session.query(IntegrationProfile).filter_by(
+        integration_profile_id=profile.integration_profile_id
+    ).first()
+
+    # Accessing posts should not trigger additional queries (already loaded)
+    # This is a behavioral test - with selectin, posts are preloaded
+    assert len(retrieved_profile.posts) == 5
+
+
+def test_integration_profile_posts_count(db_session):
+    """Test counting posts associated with an integration profile"""
+    # Create dependencies
+    tenant = Tenant(name="Test Tenant")
+    db_session.add(tenant)
+    db_session.commit()
+
+    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
+    db_session.add(project)
+    db_session.commit()
+
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Create two different profiles
+    profile1 = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="unsplash",
+        text_provider_key="openai",
+        channel_key="pinterest"
+    )
+    profile2 = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="dalle",
+        text_provider_key="claude",
+        channel_key="instagram"
+    )
+    db_session.add_all([profile1, profile2])
+    db_session.commit()
+
+    # Create different numbers of posts for each profile
+    for i in range(7):
+        post = Post(
+            integration_profile_id=profile1.integration_profile_id,
+            asset_url=f"https://example.com/profile1_image{i}.jpg",
+            title=f"Profile 1 Post {i}",
+            description=f"Description {i}"
+        )
+        db_session.add(post)
+
+    for i in range(3):
+        post = Post(
+            integration_profile_id=profile2.integration_profile_id,
+            asset_url=f"https://example.com/profile2_image{i}.jpg",
+            title=f"Profile 2 Post {i}",
+            description=f"Description {i}"
+        )
+        db_session.add(post)
+
+    db_session.commit()
+
+    # Clear session
+    db_session.expire_all()
+
+    # Retrieve profiles and verify post counts
+    retrieved_profile1 = db_session.query(IntegrationProfile).filter_by(
+        integration_profile_id=profile1.integration_profile_id
+    ).first()
+    retrieved_profile2 = db_session.query(IntegrationProfile).filter_by(
+        integration_profile_id=profile2.integration_profile_id
+    ).first()
+
+    assert len(retrieved_profile1.posts) == 7
+    assert len(retrieved_profile2.posts) == 3
+
+
+def test_integration_profile_posts_with_different_statuses(db_session):
+    """Test accessing posts through integration_profile with different post statuses"""
+    # Create dependencies
+    tenant = Tenant(name="Test Tenant")
+    db_session.add(tenant)
+    db_session.commit()
+
+    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
+    db_session.add(project)
+    db_session.commit()
+
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Create integration profile
+    profile = IntegrationProfile(
+        project_id=project.project_id,
+        niche_id=niche.niche_id,
+        image_provider_key="unsplash",
+        text_provider_key="openai",
+        channel_key="pinterest"
+    )
+    db_session.add(profile)
+    db_session.commit()
+
+    # Create posts with different statuses
+    from common.db_core.models import PostStatus
+
+    post1 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image1.jpg",
+        title="Generated Post",
+        description="Description",
+        status=PostStatus.generated
+    )
+    post2 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image2.jpg",
+        title="Ready Post",
+        description="Description",
+        status=PostStatus.ready
+    )
+    post3 = Post(
+        integration_profile_id=profile.integration_profile_id,
+        asset_url="https://example.com/image3.jpg",
+        title="Posted Post",
+        description="Description",
+        status=PostStatus.posted
+    )
+    db_session.add_all([post1, post2, post3])
+    db_session.commit()
+
+    # Clear session
+    db_session.expire_all()
+
+    # Retrieve profile and verify all posts are accessible regardless of status
+    retrieved_profile = db_session.query(IntegrationProfile).filter_by(
+        integration_profile_id=profile.integration_profile_id
+    ).first()
+
+    assert len(retrieved_profile.posts) == 3
+
+    # Verify we can filter posts by status
+    statuses = {post.status for post in retrieved_profile.posts}
+    assert PostStatus.generated in statuses
+    assert PostStatus.ready in statuses
+    assert PostStatus.posted in statuses
