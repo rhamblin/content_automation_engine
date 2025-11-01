@@ -20,12 +20,9 @@ CREATE TABLE identity.tenant_users (
   tenant_id UUID REFERENCES identity.tenants(tenant_id),
   user_id   UUID REFERENCES identity.users(user_id),
   role      TEXT NOT NULL,                  -- admin, editor, viewer
-  PRIMARY KEY (tenant_id, user_id)
+  PRIMARY KEY (tenant_id, user_id),
+  CONSTRAINT uq_tenant_users_user_id UNIQUE (user_id)
 );
-
--- Index to look up all tenants for a given user
-CREATE INDEX idx_tenant_users_user_id
-  ON identity.tenant_users(user_id);
 
 CREATE TABLE identity.projects (
   project_id  UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
