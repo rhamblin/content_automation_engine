@@ -7,6 +7,7 @@ setup(
     install_requires=[
         "SQLAlchemy>=1.4",
         "asyncpg",            # or your async driver of choice
+        "tenacity>=8.0.0",    # Retry logic for database connections
         # any other dependencies
     ],
 )
