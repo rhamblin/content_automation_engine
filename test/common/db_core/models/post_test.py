@@ -87,7 +87,7 @@ def test_post_status_defaults_to_generated(db_session):
     db_session.commit()
 
     # Verify status defaults to generated
-    assert post.status == PostStatus.generated
+    assert post.status == "generated"
 
 
 def test_post_hashtags_defaults_to_empty_list(db_session):
@@ -141,7 +141,7 @@ def test_post_status_enum_values(db_session):
             asset_url=f"https://example.com/image_{status.value}.jpg",
             title=f"Test Post {status.value}",
             description=f"Test description for {status.value}",
-            status=status
+            status=status.value
         )
         db_session.add(post)
 
@@ -153,7 +153,7 @@ def test_post_status_enum_values(db_session):
             title=f"Test Post {status.value}"
         ).first()
         assert retrieved_post is not None
-        assert retrieved_post.status == status
+        assert retrieved_post.status == status.value
 
 
 def test_post_last_posted_at_nullable(db_session):
@@ -317,21 +317,21 @@ def test_post_status_transition_workflow(db_session):
         asset_url="https://example.com/image.jpg",
         title="Test Post",
         description="Test description",
-        status=PostStatus.generated
+        status=PostStatus.generated.value
     )
     db_session.add(post)
     db_session.commit()
 
     # Transition to ready
-    post.status = PostStatus.ready
+    post.status = PostStatus.ready.value
     db_session.commit()
-    assert post.status == PostStatus.ready
+    assert post.status == PostStatus.ready.value
 
     # Transition to posted and set last_posted_at
-    post.status = PostStatus.posted
+    post.status = PostStatus.posted.value
     post.last_posted_at = datetime.utcnow()
     db_session.commit()
-    assert post.status == PostStatus.posted
+    assert post.status == PostStatus.posted.value
     assert post.last_posted_at is not None
 
 
@@ -341,12 +341,12 @@ def test_post_status_error_state(db_session):
         asset_url="https://example.com/image.jpg",
         title="Test Post",
         description="Test description",
-        status=PostStatus.error
+        status=PostStatus.error.value
     )
     db_session.add(post)
     db_session.commit()
 
-    assert post.status == PostStatus.error
+    assert post.status == PostStatus.error.value
 
 
 def test_multiple_posts_for_same_integration_profile(db_session):

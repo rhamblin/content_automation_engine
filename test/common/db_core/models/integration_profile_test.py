@@ -1037,21 +1037,21 @@ def test_integration_profile_posts_with_different_statuses(db_session):
         asset_url="https://example.com/image1.jpg",
         title="Generated Post",
         description="Description",
-        status=PostStatus.generated
+        status=PostStatus.generated.value
     )
     post2 = Post(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image2.jpg",
         title="Ready Post",
         description="Description",
-        status=PostStatus.ready
+        status=PostStatus.ready.value
     )
     post3 = Post(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image3.jpg",
         title="Posted Post",
         description="Description",
-        status=PostStatus.posted
+        status=PostStatus.posted.value
     )
     db_session.add_all([post1, post2, post3])
     db_session.commit()
@@ -1068,6 +1068,6 @@ def test_integration_profile_posts_with_different_statuses(db_session):
 
     # Verify we can filter posts by status
     statuses = {post.status for post in retrieved_profile.posts}
-    assert PostStatus.generated in statuses
-    assert PostStatus.ready in statuses
-    assert PostStatus.posted in statuses
+    assert PostStatus.generated.value in statuses
+    assert PostStatus.ready.value in statuses
+    assert PostStatus.posted.value in statuses

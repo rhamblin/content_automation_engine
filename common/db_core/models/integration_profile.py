@@ -4,8 +4,8 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import String, DateTime, ForeignKey, JSONB, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy import String, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from common.constants import constants
