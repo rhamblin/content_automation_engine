@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import String, DateTime, ForeignKey, JSON, UniqueConstraint
+from sqlalchemy import String, DateTime, ForeignKey, JSONB, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -35,7 +35,7 @@ class IntegrationProfile(Base):
     image_provider_key: Mapped[str] = mapped_column(String, nullable=False)
     text_provider_key: Mapped[str] = mapped_column(String, nullable=False)
     channel_key: Mapped[str] = mapped_column(String, nullable=False)
-    settings: Mapped[dict] = mapped_column(JSON, default=dict)
+    settings: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
     project: Mapped["Project"] = relationship("Project", back_populates="integration_profiles")

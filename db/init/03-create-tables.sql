@@ -18,7 +18,7 @@ CREATE TABLE identity.users (
 
 CREATE TABLE identity.tenant_users (
   tenant_id UUID REFERENCES identity.tenants(tenant_id) ON DELETE CASCADE,
-  user_id   UUID REFERENCES identity.users(user_id),
+  user_id   UUID REFERENCES identity.users(user_id) ON DELETE CASCADE,
   role      TEXT NOT NULL,                  -- admin, editor, viewer
   PRIMARY KEY (tenant_id, user_id),
   CONSTRAINT uq_tenant_users_user_id UNIQUE (user_id)
@@ -26,7 +26,7 @@ CREATE TABLE identity.tenant_users (
 
 CREATE TABLE identity.projects (
   project_id  UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   UUID       NOT NULL REFERENCES identity.tenants(tenant_id),
+  tenant_id   UUID       NOT NULL REFERENCES identity.tenants(tenant_id) ON DELETE CASCADE,
   name        TEXT       NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -65,12 +65,12 @@ CREATE INDEX idx_keywords_niche_id
 
 CREATE TABLE integration_profiles (
   integration_profile_id UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id            UUID       NOT NULL REFERENCES identity.projects(project_id),
-  niche_id              UUID       NOT NULL REFERENCES niches.niches(niche_id),
+  project_id            UUID       NOT NULL REFERENCES identity.projects(project_id) ON DELETE CASCADE,
+  niche_id              UUID       NOT NULL REFERENCES niches.niches(niche_id) ON DELETE CASCADE,
   image_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_image'
-  text_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_text'
+  text_provider_key     TEXT       NOT NULL,    -- e.g. 'openai_text'
   channel_key           TEXT       NOT NULL,    -- e.g. 'pinterest'
-  settings              JSONB,                 -- prompt templates, budgets, thresholds, schedule
+  settings              JSONB NOT NULL DEFAULT '{}',                 -- prompt templates, budgets, thresholds, schedule
   created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT uq_integration_profile_combination UNIQUE (project_id, niche_id, channel_key, image_provider_key, text_provider_key)
 );
@@ -120,7 +120,7 @@ CREATE TABLE analytics.metrics (
   impressions BIGINT     NOT NULL DEFAULT 0,
   clicks      BIGINT     NOT NULL DEFAULT 0,
   saves       BIGINT     NOT NULL DEFAULT 0,
-  UNIQUE(post_id, date)
+  CONSTRAINT uq_metrics_post_date UNIQUE (post_id, date)
 );
 
 -- Index to query metrics by date
