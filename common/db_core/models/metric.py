@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 import uuid
 
-from sqlalchemy import Date, Integer, BigInteger, ForeignKey
+from sqlalchemy import Date, Integer, BigInteger, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -12,7 +12,10 @@ from .base import Base
 
 class Metric(Base):
     __tablename__ = "metrics"
-    __table_args__ = {"schema": "analytics"}
+    __table_args__ = (
+          UniqueConstraint('post_id', 'date', name='uq_metrics_post_date'),  # Ensure one metric entry per post per day
+          {"schema": "analytics"}
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     post_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("posts.posts.post_id", ondelete="CASCADE"), nullable=False)

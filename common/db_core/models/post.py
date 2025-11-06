@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import Text, DateTime, Enum, ForeignKey
+from sqlalchemy import Text, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -30,7 +30,7 @@ class Post(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     hashtags: Mapped[List[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
-    status: Mapped[PostStatus] = mapped_column(Enum(PostStatus, name="post_status"), default=PostStatus.generated, nullable=False)
+    status: Mapped[PostStatus] = mapped_column(String, nullable=False, default=PostStatus.generated.value)
     last_posted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
