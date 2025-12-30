@@ -2,7 +2,7 @@ import uuid
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from common.db_core.models import Keyword, Niche
+from common.db_core.models import Keyword, Niche, KeywordImageMatchConfidence
 
 
 # ============================================================================
@@ -282,6 +282,46 @@ def test_keyword_to_readable_without_loaded_niche(db_session):
     assert str(keyword_id) in readable
     assert "'basketball'" in readable
     assert f"niche_id={niche_id}" in readable
+
+
+def test_keyword_image_match_confidence_enum_values(db_session):
+    """Test that image_match_confidence defaults to 'low' and all enum values work"""
+    # Create niche dependency
+    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
+    db_session.add(niche)
+    db_session.commit()
+
+    # Test 1: Default value should be 'low'
+    keyword_default = Keyword(niche_id=niche.niche_id, keyword="default test")
+    db_session.add(keyword_default)
+    db_session.commit()
+    assert keyword_default.keyword_image_match_confidence == KeywordImageMatchConfidence.high.value
+
+    # Test 2: High and low enum values should work
+    keyword_high = Keyword(
+        niche_id=niche.niche_id,
+        keyword="high confidence keyword",
+        keyword_image_match_confidence=KeywordImageMatchConfidence.high.value
+    )
+    keyword_low = Keyword(
+        niche_id=niche.niche_id,
+        keyword="low confidence keyword",
+        keyword_image_match_confidence=KeywordImageMatchConfidence.low.value
+    )
+    db_session.add_all([keyword_high, keyword_low])
+    db_session.commit()
+
+    # Test 3: Verify values were stored correctly
+    retrieved_high = db_session.query(Keyword).filter_by(keyword="high confidence keyword").first()
+    assert retrieved_high.keyword_image_match_confidence == KeywordImageMatchConfidence.high.value
+
+    retrieved_low = db_session.query(Keyword).filter_by(keyword="low confidence keyword").first()
+    assert retrieved_low.keyword_image_match_confidence == KeywordImageMatchConfidence.low.value
+
+    # Test 4: Verify it appears in to_dict()
+    keyword_dict = keyword_default.to_dict()
+    assert "keyword_image_match_confidence" in keyword_dict
+    assert keyword_dict["keyword_image_match_confidence"] == "high"
 
 
 # ============================================================================

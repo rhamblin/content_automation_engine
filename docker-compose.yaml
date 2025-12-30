@@ -23,11 +23,13 @@ services:
       dockerfile: services/post-worker/Dockerfile
     restart: unless-stopped
     secrets:
-      - open-ai-api-key
+      - openai-api-key
       - unsplash-access-key
+      - azure-blob-storage-connection-string
     environment:
-      OPENAI_API_KEY: /run/secrets/open-ai-api-key
-      UNSPLASH_ACCESSKEY: /run/secrets/unsplash-access-key
+      OPENAI_API_KEY: /run/secrets/openai-api-key
+      UNSPLASH_ACCESS_KEY: /run/secrets/unsplash-access-key
+      AZURE_BLOB_STORAGE_CONNECTION_STRING: /run/secrets/azure-blob-storage-connection-string
       DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
     networks:
       - backend
@@ -173,10 +175,12 @@ services:
       - development
 
 secrets:
-  open-ai-api-key:
-    file: ./secrets/openai-apikey.txt
+  openai-api-key:
+    file: ./secrets/openai-api-key.txt
   unsplash-access-key:
-    file: ./secrets/unsplash-accesskey.txt
+    file: ./secrets/unsplash-access-key.txt
+  azure-blob-storage-connection-string:
+    file: ./secrets/azure-blob-storage-connection-string.txt
 
 volumes:
   db_data:

@@ -53,7 +53,7 @@ class UnsplashImageProvider(IImageProvider):
 
     def __get_api_key(self) -> str:
         self.logger.info("Retrieving Unsplash API key")
-        secret_path = os.getenv('UNSPLASH_ACCESSKEY')
+        secret_path = os.getenv('UNSPLASH_ACCESS_KEY')
         unsplash_access_key = ""
 
         with open(secret_path, 'r') as f:

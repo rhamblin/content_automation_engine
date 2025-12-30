@@ -2,8 +2,6 @@
 
 A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post generation; Phases 2 & 3 add Posting/Ads and Analytics/Pruning.
 
----
-
 ## Data Model
 
 ### High-Level Relationships
@@ -87,6 +85,7 @@ erDiagram
       UUID keyword_id PK
       UUID niche_id FK
       TEXT keyword
+      TEXT image_match_confidence
     }
     integration_profiles {
       UUID integration_profile_id PK
@@ -107,7 +106,7 @@ erDiagram
       TEXT[] hashtags
       TEXT status
       TIMESTAMPTZ last_posted_at
-      TIMESTAMPTZ created_at
+      TIMESTAMPTZ created_at 
     }
     analytics_metrics {
       SERIAL id PK
@@ -128,29 +127,33 @@ erDiagram
     posts      ||--o{ analytics_metrics   : ""
 ```
 
----
-
 ## Getting Started
 
 1. **Download and install Docker Desktop**
     Visit Docker (website)[https://www.docker.com/products/docker-desktop/]
-    
-2. **Build & run services**  
-    Build & run entire application: 
+
+2. **Ensure the following API keys / secrets are in place under <<APP ROOT>>/secrets**
+    azure-blob-storage-connection-string.txt
+    openai-api-key.txt
+    unsplash-access-key.txt
+
+3. **Build & run services**  
+```bash
+    # Build & run entire application: 
     docker compose --env-file ./config/dev/variables.env up --build -d
 
-    Spin up a single service:
+    # Spin up a single service:
     docker compose --env-file ./config/dev/variables.env up --build -d service_name
 
-    Tear down including volumes
+    # Tear down everything including volumes
     docker compose --env-file ./config/dev/variables.env down -v
 
-    Tear down while keeping persisted volumes as the same
+    # Tear down everything while keeping persisted volumes as the same
     docker compose --env-file ./config/dev/variables.env down
+```
+4. **See db/init/05-seed-db.sql for sample data**
 
-3. **See db/init/05-seed-db.sql for sample data**
 
----
 
 ## Testing
 
@@ -179,18 +182,27 @@ The test runner has access to:
 - All common modules (db_core, providers, etc.)
 - Docker socket for testcontainers
 
----
+## Debugging and Dev Containers
+1.	Define a devcontainer.json which defines how that container will be spun up. The route our project is going with is by using the service’s Dockerfile directly so that means any special configurations done in the project root docker-compose needs to be replicated e.g. environment variables, networks (a1) . Also ensure any env file is also included and dependent packages are loaded
+2.	The service being ran in dev container is ran separate to other so this means the developer at this moment has to manually start up services in the right order as seen in Dependency Order below
+3.	Ensure Dev Containers extension is installed
+4.	Startup containers in right order via terminal and “Reopen in container” for the container you want to debug. YOU CAN TYPE ">Dev Containers:Reopen In Container" in VS Code
+5.	Start Python Debugger via “PYTHONPATH=/app/services/post-worker/app:/app/common:/app python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m post_worker.worker”
+6.	Run -> Start Debugging : if launch.json file is not already in place then select Python Debugger -> Remote Attach -> localhost -> 5678 (or what ever is configured in devcontainer.json
+7.	Happy Debugging!
+*a1 On the note of networks, my early research shows that in its simplest form you can only connect to one network without extra steps so I made a special development network for ease of local development*
 
-## Important Notes
-These are the services in order of dependency. This sequence is important when needing to start a dev container
-This should be kept up to date as new containers/services are added and removed
+## Dependency Order
+```bash
+# These are the services in order of dependency. This sequence is important when needing to start a dev container
+# This should be kept up to date as new containers/services are added and removed
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps db
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps redis
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-worker
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-dispatcher
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-generation-scheduler
+```
 
----
 
 ## Next Steps
 
