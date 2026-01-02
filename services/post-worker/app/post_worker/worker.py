@@ -46,14 +46,15 @@ async def generate_post(job_id: str, profile_id: str) -> None:
         profile = result.scalar_one()
 
         # Get providers
-        image_provider = registry.get_image_provider(profile.image_provider_key)
+        # image_provider = registry.get_image_provider(profile.image_provider_key)
         text_provider = registry.get_text_provider(profile.text_provider_key)
+        destination_channel = registry.get_channel(profile.channel_key)
 
         # Generate content (add await if these are async)
         keywords = ", ".join(kw.keyword for kw in profile.niche.keywords)
         title = await text_provider.generate_text(f"title for {profile.niche.name} {keywords}")
         description = await text_provider.generate_text(f"description for {profile.niche.name} {keywords}")
-        image = await image_provider.generate_image(f"image for niche {profile.niche.name}")
+        # image = await image_provider.generate_image(f"image for niche {profile.niche.name}")
 
         # # Create and save post
         # post = Post(

@@ -91,7 +91,6 @@ erDiagram
       UUID integration_profile_id PK
       UUID project_id FK
       UUID niche_id FK
-      TEXT image_provider_key
       TEXT text_provider_key
       TEXT channel_key
       JSONB settings

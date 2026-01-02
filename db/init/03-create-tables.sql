@@ -69,12 +69,11 @@ CREATE TABLE integration_profiles (
   integration_profile_id UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id            UUID       NOT NULL REFERENCES identity.projects(project_id) ON DELETE CASCADE,
   niche_id              UUID       NOT NULL REFERENCES niches.niches(niche_id) ON DELETE CASCADE,
-  image_provider_key    TEXT       NOT NULL,    -- e.g. 'openai_image'
   text_provider_key     TEXT       NOT NULL,    -- e.g. 'openai_text'
   channel_key           TEXT       NOT NULL,    -- e.g. 'pinterest'
   settings              JSONB NOT NULL DEFAULT '{}',                 -- prompt templates, budgets, thresholds, schedule
   created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT uq_integration_profile_combination UNIQUE (project_id, niche_id, channel_key, image_provider_key, text_provider_key)
+  CONSTRAINT uq_integration_profile_combination UNIQUE (project_id, niche_id, channel_key, text_provider_key)
 );
 
 -- Indexes for common lookups

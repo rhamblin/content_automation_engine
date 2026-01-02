@@ -20,15 +20,18 @@ _channels = {
 
 
 def get_image_provider(key: str) -> IImageProvider:
+    # Retrieve the provider class from the registry (not an instance)
     cls: Type[IImageProvider] = _image_providers[key]
-    return cls()
+    return cls() #returns an instance of the class
 
 
 def get_text_provider(key: str) -> ITextProvider:
+    # Retrieve the provider class from the registry (not an instance)
     cls: Type[ITextProvider] = _text_providers[key]
-    return cls()
+    return cls() #returns an instance of the class
 
 
 def get_channel(key: str) -> IChannel:
+    # Retrieve the provider class from the registry (not an instance)
     cls: Type[IChannel] = _channels[key]
-    return cls()
+    return cls() #returns an instance of the class

@@ -25,7 +25,6 @@ def test_integration_profile_auto_generated_fields(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -64,7 +63,6 @@ def test_integration_profile_requires_project_id(db_session):
     # Try to create IntegrationProfile with project_id = None
     profile = IntegrationProfile(
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -94,41 +92,10 @@ def test_integration_profile_requires_niche_id(db_session):
     # Try to create IntegrationProfile with niche_id = None
     profile = IntegrationProfile(
         project_id=project.project_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
     profile.niche_id = None  # Explicitly set to None
-    db_session.add(profile)
-
-    with pytest.raises(IntegrityError):
-        db_session.commit()
-    db_session.rollback()
-
-
-def test_integration_profile_requires_image_provider_key(db_session):
-    """Test that image_provider_key is required (nullable=False constraint)"""
-    # Create dependencies
-    tenant = Tenant(name="Test Tenant")
-    db_session.add(tenant)
-    db_session.commit()
-
-    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
-    db_session.add(project)
-    db_session.commit()
-
-    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
-    db_session.add(niche)
-    db_session.commit()
-
-    # Try to create IntegrationProfile with image_provider_key = None
-    profile = IntegrationProfile(
-        project_id=project.project_id,
-        niche_id=niche.niche_id,
-        text_provider_key="openai",
-        channel_key="pinterest"
-    )
-    profile.image_provider_key = None  # Explicitly set to None
     db_session.add(profile)
 
     with pytest.raises(IntegrityError):
@@ -155,7 +122,6 @@ def test_integration_profile_requires_text_provider_key(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         channel_key="pinterest"
     )
     profile.text_provider_key = None  # Explicitly set to None
@@ -185,7 +151,6 @@ def test_integration_profile_requires_channel_key(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai"
     )
     profile.channel_key = None  # Explicitly set to None
@@ -208,7 +173,6 @@ def test_integration_profile_requires_valid_project_fk(db_session):
     profile = IntegrationProfile(
         project_id=fake_project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -238,7 +202,6 @@ def test_integration_profile_requires_valid_niche_fk(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=fake_niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -271,7 +234,6 @@ def test_integration_profile_settings_defaults_to_empty_dict(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -320,7 +282,6 @@ def test_integration_profile_settings_stores_complex_json(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest",
         settings=complex_settings
@@ -361,7 +322,6 @@ def test_integration_profile_project_relationship(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -400,7 +360,6 @@ def test_integration_profile_niche_relationship(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -439,14 +398,12 @@ def test_delete_project_cascades_to_integration_profiles(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="dalle",
         text_provider_key="claude",
         channel_key="instagram"
     )
@@ -488,14 +445,12 @@ def test_delete_niche_cascades_to_integration_profiles(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="dalle",
         text_provider_key="claude",
         channel_key="instagram"
     )
@@ -537,21 +492,18 @@ def test_multiple_integration_profiles_per_project(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="dalle",
         text_provider_key="claude",
         channel_key="instagram"
     )
     profile3 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="midjourney",
         text_provider_key="gemini",
         channel_key="twitter"
     )
@@ -590,14 +542,12 @@ def test_multiple_integration_profiles_per_niche(db_session):
     profile1 = IntegrationProfile(
         project_id=project1.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project2.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="dalle",
         text_provider_key="claude",
         channel_key="instagram"
     )
@@ -631,18 +581,17 @@ def test_integration_profile_different_provider_combinations(db_session):
 
     # Test different provider combinations
     combinations = [
-        ("unsplash", "openai", "pinterest"),
-        ("dalle", "claude", "instagram"),
-        ("midjourney", "gemini", "twitter"),
-        ("pexels", "openai", "facebook"),
+        ("openai", "pinterest"),
+        ("claude", "instagram"),
+        ("gemini", "twitter"),
+        ("openai", "facebook"),
     ]
 
     profiles = []
-    for img_provider, text_provider, channel in combinations:
+    for text_provider, channel in combinations:
         profile = IntegrationProfile(
             project_id=project.project_id,
             niche_id=niche.niche_id,
-            image_provider_key=img_provider,
             text_provider_key=text_provider,
             channel_key=channel
         )
@@ -656,12 +605,11 @@ def test_integration_profile_different_provider_combinations(db_session):
     assert len(retrieved_profiles) == 4
 
     for profile in retrieved_profiles:
-        assert profile.image_provider_key is not None
         assert profile.text_provider_key is not None
         assert profile.channel_key is not None
 
         # Verify the combination exists in our original set
-        combo = (profile.image_provider_key, profile.text_provider_key, profile.channel_key)
+        combo = (profile.text_provider_key, profile.channel_key)
         assert combo in combinations
 
 
@@ -684,7 +632,6 @@ def test_integration_profile_with_identical_provider_combinations(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest",
         settings={"theme": "dark"}
@@ -696,7 +643,6 @@ def test_integration_profile_with_identical_provider_combinations(db_session):
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest",
         settings={"theme": "light"}
@@ -731,7 +677,6 @@ def test_delete_integration_profile_sets_null_on_posts(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -795,7 +740,6 @@ def test_integration_profile_posts_relationship_empty(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -833,7 +777,6 @@ def test_integration_profile_posts_relationship_loaded(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -903,7 +846,6 @@ def test_integration_profile_posts_relationship_selectin_loading(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
@@ -953,14 +895,12 @@ def test_integration_profile_posts_count(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="dalle",
         text_provider_key="claude",
         channel_key="instagram"
     )
@@ -1022,7 +962,6 @@ def test_integration_profile_posts_with_different_statuses(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        image_provider_key="unsplash",
         text_provider_key="openai",
         channel_key="pinterest"
     )
