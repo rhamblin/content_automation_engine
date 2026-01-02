@@ -11,12 +11,12 @@ class ImageResult:
 
 class IImageProvider(ABC):
     @abstractmethod
-    def generate_image(self, keyword: str) -> ImageResult:
+    def generate_image(self, niche: str, keyword: str) -> ImageResult:
         pass
 
 class ITextProvider(ABC):
     @abstractmethod
-    def generate_text(self, prompt: str) -> str:
+    def generate_text(self, niche: str, keyword: str) -> dict:
         pass
 
 class IChannel(ABC):

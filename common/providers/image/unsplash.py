@@ -10,12 +10,12 @@ class UnsplashImageProvider(IImageProvider):
         self.logger = logging.getLogger(__name__)
         self.logger.propagate = False
 
-    def generate_image(self, keywords: str) -> ImageResult:
-        self.logger.info(f"Generating image for keywords: {keywords}")
+    def generate_image(self, niche: str, keyword: str) -> ImageResult:
+        self.logger.info(f"Generating image for keyword: {keyword}")
 
         ACCESS_KEY = self.__get_api_key()
         url = f"https://api.unsplash.com/search/photos"
-        payload = {'query': keywords}
+        payload = {'query': keyword}
         headers = {
             'Authorization': 'Client-ID ' + ACCESS_KEY,
             'Accept-Version': 'v1'

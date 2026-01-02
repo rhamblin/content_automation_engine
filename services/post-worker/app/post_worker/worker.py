@@ -45,36 +45,44 @@ async def generate_post(job_id: str, profile_id: str) -> None:
         )
         profile = result.scalar_one()
 
-        # Get providers
-        # image_provider = registry.get_image_provider(profile.image_provider_key)
         text_provider = registry.get_text_provider(profile.text_provider_key)
-        destination_channel = registry.get_channel(profile.channel_key)
 
-        # Generate content (add await if these are async)
-        keywords = ", ".join(kw.keyword for kw in profile.niche.keywords)
-        title = await text_provider.generate_text(f"title for {profile.niche.name} {keywords}")
-        description = await text_provider.generate_text(f"description for {profile.niche.name} {keywords}")
-        # image = await image_provider.generate_image(f"image for niche {profile.niche.name}")
+        niche_name = profile.niche.name
+        for keyword in profile.niche.keywords:
+             # Generate title and description
+            generated_text = text_provider.generate_text(niche_name, keyword)
+            title = generated_text.get("title", "")
+            description = generated_text.get("description", "")
 
-        # # Create and save post
-        # post = Post(
-        #     integration_profile_id=profile.integration_profile_id,
-        #     asset_url=image,  # Use the generated image
-        #     title=title,
-        #     description=description,
-        #     hashtags=[kw.keyword for kw in profile.niche.keywords],
-        #     status=PostStatus.ready,
-        # )
-        # session.add(post)
-        # await session.commit()  # Add await for commit
-        # await session.refresh(post)  # Add await for refresh
+            image = getImage(niche_name, keyword)
 
-        # Push to next queue using async Redis
-        await broker.rpush(
-            constants.POST_READY_BROKER_NAME, 
-            json.dumps({"post_id": str(post.post_id)})
-        )
-        print(f"[JOB {job_id}] Generated post {post.post_id}", flush=True)
+            post = Post(
+                integration_profile_id=profile.integration_profile_id,
+                asset_url=image,
+                title=title,
+                description=description,
+                hashtags=[kw.keyword for kw in profile.niche.keywords],
+                status=PostStatus.ready,
+            )
+
+            session.add(post)
+            await session.commit()
+
+            # Push to next queue using async Redis
+            await broker.rpush(
+                constants.POST_READY_BROKER_NAME, 
+                json.dumps({
+                    "post_id": str(post.post_id),
+                    "channel_key": profile.channel_key
+                })
+            )
+            print(f"[JOB {job_id}] Pushed post {post.post_id} to {constants.POST_READY_BROKER_NAME}", flush=True)
+        print(f"[JOB {job_id}] Completed post generation for profile {profile_id}", flush=True)
+
+def getImage(niche_name, keyword):
+    image_provider = registry.get_image_provider(keyword)
+    image = image_provider.generate_image(f"image for niche {niche_name} and keyword {keyword.keyword}")
+    return image.regular_url
 
 async def main():
     """Entry point for the worker"""

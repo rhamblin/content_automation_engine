@@ -15,10 +15,6 @@ def __get_api_key() -> str:
     return openai_api_key
 
 class OpenAITextProvider(ITextProvider):
-    
-    def generate_text(self, prompt: str) -> str:
-        # Placeholder text generation
-        return f"Generated text for: {prompt}"
 
     def __get_system_message(self) -> str:
         return (
@@ -28,15 +24,16 @@ class OpenAITextProvider(ITextProvider):
             "Craft titles that maximize click-through rates and descriptions that highlight benefits, evoke emotion, and encourage saves and shares."
         )
 
-    def generate_pin_title(self, niche: str, keywords: str) -> str:
+    def generate_text(self, niche: str, keyword: str) -> dict:
         """
         Generates a high-engagement, keyword-rich Post title for the given niche and keywords on the given channel.
         """
+        # add in formatting instruction for title and description output
         messages = [
             {"role": "system", "content": self.get_system_message()},
             {"role": "user", "content": (
                 f"Niche: {niche}\n"
-                f"Primary keywords: {keywords}\n"
+                f"Primary keywords: {keyword}\n"
                 "Audience: Pinterest users interested in this niche\n"
                 "Task: Generate a clickable, under 50-character Pin title optimized for engagement and discovery."
             )}
