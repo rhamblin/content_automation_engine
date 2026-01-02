@@ -1,0 +1,11 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="providers",
+    version="0.1.0",
+    packages=find_packages(include=["providers", "providers.*"]),
+    install_requires=[
+        "openai",
+        "requests>=2.28.0",
+    ],
+)
