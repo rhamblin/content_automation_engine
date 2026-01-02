@@ -24,7 +24,7 @@ class OpenAITextProvider(ITextProvider):
             "Craft titles that maximize click-through rates and descriptions that highlight benefits, evoke emotion, and encourage saves and shares."
         )
 
-    def generate_text(self, niche: str, keyword: str) -> dict:
+    def generate_text(self, niche: str, keyword: str, channel: str) -> dict:
         """
         Generates a high-engagement, keyword-rich Post title for the given niche and keywords on the given channel.
         """

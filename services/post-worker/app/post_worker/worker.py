@@ -48,9 +48,10 @@ async def generate_post(job_id: str, profile_id: str) -> None:
         text_provider = registry.get_text_provider(profile.text_provider_key)
 
         niche_name = profile.niche.name
+        channel = profile.channel_key
         for keyword in profile.niche.keywords:
              # Generate title and description
-            generated_text = text_provider.generate_text(niche_name, keyword)
+            generated_text = text_provider.generate_text(niche_name, keyword, channel)
             title = generated_text.get("title", "")
             description = generated_text.get("description", "")
 
