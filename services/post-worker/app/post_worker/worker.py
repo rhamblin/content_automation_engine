@@ -51,18 +51,24 @@ async def generate_post(job_id: str, profile_id: str) -> None:
         channel = profile.channel_key
         for keyword in profile.niche.keywords:
              # Generate title and description
-            generated_text = text_provider.generate_text(niche_name, keyword, channel)
+            generated_text = ""
+            try:
+                generated_text = text_provider.generate_text(niche_name, keyword, channel)
+            except Exception as e:
+                print(f"[ERROR] Text generation failed for keyword {keyword} in profile {profile_id}: {e}", flush=True)
+                continue
+
             title = generated_text.get("title", "")
             description = generated_text.get("description", "")
 
-            image = getImage(niche_name, keyword)
+            # image = getImage(niche_name, keyword)
 
             post = Post(
                 integration_profile_id=profile.integration_profile_id,
-                asset_url=image,
+                asset_url="dummy_image_url",  # Placeholder for image URL
                 title=title,
                 description=description,
-                hashtags=[kw.keyword for kw in profile.niche.keywords],
+                hashtags=f"#{keyword}",
                 status=PostStatus.ready,
             )
 
@@ -82,7 +88,7 @@ async def generate_post(job_id: str, profile_id: str) -> None:
 
 def getImage(niche_name, keyword):
     image_provider = registry.get_image_provider(keyword)
-    image = image_provider.generate_image(f"image for niche {niche_name} and keyword {keyword.keyword}")
+    image = image_provider.generate_image(niche_name, keyword)
     return image.regular_url
 
 async def main():

@@ -26,10 +26,12 @@ services:
       - openai-api-key
       - unsplash-access-key
       - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
     environment:
       OPENAI_API_KEY: /run/secrets/openai-api-key
       UNSPLASH_ACCESS_KEY: /run/secrets/unsplash-access-key
       AZURE_BLOB_STORAGE_CONNECTION_STRING: /run/secrets/azure-blob-storage-connection-string
+      AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY: /run/secrets/azure-foundry-proj-default-api-key
       DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
     networks:
       - backend
@@ -181,6 +183,8 @@ secrets:
     file: ./secrets/unsplash-access-key.txt
   azure-blob-storage-connection-string:
     file: ./secrets/azure-blob-storage-connection-string.txt
+  azure-foundry-proj-default-api-key:
+    file: ./secrets/azure-foundry-proj-default-api-key.txt
 
 volumes:
   db_data:

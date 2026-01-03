@@ -47,12 +47,11 @@ BEGIN
       '00000000-0000-0000-0000-000000000007',
       '00000000-0000-0000-0000-000000000003',
       '00000000-0000-0000-0000-000000000004',
-      'openai',
+      'azure_foundry',
       'pinterest',
       '{"default_budget":50,"post_dimensions":"1000x1500"}',
       NOW()
     );
-
 
     -- 4. One Sample Post
     INSERT INTO posts.posts (

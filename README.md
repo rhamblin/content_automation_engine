@@ -133,8 +133,10 @@ erDiagram
 
 2. **Ensure the following API keys / secrets are in place under <<APP ROOT>>/secrets**
     azure-blob-storage-connection-string.txt
+    azure-foundry-proj-default-api-key.txt
     openai-api-key.txt
     unsplash-access-key.txt
+
 
 3. **Build & run services**  
 ```bash
@@ -182,16 +184,17 @@ The test runner has access to:
 - Docker socket for testcontainers
 
 ## Debugging and Dev Containers
+### Steps
 1.	Define a devcontainer.json which defines how that container will be spun up. The route our project is going with is by using the service’s Dockerfile directly so that means any special configurations done in the project root docker-compose needs to be replicated e.g. environment variables, networks (a1) . Also ensure any env file is also included and dependent packages are loaded
 2.	The service being ran in dev container is ran separate to other so this means the developer at this moment has to manually start up services in the right order as seen in Dependency Order below
 3.	Ensure Dev Containers extension is installed
 4.	Startup containers in right order via terminal and “Reopen in container” for the container you want to debug. YOU CAN TYPE ">Dev Containers:Reopen In Container" in VS Code
 5.	Start Python Debugger via “PYTHONPATH=/app/services/post-worker/app:/app/common:/app python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m post_worker.worker”
-6.	Run -> Start Debugging : if launch.json file is not already in place then select Python Debugger -> Remote Attach -> localhost -> 5678 (or what ever is configured in devcontainer.json
+6.	Run -> Start Debugging : if launch.json file is not already in place then select Python Debugger -> Remote Attach -> localhost -> 5678 (or what ever is configured in devcontainer.json)
 7.	Happy Debugging!
 *a1 On the note of networks, my early research shows that in its simplest form you can only connect to one network without extra steps so I made a special development network for ease of local development*
 
-## Dependency Order
+### Dependency Order
 ```bash
 # These are the services in order of dependency. This sequence is important when needing to start a dev container
 # This should be kept up to date as new containers/services are added and removed
@@ -208,3 +211,6 @@ The test runner has access to:
 - Phase 2: Poster & AdAutomation workers  
 - Phase 3: Analytics Capture & Pruner  
 - Drop-in new channel by adding a plugin and an `integration_profile` row  
+
+## Assumptions made
+1.  Channel is being passed into common/providers/text/azure_foundry.py generate_text method which is the implementation of the interface but we don't use it as of yet.The system messages was tailored to be Pinterest centric. This can be decoupled at a later time if expansion to other channels is desired

@@ -4,7 +4,7 @@ from .base import IImageProvider, ITextProvider, IChannel
 from ..db_core.models import Keyword, KeywordImageMatchConfidence
 from .image.unsplash import UnsplashImageProvider
 from .image.azure_blob_storage import AzureBlobStorageImageProvider
-from .text.openai import OpenAITextProvider
+from .text.azure_foundry import AzureFoundryTextProvider
 from .channel.pinterest import PinterestChannel
 
 def get_image_provider(keyword: Keyword) -> IImageProvider:
@@ -17,11 +17,11 @@ def get_image_provider(keyword: Keyword) -> IImageProvider:
 
 def get_text_provider(key: str) -> ITextProvider:
     text_providers = {
-        "openai": OpenAITextProvider,
+        "azure_foundry": AzureFoundryTextProvider,
     }
 
     # Retrieve the provider class from the registry (not an instance)
-    cls: Type[ITextProvider] = text_providers.get(key, OpenAITextProvider)
+    cls: Type[ITextProvider] = text_providers.get(key, AzureFoundryTextProvider)
 
     return cls() #returns an instance of the class
 
