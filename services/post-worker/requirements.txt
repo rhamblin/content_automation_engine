@@ -1,5 +1,4 @@
--e db_core
--e providers
+-e common
 redis
 
 SQLAlchemy>=2.0.30,<3.0.0

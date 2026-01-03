@@ -7,5 +7,6 @@ setup(
     install_requires=[
         "openai",
         "requests>=2.28.0",
+        "tenacity>=8.0.0",    # Retry logic for API calls
     ],
 )

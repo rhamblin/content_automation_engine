@@ -49,7 +49,8 @@ async def generate_post(job_id: str, profile_id: str) -> None:
 
         niche_name = profile.niche.name
         channel = profile.channel_key
-        for keyword in profile.niche.keywords:
+        for kw in profile.niche.keywords:
+            keyword = kw.keyword
              # Generate title and description
             generated_text = ""
             try:
@@ -68,8 +69,8 @@ async def generate_post(job_id: str, profile_id: str) -> None:
                 asset_url="dummy_image_url",  # Placeholder for image URL
                 title=title,
                 description=description,
-                hashtags=f"#{keyword}",
-                status=PostStatus.ready,
+                hashtags=[f"#{keyword}"],
+                status=PostStatus.ready.value,
             )
 
             session.add(post)
@@ -86,7 +87,7 @@ async def generate_post(job_id: str, profile_id: str) -> None:
             print(f"[JOB {job_id}] Pushed post {post.post_id} to {constants.POST_READY_BROKER_NAME}", flush=True)
         print(f"[JOB {job_id}] Completed post generation for profile {profile_id}", flush=True)
 
-def getImage(niche_name, keyword):
+def getImage(niche_name: str, keyword: str):
     image_provider = registry.get_image_provider(keyword)
     image = image_provider.generate_image(niche_name, keyword)
     return image.regular_url

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from redis import Redis
 import json
 import uuid
-from constants import constants
+from common.constants import constants
 
 app = FastAPI(
     title="Post Dispatcher",

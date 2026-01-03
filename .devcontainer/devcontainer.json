@@ -24,7 +24,7 @@
 
   // Env vars inside the container
   "containerEnv": {
-    "PYTHONPATH": "/app/services/post-worker/app:/app/common:/app",
+    "PYTHONPATH": "/app/services/post-worker/app:/app",
     // App expects envs to point at the mounted secret files (same as your Compose pattern)
     "OPENAI_API_KEY": "/run/secrets/openai-api-key"
     ,"UNSPLASH_ACCESS_KEY": "/run/secrets/unsplash-access-key"
@@ -49,5 +49,5 @@
     }
   },
 
-  "postCreateCommand": "pip install debugpy"
+  "postCreateCommand": "pip install debugpy && pip install -e /app/common"
 }

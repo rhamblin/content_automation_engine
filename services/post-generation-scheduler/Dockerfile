@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 WORKDIR /app
-COPY common/constants ./constants
+COPY common ./common
 ENV PYTHONPATH=/app
 COPY services/post-generation-scheduler/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

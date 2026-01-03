@@ -65,13 +65,13 @@ class AzureFoundryTextProvider(ITextProvider):
         )
     
     def __get_endpoint(self):
-        return os.getenv("MICROSOFT_FOUNDRY_ENDPOINT")
+        return os.getenv("AZURE_FOUNDRY_ENDPOINT")
 
     def __get_subscription_key(self):
         secret_path = os.getenv('AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY')
-        openai_api_key = ""
+        azure_foundry_api_key = ""
 
         with open(secret_path, 'r') as f:
-            openai_api_key = f.read().strip()
+            azure_foundry_api_key = f.read().strip()
 
-        return openai_api_key
+        return azure_foundry_api_key
