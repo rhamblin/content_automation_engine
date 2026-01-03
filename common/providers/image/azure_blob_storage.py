@@ -1,4 +1,4 @@
-from ..base import IImageProvider, ImageResult
+from . import IImageProvider, ImageResult
 import logging
 
 class AzureBlobStorageImageProvider(IImageProvider):

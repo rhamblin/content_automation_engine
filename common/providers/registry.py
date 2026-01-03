@@ -1,6 +1,8 @@
 from typing import Type
 
-from .base import IImageProvider, ITextProvider, IChannel
+from .image import IImageProvider
+from .text import ITextProvider
+from .channel import IChannel
 from ..db_core.models import Keyword, KeywordImageMatchConfidence
 from .image.unsplash import UnsplashImageProvider
 from .image.azure_blob_storage import AzureBlobStorageImageProvider

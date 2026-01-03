@@ -1,5 +1,4 @@
-from ..base import IChannel
-
+from . import IChannel
 
 class PinterestChannel(IChannel):
     def post(self, title: str, description: str, image_url: str, **kwargs) -> bool:

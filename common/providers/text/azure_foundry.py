@@ -1,4 +1,4 @@
-from common.providers.base import ITextProvider
+from . import ITextProvider
 from openai import AzureOpenAI
 import os
 import json
