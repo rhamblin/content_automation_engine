@@ -1,11 +1,9 @@
 from . import IImageProvider, ImageResult
 import logging
 
+logger = logging.getLogger(__name__)
+
 class AzureBlobStorageImageProvider(IImageProvider):
-    def __init__(self):
-        super().__init__()
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
 
     def generate_image(self, niche: str, keyword: str) -> ImageResult:
         # Placeholder implementation for Azure Blob Storage image retrieval

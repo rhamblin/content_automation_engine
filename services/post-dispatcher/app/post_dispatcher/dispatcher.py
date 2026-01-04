@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from redis import Redis
 import json
 import uuid
+import logging
 from common.constants import constants
+from common.observability.logging_config import configure_logging
+
+configure_logging()
 
 app = FastAPI(
     title="Post Dispatcher",
@@ -10,6 +14,8 @@ app = FastAPI(
     )
 
 queue = Redis(host="redis", port=6379)
+
+logger = logging.getLogger(__name__)
 
 @app.post("/v1/projects/{project_id}/integration_profiles/{profile_id}/generate")
 def dispatch(project_id: str, profile_id: str, payload: dict):

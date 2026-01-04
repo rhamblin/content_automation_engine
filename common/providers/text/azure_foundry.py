@@ -2,6 +2,9 @@ from . import ITextProvider
 from openai import AzureOpenAI
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AzureFoundryTextProvider(ITextProvider):
 

@@ -1,3 +1,4 @@
+import logging
 from typing import Type
 
 from .image import IImageProvider
@@ -8,6 +9,8 @@ from .image.unsplash import UnsplashImageProvider
 from .image.azure_blob_storage import AzureBlobStorageImageProvider
 from .text.azure_foundry import AzureFoundryTextProvider
 from .channel.pinterest import PinterestChannel
+
+logger = logging.getLogger(__name__)
 
 def get_image_provider(keyword: Keyword) -> IImageProvider:
     cls: Type[IImageProvider] = UnsplashImageProvider

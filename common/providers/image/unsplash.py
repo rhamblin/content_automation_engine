@@ -4,11 +4,9 @@ import os
 import http
 import logging
 
+logger = logging.getLogger(__name__)
+
 class UnsplashImageProvider(IImageProvider):
-    def __init__(self):
-        super().__init__()
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
 
     def generate_image(self, niche: str, keyword: str) -> ImageResult:
         self.logger.info(f"Generating image for keyword: {keyword}")
