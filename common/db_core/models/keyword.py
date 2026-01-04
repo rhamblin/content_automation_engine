@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import enum
 import uuid
 from typing import Optional
 
@@ -10,10 +9,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from common.constants import constants
 
 from .base import Base
-
-class KeywordImageMatchConfidence(enum.Enum):
-    high = "high"
-    low = "low"
 
 class Keyword(Base):
     __tablename__ = "keywords"
@@ -26,7 +21,6 @@ class Keyword(Base):
     keyword_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey(constants.NICHE_ID_FULL_QUALIFIER), nullable=False)
     keyword: Mapped[str] = mapped_column(String, nullable=False)
-    keyword_image_match_confidence: Mapped[KeywordImageMatchConfidence] = mapped_column(String, nullable=False, default=KeywordImageMatchConfidence.high.value)
 
     niche: Mapped["Niche"] = relationship(back_populates="keywords", lazy="selectin")
 
@@ -35,10 +29,9 @@ class Keyword(Base):
             "keyword_id": str(self.keyword_id),
             "niche_id": str(self.niche_id),
             "keyword": self.keyword,
-            "keyword_image_match_confidence": self.keyword_image_match_confidence,
         }
 
     def to_readable(self) -> str:
         niche_name = getattr(self.niche, "name", None)
         niche_part = f" (niche='{niche_name}')" if niche_name else ""
-        return f"Keyword[{self.keyword_id}]: '{self.keyword}'{niche_part} | niche_id={self.niche_id} | keyword_image_match_confidence={self.keyword_image_match_confidence}"
+        return f"Keyword[{self.keyword_id}]: '{self.keyword}'{niche_part} | niche_id={self.niche_id}"

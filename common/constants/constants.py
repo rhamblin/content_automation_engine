@@ -9,5 +9,4 @@ INTEGRATION_ID = "integration_id"
 # Provider Keys
 TEXT_PROVIDER_AZURE_FOUNDRY = "azure_foundry"
 CHANNEL_PINTEREST = "pinterest"
-IMAGE_PROVIDER_UNSPLASH = "unsplash"
 IMAGE_PROVIDER_AZURE_BLOB_STORAGE = "azure_blob_storage"

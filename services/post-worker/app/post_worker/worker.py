@@ -59,7 +59,7 @@ class PostWorker:
                 title = generated_text.get("title", "")
                 description = generated_text.get("description", "")
 
-                # image = getImage(niche_name, keyword)
+                # image = getImage(niche_name, key)
 
                 post = Post(
                     integration_profile_id=profile.integration_profile_id,
@@ -84,7 +84,7 @@ class PostWorker:
                 self.logger.info(f"[JOB {job_id}] Pushed post {post.post_id} to {constants.POST_READY_BROKER_NAME}")
             self.logger.info(f"[JOB {job_id}] Completed post generation for profile {profile_id}")
 
-    def getImage(self, niche_name: str, keyword: str):
-        image_provider = self.provider_registry.get_image_provider(keyword)
-        image = image_provider.generate_image(niche_name, keyword)
+    def getImage(self, niche_name: str, key: str):
+        image_provider = self.provider_registry.get_image_provider(key)
+        image = image_provider.generate_image(niche_name, key)
         return image.regular_url

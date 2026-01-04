@@ -1,6 +1,6 @@
 from .base import Base
 from .niche import Niche
-from .keyword import Keyword, KeywordImageMatchConfidence
+from .keyword import Keyword
 from .tenant import Tenant
 from .user import User
 from .tenant_user import TenantUser
@@ -13,7 +13,6 @@ __all__ = [
     "Base",
     "Niche",
     "Keyword",
-    "KeywordImageMatchConfidence",
     "Tenant",
     "User",
     "TenantUser",

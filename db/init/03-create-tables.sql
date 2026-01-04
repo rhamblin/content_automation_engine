@@ -1,3 +1,4 @@
+-- Active: 1767067788563@@127.0.0.1@5432@contentengine_development
 -- 1. Identity Schema: Tenants, Users, Tenant-Users, Projects
 
 CREATE SCHEMA IF NOT EXISTS identity;
@@ -52,10 +53,8 @@ CREATE TABLE niches.keywords (
   keyword_id  UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
   niche_id    UUID       NOT NULL REFERENCES niches.niches(niche_id) ON DELETE CASCADE,
   keyword     TEXT       NOT NULL,
-  keyword_image_match_confidence TEXT NOT NULL DEFAULT 'medium',
   CONSTRAINT uq_keyword_per_niche UNIQUE(niche_id, keyword),
-  CONSTRAINT ck_keyword_not_empty CHECK (keyword != ''),
-  CONSTRAINT ck_keyword_image_match_confidence CHECK (keyword_image_match_confidence IN ('high', 'low'))
+  CONSTRAINT ck_keyword_not_empty CHECK (keyword != '')
 );
 
 -- Index to fetch all keywords for a niche quickly

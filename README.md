@@ -2,6 +2,24 @@
 
 A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post generation; Phases 2 & 3 add Posting/Ads and Analytics/Pruning.
 
+See system diagram for full context of system design. (Doc)[./doc_assets/system-diagram.png]
+
+## Onboarding a Niche and Keywords
+The Niche API can be used to add a net new Niche or to add a keyword to a niche
+
+Once it has been onboarded then a folder with the UUID must be made in the blob storage and images to be used uploaded there.
+
+When making post, this structure is expected to be inplace for a given keyword. If UUID changes then a renaming of folders in blob storage must occur
+
+images
+  keywords
+    keyword_uuid
+      img1.png
+      img2.png
+    keyword_uuid
+      img1.png
+      img2.png
+      img3.png
 
 ## Getting Started For Local Development
 
@@ -12,7 +30,6 @@ A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post ge
     azure-blob-storage-connection-string.txt
     azure-foundry-proj-default-api-key.txt
     openai-api-key.txt
-    unsplash-access-key.txt
 
 3. **Build & run services**  
 ```bash
@@ -28,7 +45,7 @@ A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post ge
     # Tear down everything while keeping persisted volumes as the same
     docker compose --env-file ./config/dev/variables.env down
 ```
-4. **See db/init/05-seed-db.sql for sample data**
+1. **See db/init/05-seed-db.sql for sample data**
 
 ## Testing
 

@@ -17,7 +17,6 @@
   // Mount secret files exactly like Compose `/run/secrets/...`
   "mounts": [
     "source=${localWorkspaceFolder}/secrets/openai-api-key.txt,target=/run/secrets/openai-api-key,type=bind,readonly",
-    "source=${localWorkspaceFolder}/secrets/unsplash-access-key.txt,target=/run/secrets/unsplash-access-key,type=bind,readonly",
     "source=${localWorkspaceFolder}/secrets/azure-blob-storage-connection-string.txt,target=/run/secrets/azure-blob-storage-connection-string,type=bind,readonly",
     "source=${localWorkspaceFolder}/secrets/azure-foundry-proj-default-api-key.txt,target=/run/secrets/azure-foundry-proj-default-api-key,type=bind,readonly"
   ],
@@ -27,7 +26,6 @@
     "PYTHONPATH": "/app/services/post-worker/app/post_worker:/app/services/post-worker/app:/app",
     // App expects envs to point at the mounted secret files (same as your Compose pattern)
     "OPENAI_API_KEY": "/run/secrets/openai-api-key"
-    ,"UNSPLASH_ACCESS_KEY": "/run/secrets/unsplash-access-key"
     ,"AZURE_BLOB_STORAGE_CONNECTION_STRING": "/run/secrets/azure-blob-storage-connection-string"
     ,"AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY": "/run/secrets/azure-foundry-proj-default-api-key"
   },

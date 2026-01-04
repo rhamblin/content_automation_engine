@@ -27,11 +27,11 @@ BEGIN
     VALUES
       ('00000000-0000-0000-0000-000000000004', 'Sports Sneakers', 'https://www.chefexotic.com', 100, NOW());
 
-    INSERT INTO niches.keywords (keyword_id, niche_id, keyword, keyword_image_match_confidence)
+    INSERT INTO niches.keywords (keyword_id, niche_id, keyword)
     VALUES
-      ('00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000004', 'running shoes', 'high'),
-      ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000004', 'squishy soccer cleats with no laces', 'low'),
-      ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000004', 'basketball sneakers', 'high');
+      ('00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000004', 'running shoes'),
+      ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000004', 'squishy soccer cleats with no laces'),
+      ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000004', 'basketball sneakers');
 
 
     -- 3. Integration Profile for Pinterest

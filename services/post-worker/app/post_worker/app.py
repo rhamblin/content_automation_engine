@@ -7,7 +7,7 @@ from azure.storage.blob import BlobServiceClient
 from common.db_core.db_async import get_db_session
 from common.observability.logging_config import configure_logging
 from common.constants import constants
-from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel, UnsplashImageProvider 
+from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel 
 from redis.asyncio import Redis
 from .worker import PostWorker
 
@@ -24,14 +24,12 @@ async def main():
         azure_openai_client = __get_azure_openai_client()
 
         azure_blob_storage_image__provider = AzureBlobStorageImageProvider(blob_client, logger)
-        unsplash_image_provider = UnsplashImageProvider(logger)
         azure_foundry_text_provider = AzureFoundryTextProvider(azure_openai_client, logger)
         pinterest_channel_provider = PinterestChannel(logger)
 
         provider_registry = registry.ProviderRegistry(
             image_providers={
                 constants.IMAGE_PROVIDER_AZURE_BLOB_STORAGE: azure_blob_storage_image__provider,
-                constants.IMAGE_PROVIDER_UNSPLASH: unsplash_image_provider,
             },
             text_providers={
                 constants.TEXT_PROVIDER_AZURE_FOUNDRY: azure_foundry_text_provider,
