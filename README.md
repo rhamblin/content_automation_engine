@@ -83,7 +83,21 @@ PYTHONPATH=/app/services/post-worker/app:/app/common:/app python -Xfrozen_module
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-dispatcher
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-generation-scheduler
 ```
+### Tracking Logs On Local
 
+Once docker containers are running you can track logs by either
+
+1. Look at a specific container
+
+```bash
+  docker compose logs -f post-worker post-dispatcher post-generation-scheduler
+```
+
+2. Look at all logs
+
+```bash
+  docker compose logs -f
+```
 
 ## Next Steps
 

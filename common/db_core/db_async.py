@@ -24,7 +24,7 @@ def get_engine():
     logger.info(f"Creating database engine")
     engine = create_async_engine(
         ASYNC_DATABASE_URL, 
-        echo=True,
+        echo=False,
         pool_pre_ping=True,
         pool_recycle=3600)
     logger.info(f"Database engine created successfully")
