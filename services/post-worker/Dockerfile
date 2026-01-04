@@ -1,4 +1,3 @@
--- Active: 1767067788563@@127.0.0.1@5432@contentengine_development
 FROM python:3.13.5-slim
 WORKDIR /app
 COPY common ./common
