@@ -9,7 +9,7 @@ from common.observability.logging_config import configure_logging
 from common.constants import constants
 from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel, UnsplashImageProvider 
 from redis.asyncio import Redis
-from worker import PostWorker
+from .worker import PostWorker
 
 async def main():
     configure_logging()
@@ -20,10 +20,10 @@ async def main():
         db_session_factory = get_db_session
 
         # provider registries
-        # blob_client = __get_azure_blob_service_client()
+        blob_client = __get_azure_blob_service_client()
         azure_openai_client = __get_azure_openai_client()
 
-        azure_blob_storage_image__provider = None#AzureBlobStorageImageProvider(blob_client, logger)
+        azure_blob_storage_image__provider = AzureBlobStorageImageProvider(blob_client, logger)
         unsplash_image_provider = UnsplashImageProvider(logger)
         azure_foundry_text_provider = AzureFoundryTextProvider(azure_openai_client, logger)
         pinterest_channel_provider = PinterestChannel(logger)
@@ -57,7 +57,12 @@ async def main():
         await redis_broker.close()
 
 def __get_azure_blob_service_client():
-    connection_string = os.getenv("AZURE_BLOB_STORAGE_CONNECTION_STRING")
+    connection_string_secret_path = os.getenv("AZURE_BLOB_STORAGE_CONNECTION_STRING")
+    connection_string = ""
+
+    with open(connection_string_secret_path, 'r') as f:
+        connection_string = f.read().strip()
+
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     return blob_service_client
 

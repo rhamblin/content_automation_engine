@@ -10,7 +10,7 @@ from common.constants import constants
 
 class PostWorker:
     """Worker to generate posts based on messages from Redis queue"""
-    def __init__(self, redis_broker,db_session_factory, provider_registry, logger):
+    def __init__(self, redis_broker, db_session_factory, provider_registry, logger):
         self.broker = redis_broker
         self.db_session_factory = db_session_factory
         self.provider_registry = provider_registry
@@ -55,13 +55,7 @@ class PostWorker:
             for kw in profile.niche.keywords:
                 keyword = kw.keyword
                 # Generate title and description
-                generated_text = ""
-                try:
-                    generated_text = text_provider.generate_text(niche_name, keyword, channel)
-                except Exception as e:
-                    self.logger.error(f"Text generation failed for keyword {keyword} in profile {profile_id}: {e}")
-                    continue
-
+                generated_text = text_provider.generate_text(niche_name, keyword, channel)
                 title = generated_text.get("title", "")
                 description = generated_text.get("description", "")
 

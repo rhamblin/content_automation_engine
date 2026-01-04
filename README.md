@@ -65,7 +65,7 @@ The test runner has access to:
 4.	Startup containers in right order via terminal and “Reopen in container” for the container you want to debug. YOU CAN TYPE ">Dev Containers:Reopen In Container" in VS Code
 5.	Start Python Debugger via the following command
 ```bash
-PYTHONPATH=/app/services/post-worker/app:/app/common:/app python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m post_worker.worker
+PYTHONPATH=/app/services/post-worker/app:/app/common:/app python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m post_worker.app
 ```
 6.	Run -> Start Debugging : if launch.json file is not already in place then select Python Debugger -> Remote Attach -> localhost -> 5678 (or what ever is configured in devcontainer.json)
 7.	Happy Debugging!
