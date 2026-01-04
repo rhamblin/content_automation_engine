@@ -24,7 +24,7 @@ async def create_niche(db: AsyncSession, data: NicheCreate):
         name=data.name,
         domain=data.domain,
         default_budget=data.default_budget,
-        keywords=[Keyword(keyword=kw.keyword) for kw in data.keywords or []]
+        keywords=[Keyword(name=kw.keyword) for kw in data.keywords or []]
     )
     db.add(new_niche)
     await db.commit()
@@ -83,7 +83,7 @@ async def update_keyword(db: AsyncSession, keyword_id: UUID, update: KeywordUpda
     if not keyword:
         return None
 
-    keyword.keyword = update.keyword
+    keyword.name = update.keyword
     await db.commit()
     await db.refresh(keyword)
     return keyword

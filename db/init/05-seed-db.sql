@@ -21,25 +21,22 @@ BEGIN
     VALUES
       ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Phase1Project', NOW());
 
-
     -- 2. Domain Data: Niche & Keywords
     INSERT INTO niches.niches (niche_id, name, domain, default_budget, created_at)
     VALUES
       ('00000000-0000-0000-0000-000000000004', 'Sports Sneakers', 'https://www.chefexotic.com', 100, NOW());
 
-    INSERT INTO niches.keywords (keyword_id, niche_id, keyword)
+    INSERT INTO niches.keywords (keyword_id, niche_id, name)
     VALUES
       ('00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000004', 'running shoes'),
-      ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000004', 'squishy soccer cleats with no laces'),
-      ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000004', 'basketball sneakers');
-
+      ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000004', 'basketball sneakers'),
+      ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000004', 'squishy soccer cleats with no laces');
 
     -- 3. Integration Profile for Pinterest
     INSERT INTO integration_profiles (
       integration_profile_id,
       project_id,
       niche_id,
-      text_provider_key,
       channel_key,
       settings,
       created_at
@@ -47,7 +44,6 @@ BEGIN
       '00000000-0000-0000-0000-000000000007',
       '00000000-0000-0000-0000-000000000003',
       '00000000-0000-0000-0000-000000000004',
-      'azure_foundry',
       'pinterest',
       '{"default_budget":50,"post_dimensions":"1000x1500"}',
       NOW()
@@ -75,7 +71,6 @@ BEGIN
       NULL,
       NOW()
     );
-
 
     -- 5. Sample Analytics Metric (for yesterday)
     INSERT INTO analytics.metrics (post_id, date, impressions, clicks, saves)

@@ -39,7 +39,7 @@ class Niche(Base):
         }
 
     def to_readable(self) -> str:
-        kw_list = ", ".join(kw.keyword for kw in self.keywords) if self.keywords else ""
+        kw_list = ", ".join(kw.name for kw in self.keywords) if self.keywords else ""
         return (
             f"Niche[{self.niche_id}]: name='{self.name}', domain='{self.domain}', default_budget={self.default_budget}, created_at='{self.created_at}'"
             f"{', keywords=[' + kw_list + ']' if kw_list else ''}"

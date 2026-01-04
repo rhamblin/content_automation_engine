@@ -1,3 +1,4 @@
+-- Active: 1767067788563@@127.0.0.1@5432@contentengine_development
 import json
 import uuid
 import asyncio
@@ -48,18 +49,19 @@ class PostWorker:
             )
             profile = result.scalar_one()
 
-            text_provider = self.provider_registry.get_text_provider(profile.text_provider_key)
+            # Text provider is hardcoded to Azure Foundry
+            text_provider = self.provider_registry.get_text_provider()
 
             niche_name = profile.niche.name
             channel = profile.channel_key
             for kw in profile.niche.keywords:
-                keyword = kw.keyword
+                keyword = kw.name
                 # Generate title and description
                 generated_text = text_provider.generate_text(niche_name, keyword, channel)
                 title = generated_text.get("title", "")
                 description = generated_text.get("description", "")
 
-                # image = getImage(niche_name, key)
+                # image_url = self.fetch_image_url(niche_name, kw)
 
                 post = Post(
                     integration_profile_id=profile.integration_profile_id,
@@ -85,6 +87,6 @@ class PostWorker:
             self.logger.info(f"[JOB {job_id}] Completed post generation for profile {profile_id}")
 
     def getImage(self, niche_name: str, key: str):
-        image_provider = self.provider_registry.get_image_provider(key)
-        image = image_provider.generate_image(niche_name, key)
+        image_provider = self.provider_registry.get_image_provider()
+        image = image_provider.fetch_image(niche_name, key)
         return image.regular_url

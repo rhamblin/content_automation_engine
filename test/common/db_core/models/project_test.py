@@ -172,13 +172,11 @@ def test_project_cascade_delete_to_integration_profiles(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="claude",
         channel_key="instagram"
     )
     db_session.add_all([profile1, profile2])
@@ -221,13 +219,11 @@ def test_project_integration_profiles_relationship(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="claude",
         channel_key="instagram"
     )
     db_session.add_all([profile1, profile2])

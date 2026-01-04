@@ -22,7 +22,6 @@ class IntegrationProfile(Base):
             'project_id',
             'niche_id',
             'channel_key',
-            'text_provider_key',
             name='uq_integration_profile_combination'
         ),
         {'schema': 'public'}
@@ -31,7 +30,6 @@ class IntegrationProfile(Base):
     integration_profile_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("identity.projects.project_id", ondelete="CASCADE"), nullable=False)
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey(constants.NICHE_ID_FULL_QUALIFIER, ondelete="CASCADE"), nullable=False)
-    text_provider_key: Mapped[str] = mapped_column(String, nullable=False)
     channel_key: Mapped[str] = mapped_column(String, nullable=False)
     settings: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)

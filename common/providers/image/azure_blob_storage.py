@@ -1,5 +1,7 @@
-from . import IImageProvider, ImageResult
-from azure.storage.blob import BlobServiceClient
+from . import IImageProvider
+from common.db_core.models import Keyword
+from azure.storage.blob import BlobServiceClient, ContainerClient
+import random
 
 class AzureBlobStorageImageProvider(IImageProvider):
 
@@ -7,15 +9,54 @@ class AzureBlobStorageImageProvider(IImageProvider):
         self.blob_client = blob_client
         self.logger = logger
 
-    def generate_image(self, niche: str, keyword: str) -> ImageResult:
-        # Placeholder implementation for Azure Blob Storage image retrieval
-        # In a real implementation, this would interact with Azure SDK to fetch the image
-        return ImageResult(
-            regular_url="https://exampleblobstorage.com/image.jpg",
-            download_link="https://exampleblobstorage.com/download/image.jpg",
-            author_name="Azure Blob Storage",
-            author_username="azure_blob_storage",  
-            utm_parameters='utm_source=content-engine&utm_medium=referral'
-        )
+    def fetch_image(self, niche: str, keyword: Keyword) -> str:
+        """
+        Fetch a random image from Azure Blob Storage for the given keyword.
+
+        Args:
+            niche: Niche name (not currently used in blob path)
+            keyword: Keyword UUID as string
+
+        Returns:
+            URL of the selected image blob.
+
+        Expected blob structure:
+            images/keywords/{keyword_uuid}/
+                keyword_name.txt
+                img1.png
+                img2.png
+        """
+        container_name = "images"
+        prefix = f"keywords/{keyword.keyword_id}/"
+
+        try:
+            container_client: ContainerClient = self.blob_client.get_container_client(container_name)
+
+            # List all blobs in the keyword folder
+            blob_list = container_client.list_blobs(name_starts_with=prefix)
+
+            # Filter to get only image files (exclude .txt files)
+            image_blobs = [
+                blob for blob in blob_list
+                if blob.name.endswith('.png')
+            ]
+
+            if not image_blobs:
+                self.logger.error(f"No images found for keyword {keyword.name} at path {prefix}")
+                raise ValueError(f"No images found for keyword {keyword.name}")
+
+            # Randomly select an image
+            selected_blob = random.choice(image_blobs)
+
+            # Construct the blob URL
+            blob_url = f"{container_client.url}/{selected_blob.name}"
+
+            self.logger.info(f"Selected image {selected_blob.name} for keyword {keyword}")
+
+            return blob_url
+
+        except Exception as e:
+            self.logger.error(f"Error fetching image for keyword {keyword.name}: {str(e)}")
+            raise
     
     

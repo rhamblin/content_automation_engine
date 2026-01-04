@@ -138,13 +138,11 @@ def test_delete_niche_cascades_to_integration_profiles(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="claude",
         channel_key="instagram"
     )
     db_session.add_all([profile1, profile2])
@@ -192,19 +190,16 @@ def test_niche_shared_across_multiple_projects(db_session):
     profile1 = IntegrationProfile(
         project_id=project1.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project2.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="claude",
         channel_key="instagram"
     )
     profile3 = IntegrationProfile(
         project_id=project3.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="gemini",
         channel_key="twitter"
     )
     db_session.add_all([profile1, profile2, profile3])

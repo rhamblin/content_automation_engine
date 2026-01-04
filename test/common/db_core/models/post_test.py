@@ -204,7 +204,6 @@ def test_post_with_valid_integration_profile(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     db_session.add(profile)
@@ -263,7 +262,6 @@ def test_post_integration_profile_relationship(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     db_session.add(profile)
@@ -365,7 +363,6 @@ def test_multiple_posts_for_same_integration_profile(db_session):
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     db_session.add(profile)
@@ -422,13 +419,11 @@ def test_query_posts_by_integration_profile_id(db_session):
     profile1 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="openai",
         channel_key="pinterest"
     )
     profile2 = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
-        text_provider_key="claude",
         channel_key="instagram"
     )
     db_session.add_all([profile1, profile2])

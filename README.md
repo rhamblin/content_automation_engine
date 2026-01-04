@@ -9,14 +9,16 @@ The Niche API can be used to add a net new Niche or to add a keyword to a niche
 
 Once it has been onboarded then a folder with the UUID must be made in the blob storage and images to be used uploaded there.
 
-When making post, this structure is expected to be inplace for a given keyword. If UUID changes then a renaming of folders in blob storage must occur
+When making post, this structure is expected to be inplace for a given keyword. If UUID changes then a renaming of folders in blob storage must occur. The keyword_name2.txt file just keeps the human-readable keyword name to aid in cases where UUID changes and a mapping needs to be reestablished.
 
-images
-  keywords
-    keyword_uuid
+images/
+  keywords/
+    keyword_uuid_1/
+      keyword_name1.txt
       img1.png
       img2.png
-    keyword_uuid
+    keyword_uuid_2/
+      keyword_name2.txt
       img1.png
       img2.png
       img3.png
@@ -160,8 +162,8 @@ erDiagram
 - **Keyword** (`niches.keywords`)  
   Individual search terms associated with a niche.
 
-- **IntegrationProfile** (`integration_profiles`)  
-  Bundles one niche + one image/model provider + one channel + settings.
+- **IntegrationProfile** (`integration_profiles`)
+  Bundles one niche + one channel + settings.
 
 - **Post** (`posts.posts`)  
   A generated asset/text item tied to an integration profile and channel.
@@ -213,7 +215,6 @@ erDiagram
       UUID integration_profile_id PK
       UUID project_id FK
       UUID niche_id FK
-      TEXT text_provider_key
       TEXT channel_key
       JSONB settings
       TIMESTAMPTZ created_at

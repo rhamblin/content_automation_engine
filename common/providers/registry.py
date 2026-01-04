@@ -1,7 +1,6 @@
 from .image import IImageProvider
 from .text import ITextProvider
 from .channel import IChannel
-from ..db_core.models import Keyword
 from ..constants import constants
 
 class ProviderRegistry:
@@ -14,14 +13,12 @@ class ProviderRegistry:
         self.text_providers = text_providers
         self.channels = channels
 
-    def get_image_provider(self, key: str) -> IImageProvider:
-        default_provider = self.image_providers.get(constants.IMAGE_PROVIDER_AZURE_BLOB_STORAGE)
-        provider: IImageProvider = self.image_providers.get(key, default_provider)
+    def get_image_provider(self) -> IImageProvider:
+        provider: IImageProvider = self.image_providers.get(constants.IMAGE_PROVIDER_AZURE_BLOB_STORAGE)
         return provider 
 
-    def get_text_provider(self, key: str) -> ITextProvider:
-        default_provider = self.text_providers.get(constants.TEXT_PROVIDER_AZURE_FOUNDRY)
-        provider: ITextProvider = self.text_providers.get(key, default_provider)
+    def get_text_provider(self) -> ITextProvider:
+        provider: ITextProvider = self.text_providers.get(constants.TEXT_PROVIDER_AZURE_FOUNDRY)
         return provider 
 
     def get_channel(self, key: str) -> IChannel:

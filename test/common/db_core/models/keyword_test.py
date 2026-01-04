@@ -62,7 +62,7 @@ def test_keyword_requires_keyword_text(db_session):
 
     # Try to create Keyword with keyword = None
     keyword = Keyword(niche_id=niche.niche_id)
-    keyword.keyword = None  # Explicitly set to None
+    keyword.name = None  # Explicitly set to None
     db_session.add(keyword)
 
     with pytest.raises(IntegrityError):
@@ -185,14 +185,14 @@ def test_multiple_keywords_per_niche(db_session):
     retrieved_keywords = db_session.query(Keyword).filter_by(niche_id=niche.niche_id).all()
     assert len(retrieved_keywords) == 5
 
-    retrieved_keywords_text = {kw.keyword for kw in retrieved_keywords}
+    retrieved_keywords_text = {kw.name for kw in retrieved_keywords}
     assert retrieved_keywords_text == set(keywords_text)
 
     # Verify niche can access all keywords via relationship
     db_session.expire_all()
     retrieved_niche = db_session.query(Niche).filter_by(name="Finance").first()
     assert len(retrieved_niche.keywords) == 5
-    niche_keywords_text = {kw.keyword for kw in retrieved_niche.keywords}
+    niche_keywords_text = {kw.name for kw in retrieved_niche.keywords}
     assert niche_keywords_text == set(keywords_text)
 
 
@@ -223,7 +223,7 @@ def test_keyword_to_dict(db_session):
     # Verify UUIDs are converted to strings
     assert keyword_dict["keyword_id"] == str(keyword.keyword_id)
     assert keyword_dict["niche_id"] == str(niche.niche_id)
-    assert keyword_dict["keyword"] == "backpacking"
+    assert keyword_dict["name"] == "backpacking"
 
     # Verify it's a proper UUID string
     uuid.UUID(keyword_dict["keyword_id"])
@@ -322,8 +322,8 @@ def test_keyword_very_long_text(db_session):
 
     # Should be stored and retrieved correctly
     retrieved = db_session.query(Keyword).filter_by(keyword_id=keyword.keyword_id).first()
-    assert retrieved.keyword == long_keyword
-    assert len(retrieved.keyword) == 500
+    assert retrieved.name == long_keyword
+    assert len(retrieved.name) == 500
 
 def test_keyword_special_characters(db_session):
     """Test keywords with special characters and unicode"""
@@ -358,7 +358,7 @@ def test_keyword_special_characters(db_session):
     retrieved = db_session.query(Keyword).filter_by(niche_id=niche.niche_id).all()
     assert len(retrieved) == len(special_keywords)
 
-    retrieved_text = {kw.keyword for kw in retrieved}
+    retrieved_text = {kw.name for kw in retrieved}
     assert retrieved_text == set(special_keywords)
 
 def test_duplicate_keywords_in_same_niche(db_session):
@@ -514,6 +514,6 @@ def test_keyword_query_by_niche_after_multiple_operations(db_session):
     final_keywords = db_session.query(Keyword).filter_by(niche_id=niche.niche_id).all()
     assert len(final_keywords) == 3
 
-    final_keywords_text = {kw.keyword for kw in final_keywords}
+    final_keywords_text = {kw.name for kw in final_keywords}
     assert final_keywords_text == {"portrait", "macro", "street photography"}
     assert "landscape" not in final_keywords_text
