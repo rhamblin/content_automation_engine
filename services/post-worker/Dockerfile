@@ -5,4 +5,4 @@ ENV PYTHONPATH=/app
 COPY services/post-worker/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r ./requirements.txt
 COPY services/post-worker/app/ ./app
-CMD ["python", "app/post_worker/worker.py"]
+CMD ["python", "app/post_worker/app.py"]

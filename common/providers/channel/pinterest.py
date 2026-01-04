@@ -1,10 +1,11 @@
 from . import IChannel
-import logging
-
-logger = logging.getLogger(__name__)
 
 class PinterestChannel(IChannel):
+    def __init__(self, logger):
+        super().__init__()
+        self.logger = logger
+
     def post(self, title: str, description: str, image_url: str, **kwargs) -> bool:
         # Placeholder posting implementation
-        logger.info(f"Posting to Pinterest: {title} - {image_url}")
+        self.logger.info(f"Posting to Pinterest: {title} - {image_url}")
         return True

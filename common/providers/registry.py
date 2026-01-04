@@ -1,42 +1,31 @@
-import logging
-from typing import Type
-
 from .image import IImageProvider
 from .text import ITextProvider
 from .channel import IChannel
 from ..db_core.models import Keyword, KeywordImageMatchConfidence
-from .image.unsplash import UnsplashImageProvider
-from .image.azure_blob_storage import AzureBlobStorageImageProvider
-from .text.azure_foundry import AzureFoundryTextProvider
-from .channel.pinterest import PinterestChannel
+from ..constants import constants
 
-logger = logging.getLogger(__name__)
+class ProviderRegistry:
+    def __init__(self
+                , image_providers
+                , text_providers
+                , channels
+                ):
+        self.image_providers = image_providers
+        self.text_providers = text_providers
+        self.channels = channels
 
-def get_image_provider(keyword: Keyword) -> IImageProvider:
-    cls: Type[IImageProvider] = UnsplashImageProvider
+    def get_image_provider(self, keyword: Keyword) -> IImageProvider:
+        if keyword.keyword_image_match_confidence == KeywordImageMatchConfidence.low:
+            return self.image_providers.get(constants.IMAGE_PROVIDER_AZURE_BLOB_STORAGE)
+        else:
+            return self.image_providers.get(constants.IMAGE_PROVIDER_UNSPLASH)
 
-    if keyword.keyword_image_match_confidence == KeywordImageMatchConfidence.low:
-        cls = AzureBlobStorageImageProvider
+    def get_text_provider(self, key: str) -> ITextProvider:
+        default_provider = self.text_providers.get(constants.TEXT_PROVIDER_AZURE_FOUNDRY)
+        provider: ITextProvider = self.text_providers.get(key, default_provider)
+        return provider 
 
-    return cls() #returns an instance of the class
-
-def get_text_provider(key: str) -> ITextProvider:
-    text_providers = {
-        "azure_foundry": AzureFoundryTextProvider,
-    }
-
-    # Retrieve the provider class from the registry (not an instance)
-    cls: Type[ITextProvider] = text_providers.get(key, AzureFoundryTextProvider)
-
-    return cls() #returns an instance of the class
-
-
-def get_channel(key: str) -> IChannel:
-    channels = {
-        "pinterest": PinterestChannel,
-    }
-
-    # Retrieve the provider class from the registry (not an instance)
-    cls: Type[IChannel] = channels.get(key, PinterestChannel)
-
-    return cls() #returns an instance of the class
+    def get_channel(self, key: str) -> IChannel:
+        default_provider = self.channels.get(constants.CHANNEL_PINTEREST)
+        provider: IChannel = self.channels.get(key, default_provider)
+        return provider 
