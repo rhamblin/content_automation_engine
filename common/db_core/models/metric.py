@@ -13,15 +13,15 @@ from .base import Base
 class Metric(Base):
     __tablename__ = "metrics"
     __table_args__ = (
-          UniqueConstraint('post_id', 'date', name='uq_metrics_post_date'),  # Ensure one metric entry per post per day
+          UniqueConstraint('content_id', 'date', name='uq_metrics_content_date'),  # Ensure one metric entry per content per day
           {"schema": "analytics"}
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    post_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("posts.posts.post_id", ondelete="CASCADE"), nullable=False)
+    content_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("contents.contents.content_id", ondelete="CASCADE"), nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
     impressions: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
     clicks: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
     saves: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
 
-    post: Mapped["Post"] = relationship("Post", back_populates="metrics")
+    content: Mapped["Content"] = relationship("Content", back_populates="metrics")

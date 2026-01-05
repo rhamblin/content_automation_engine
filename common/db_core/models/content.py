@@ -13,26 +13,25 @@ from sqlalchemy.sql import func
 from .base import Base
 
 
-class PostStatus(enum.Enum):
-    generated = "generated"
+class ContentStatus(enum.Enum):
+    draft = "draft"
     ready = "ready"
-    posted = "posted"
-    error = "error"
+    archived = "archived"
 
 
-class Post(Base):
-    __tablename__ = "posts"
-    __table_args__ = {"schema": "posts"}
+class Content(Base):
+    __tablename__ = "contents"
+    __table_args__ = {"schema": "contents"}
 
-    post_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    content_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     integration_profile_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("public.integration_profiles.integration_profile_id", ondelete="SET NULL"), nullable=True)
     asset_url: Mapped[str] = mapped_column(Text, nullable=False)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     hashtags: Mapped[List[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
-    status: Mapped[PostStatus] = mapped_column(String, nullable=False, default=PostStatus.generated.value)
-    last_posted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    status: Mapped[ContentStatus] = mapped_column(String, nullable=False, default=ContentStatus.draft.value)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
-    integration_profile: Mapped[Optional["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="posts")
-    metrics: Mapped[List["Metric"]] = relationship("Metric", back_populates="post", cascade="all, delete", lazy="selectin")
+    integration_profile: Mapped[Optional["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="contents")
+    publications: Mapped[List["ContentPublication"]] = relationship("ContentPublication", back_populates="content", cascade="all, delete", lazy="selectin")
+    metrics: Mapped[List["Metric"]] = relationship("Metric", back_populates="content", cascade="all, delete", lazy="selectin")

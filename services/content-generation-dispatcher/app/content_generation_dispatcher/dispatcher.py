@@ -9,8 +9,8 @@ from common.observability.logging_config import configure_logging
 configure_logging()
 
 app = FastAPI(
-    title="Post Dispatcher",
-    description="This is what submits a job to the broker signalling a post should be generated",
+    title="Content Generation Dispatcher",
+    description="Submits jobs to the broker signaling content should be generated",
     )
 
 queue = Redis(host="redis", port=6379)
@@ -25,5 +25,5 @@ def dispatch(project_id: str, profile_id: str, payload: dict):
         "integration_profile_id": profile_id,
         "data": payload.get("data", {}),
     }
-    queue.lpush(constants.GENERATE_POST_QUEUE_NAME, json.dumps(job_payload))
+    queue.lpush(constants.GENERATE_CONTENT_QUEUE_NAME, json.dumps(job_payload))
     return {"status": "queued", "job_id": job_payload["job_id"]}

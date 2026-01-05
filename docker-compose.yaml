@@ -6,21 +6,21 @@ services:
       - backend
       - development
 
-  post-generation-scheduler:
+  content-generation-scheduler:
     build:
       context: .
-      dockerfile: services/post-generation-scheduler/Dockerfile
+      dockerfile: services/content-generation-scheduler/Dockerfile
     restart: unless-stopped
     networks:
       - backend
       - development
     depends_on:
-      - post-dispatcher
+      - content-generation-dispatcher
 
-  post-worker:
+  content-generation-worker:
     build:
       context: .
-      dockerfile: services/post-worker/Dockerfile
+      dockerfile: services/content-generation-worker/Dockerfile
     restart: unless-stopped
     secrets:
       - openai-api-key
@@ -40,10 +40,10 @@ services:
       - redis
       - db
 
-  post-dispatcher:
+  content-generation-dispatcher:
     build:
       context: .
-      dockerfile: services/post-dispatcher/Dockerfile
+      dockerfile: services/content-generation-dispatcher/Dockerfile
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -52,7 +52,7 @@ services:
       - development
     depends_on:
       - redis
-      - post-worker
+      - content-generation-worker
 
   test-runner:
     build:

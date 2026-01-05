@@ -6,7 +6,8 @@ from .user import User
 from .tenant_user import TenantUser
 from .project import Project
 from .integration_profile import IntegrationProfile
-from .post import Post, PostStatus
+from .content import Content, ContentStatus
+from .content_publication import ContentPublication
 from .metric import Metric
 
 __all__ = [
@@ -18,7 +19,8 @@ __all__ = [
     "TenantUser",
     "Project",
     "IntegrationProfile",
-    "Post",
-    "PostStatus",
+    "Content",
+    "ContentStatus",
+    "ContentPublication",
     "Metric",
 ]

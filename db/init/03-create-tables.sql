@@ -83,29 +83,47 @@ CREATE INDEX idx_profiles_channel_key
   ON integration_profiles(channel_key);
 
 
--- 4. Posts Schema (formerly Pins)
+-- 4. Contents Schema: Content and Content Publications
 
-CREATE SCHEMA IF NOT EXISTS posts;
+CREATE SCHEMA IF NOT EXISTS contents;
 
-CREATE TABLE posts.posts (
-  post_id                UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+-- Content table (channel-agnostic content pieces)
+CREATE TABLE contents.contents (
+  content_id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
   integration_profile_id UUID         REFERENCES integration_profiles(integration_profile_id) ON DELETE SET NULL,
   asset_url              TEXT         NOT NULL,
   title                  TEXT         NOT NULL,
   description            TEXT         NOT NULL,
-  hashtags               TEXT[]       NOT NULL,
-  status                 TEXT         NOT NULL,
-  last_posted_at         TIMESTAMPTZ,
+  hashtags               TEXT[]       NOT NULL DEFAULT '{}',
+  status                 TEXT         NOT NULL DEFAULT 'draft',
   created_at             TIMESTAMPTZ  NOT NULL DEFAULT now(),
-  CONSTRAINT chk_post_status
-    CHECK (status IN ('generated','ready','posted','error'))
+  CONSTRAINT chk_content_status
+    CHECK (status IN ('draft','ready','archived'))
 );
 
--- Indexes to fetch posts by profile and status
-CREATE INDEX idx_posts_by_profile
-  ON posts.posts(integration_profile_id);
-CREATE INDEX idx_posts_by_status
-  ON posts.posts(status);
+-- Content Publications table (tracks where content was published)
+CREATE TABLE contents.content_publications (
+  publication_id   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  content_id       UUID         NOT NULL REFERENCES contents.contents(content_id) ON DELETE CASCADE,
+  channel_key      TEXT         NOT NULL,
+  platform_post_id TEXT,
+  published_at     TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  platform_metadata JSONB       DEFAULT '{}'
+);
+
+-- Indexes for contents
+CREATE INDEX idx_contents_by_profile
+  ON contents.contents(integration_profile_id);
+CREATE INDEX idx_contents_by_status
+  ON contents.contents(status);
+
+-- Indexes for content_publications
+CREATE INDEX idx_content_publications_content_id
+  ON contents.content_publications(content_id);
+CREATE INDEX idx_content_publications_channel_key
+  ON contents.content_publications(channel_key);
+CREATE INDEX idx_content_publications_platform_post_id
+  ON contents.content_publications(platform_post_id);
 
 
 -- 5. Analytics Schema: Metrics
@@ -114,12 +132,12 @@ CREATE SCHEMA IF NOT EXISTS analytics;
 
 CREATE TABLE analytics.metrics (
   id          SERIAL     PRIMARY KEY,
-  post_id     UUID       NOT NULL REFERENCES posts.posts(post_id) ON DELETE CASCADE,
+  content_id  UUID       NOT NULL REFERENCES contents.contents(content_id) ON DELETE CASCADE,
   date        DATE       NOT NULL,
   impressions BIGINT     NOT NULL DEFAULT 0,
   clicks      BIGINT     NOT NULL DEFAULT 0,
   saves       BIGINT     NOT NULL DEFAULT 0,
-  CONSTRAINT uq_metrics_post_date UNIQUE (post_id, date)
+  CONSTRAINT uq_metrics_content_date UNIQUE (content_id, date)
 );
 
 -- Index to query metrics by date

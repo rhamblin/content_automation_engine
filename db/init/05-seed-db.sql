@@ -49,16 +49,15 @@ BEGIN
       NOW()
     );
 
-    -- 4. One Sample Post
-    INSERT INTO posts.posts (
-      post_id,
+    -- 4. Sample Content
+    INSERT INTO contents.contents (
+      content_id,
       integration_profile_id,
       asset_url,
       title,
       description,
       hashtags,
       status,
-      last_posted_at,
       created_at
     ) VALUES (
       '00000000-0000-0000-0000-000000000008',
@@ -67,13 +66,29 @@ BEGIN
       'Top-Rated Running Shoes',
       'Check out these top-rated running shoes for ultimate comfort and style.',
       ARRAY['running','sneakers','fitness'],
-      'generated',
-      NULL,
+      'draft',
       NOW()
     );
 
-    -- 5. Sample Analytics Metric (for yesterday)
-    INSERT INTO analytics.metrics (post_id, date, impressions, clicks, saves)
+    -- 5. Sample Content Publication (published to Pinterest)
+    INSERT INTO contents.content_publications (
+      publication_id,
+      content_id,
+      channel_key,
+      platform_post_id,
+      published_at,
+      platform_metadata
+    ) VALUES (
+      '00000000-0000-0000-0000-000000000009',
+      '00000000-0000-0000-0000-000000000008',
+      'pinterest',
+      '1234567890',
+      NOW() - INTERVAL '1 day',
+      '{"board_id": "abc123", "section_id": null}'
+    );
+
+    -- 6. Sample Analytics Metric (for yesterday)
+    INSERT INTO analytics.metrics (content_id, date, impressions, clicks, saves)
     VALUES
       ('00000000-0000-0000-0000-000000000008', CURRENT_DATE - INTERVAL '1 day', 150, 12, 3);
 

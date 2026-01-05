@@ -9,7 +9,7 @@ from common.observability.logging_config import configure_logging
 from common.constants import constants
 from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel 
 from redis.asyncio import Redis
-from .worker import PostWorker
+from .worker import ContentGenerationWorker
 
 async def main():
     configure_logging()
@@ -39,10 +39,10 @@ async def main():
             }
         )
     except Exception as e:
-        logger.error(f"Failed to initialize Post Worker: {e}")
+        logger.error(f"Failed to initialize Content Generation Worker: {e}")
         return
-    
-    worker = PostWorker(
+
+    worker = ContentGenerationWorker(
         redis_broker,
         db_session_factory,
         provider_registry,
