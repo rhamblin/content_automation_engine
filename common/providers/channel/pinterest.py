@@ -5,7 +5,7 @@ class PinterestChannel(IChannel):
         super().__init__()
         self.logger = logger
 
-    def post(self, title: str, description: str, image_url: str, **kwargs) -> bool:
-        # Placeholder posting implementation
-        self.logger.info(f"Posting to Pinterest: {title} - {image_url}")
+    def publish(self, title: str, description: str, image_url: str, **kwargs) -> bool:
+        # Placeholder publishing implementation
+        self.logger.info(f"Publishing to Pinterest: {title} - {image_url}")
         return True

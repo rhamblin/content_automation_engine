@@ -1,6 +1,6 @@
 # Content Automation Engine
 
-A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Post generation; Phases 2 & 3 add Posting/Ads and Analytics/Pruning.
+A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Content generation; Phases 2 & 3 add Posting/Ads and Analytics/Pruning.
 
 See system diagram for full context of system design. (Doc)[./doc_assets/system-diagram.png]
 
@@ -98,9 +98,9 @@ PYTHONPATH=/app/services/post-worker/app:/app/common:/app python -Xfrozen_module
 # This should be kept up to date as new containers/services are added and removed
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps db
   docker compose --env-file ./config/dev/variables.env up --build -d --no-deps redis
-  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-worker
-  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-dispatcher
-  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps post-generation-scheduler
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps content-generation-worker
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps content-generation-dispatcher
+  docker compose --env-file ./config/dev/variables.env up --build -d --no-deps content-generation-scheduler
 ```
 ### Tracking Logs On Local
 

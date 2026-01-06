@@ -83,7 +83,7 @@ async def update_keyword(db: AsyncSession, keyword_id: UUID, update: KeywordUpda
     if not keyword:
         return None
 
-    keyword.name = update.keyword
+    keyword.name = update.name
     await db.commit()
     await db.refresh(keyword)
     return keyword

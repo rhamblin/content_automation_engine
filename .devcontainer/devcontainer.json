@@ -1,7 +1,7 @@
 {
-  "name": "Post Worker Dev Container For Development",
+  "name": "Content Generation Worker Dev Container For Development",
   "build": {
-    "dockerfile": "../services/post-worker/Dockerfile",
+    "dockerfile": "../services/content-generation-worker/Dockerfile",
     "context": ".."
   },
 
@@ -23,7 +23,7 @@
 
   // Env vars inside the container
   "containerEnv": {
-    "PYTHONPATH": "/app/services/post-worker/app/post_worker:/app/services/post-worker/app:/app",
+    "PYTHONPATH": "/app/services/content-generation-worker/app/content_generation_worker:/app/services/content-generation-worker/app:/app",
     // App expects envs to point at the mounted secret files (same as your Compose pattern)
     "OPENAI_API_KEY": "/run/secrets/openai-api-key"
     ,"AZURE_BLOB_STORAGE_CONNECTION_STRING": "/run/secrets/azure-blob-storage-connection-string"

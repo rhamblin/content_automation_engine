@@ -97,9 +97,9 @@ def test_delete_niche_cascades_to_keywords(db_session):
     db_session.commit()
 
     # Create keywords for this niche
-    keyword1 = Keyword(niche_id=niche.niche_id, keyword="AI")
-    keyword2 = Keyword(niche_id=niche.niche_id, keyword="Machine Learning")
-    keyword3 = Keyword(niche_id=niche.niche_id, keyword="Data Science")
+    keyword1 = Keyword(niche_id=niche.niche_id, name="AI")
+    keyword2 = Keyword(niche_id=niche.niche_id, name="Machine Learning")
+    keyword3 = Keyword(niche_id=niche.niche_id, name="Data Science")
     db_session.add_all([keyword1, keyword2, keyword3])
     db_session.commit()
 
@@ -227,15 +227,15 @@ def test_keyword_same_text_different_niches_allowed(db_session):
     db_session.commit()
 
     # Create same keyword text in both niches - should succeed
-    keyword1 = Keyword(niche_id=niche1.niche_id, keyword="innovation")
-    keyword2 = Keyword(niche_id=niche2.niche_id, keyword="innovation")
+    keyword1 = Keyword(niche_id=niche1.niche_id, name="innovation")
+    keyword2 = Keyword(niche_id=niche2.niche_id, name="innovation")
     db_session.add_all([keyword1, keyword2])
     db_session.commit()
 
     # Verify both keywords exist with same text but different niches
-    keywords = db_session.query(Keyword).filter_by(keyword="innovation").all()
+    keywords = db_session.query(Keyword).filter_by(name="innovation").all()
     assert len(keywords) == 2
-    assert keywords[0].keyword == keywords[1].keyword == "innovation"
+    assert keywords[0].name == keywords[1].name == "innovation"
     assert keywords[0].niche_id != keywords[1].niche_id
 
 
@@ -247,12 +247,12 @@ def test_keyword_duplicate_within_same_niche_fails(db_session):
     db_session.commit()
 
     # Create first keyword
-    keyword1 = Keyword(niche_id=niche.niche_id, keyword="AI")
+    keyword1 = Keyword(niche_id=niche.niche_id, name="AI")
     db_session.add(keyword1)
     db_session.commit()
 
     # Try to create duplicate keyword in same niche
-    keyword2 = Keyword(niche_id=niche.niche_id, keyword="AI")
+    keyword2 = Keyword(niche_id=niche.niche_id, name="AI")
     db_session.add(keyword2)
 
     with pytest.raises(IntegrityError) as exc_info:

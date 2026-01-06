@@ -23,7 +23,7 @@ def engine(postgres_container):
     with engine.connect() as conn:
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS niches"))
-        conn.execute(text("CREATE SCHEMA IF NOT EXISTS posts"))
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS contents"))
         conn.execute(text("CREATE SCHEMA IF NOT EXISTS analytics"))
         conn.commit()
 

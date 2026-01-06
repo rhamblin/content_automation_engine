@@ -226,7 +226,7 @@ def test_integration_profile_settings_stores_complex_json(db_session):
 
     # Create complex settings
     complex_settings = {
-        "posting_schedule": {
+        "publishing_schedule": {
             "frequency": "daily",
             "times": ["09:00", "15:00", "21:00"]
         },
@@ -261,7 +261,7 @@ def test_integration_profile_settings_stores_complex_json(db_session):
     ).first()
 
     assert retrieved_profile.settings == complex_settings
-    assert retrieved_profile.settings["posting_schedule"]["frequency"] == "daily"
+    assert retrieved_profile.settings["publishing_schedule"]["frequency"] == "daily"
     assert len(retrieved_profile.settings["hashtags"]) == 3
     assert retrieved_profile.settings["budget_allocation"]["ads"] == 500
 
@@ -598,8 +598,8 @@ def test_integration_profile_with_identical_combinations(db_session):
     db_session.rollback()
 
 
-def test_delete_integration_profile_sets_null_on_posts(db_session):
-    """Test that deleting integration profile sets integration_profile_id to NULL on posts (ON DELETE SET NULL)"""
+def test_delete_integration_profile_sets_null_on_contents(db_session):
+    """Test that deleting integration profile sets integration_profile_id to NULL on contents (ON DELETE SET NULL)"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
     db_session.add(tenant)
@@ -622,7 +622,7 @@ def test_delete_integration_profile_sets_null_on_posts(db_session):
     db_session.add(profile)
     db_session.commit()
 
-    # Create posts associated with this profile
+    # Create contents associated with this profile
     content1 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image1.jpg",
@@ -637,31 +637,31 @@ def test_delete_integration_profile_sets_null_on_posts(db_session):
         description="Description 2",
         hashtags=["#test"]
     )
-    db_session.add_all([post1, post2])
+    db_session.add_all([content1, content2])
     db_session.commit()
 
-    # Store post IDs for later verification
-    content_ids = [post1.content_id, post2.content_id]
+    # Store Content IDs for later verification
+    content_ids = [content1.content_id, content2.content_id]
 
-    # Verify posts are linked to profile
+    # Verify contents are linked to profile
     assert db_session.query(Content).filter_by(integration_profile_id=profile.integration_profile_id).count() == 2
 
     # Delete integration profile
     db_session.delete(profile)
     db_session.commit()
 
-    # Verify posts still exist but integration_profile_id is NULL
+    # Verify contents still exist but integration_profile_id is NULL
     for content_id in content_ids:
         content = db_session.query(Content).filter_by(content_id=content_id).first()
-        assert post is not None  # Content should still exist
+        assert content is not None  # Content should still exist
         assert content.integration_profile_id is None  # FK should be NULL
 
-    # Verify posts count remains the same
+    # Verify contents count remains the same
     assert db_session.query(Content).filter(Content.content_id.in_(content_ids)).count() == 2
 
 
-def test_integration_profile_posts_relationship_empty(db_session):
-    """Test that integration_profile.contents returns empty list when no posts exist"""
+def test_integration_profile_contents_relationship_empty(db_session):
+    """Test that integration_profile.contents returns empty list when no contents exist"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
     db_session.add(tenant)
@@ -675,7 +675,7 @@ def test_integration_profile_posts_relationship_empty(db_session):
     db_session.add(niche)
     db_session.commit()
 
-    # Create integration profile without posts
+    # Create integration profile without contents
     profile = IntegrationProfile(
         project_id=project.project_id,
         niche_id=niche.niche_id,
@@ -687,7 +687,7 @@ def test_integration_profile_posts_relationship_empty(db_session):
     # Clear session to test lazy loading
     db_session.expire_all()
 
-    # Retrieve profile and verify posts collection is empty
+    # Retrieve profile and verify contents collection is empty
     retrieved_profile = db_session.query(IntegrationProfile).filter_by(
         integration_profile_id=profile.integration_profile_id
     ).first()
@@ -696,8 +696,8 @@ def test_integration_profile_posts_relationship_empty(db_session):
     assert len(retrieved_profile.contents) == 0
 
 
-def test_integration_profile_posts_relationship_loaded(db_session):
-    """Test that integration_profile.contents relationship loads all associated posts"""
+def test_integration_profile_contents_relationship_loaded(db_session):
+    """Test that integration_profile.contents relationship loads all associated contents"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
     db_session.add(tenant)
@@ -720,7 +720,7 @@ def test_integration_profile_posts_relationship_loaded(db_session):
     db_session.add(profile)
     db_session.commit()
 
-    # Create multiple posts for this profile
+    # Create multiple contents for this profile
     content1 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image1.jpg",
@@ -739,16 +739,16 @@ def test_integration_profile_posts_relationship_loaded(db_session):
         title="Test Content 3",
         description="Description 3"
     )
-    db_session.add_all([post1, post2, post3])
+    db_session.add_all([content1, content2, content3])
     db_session.commit()
 
-    # Store post IDs for verification
-    expected_content_ids = {post1.content_id, post2.content_id, post3.content_id}
+    # Store content IDs for verification
+    expected_content_ids = {content1.content_id, content2.content_id, content3.content_id}
 
     # Clear session to test lazy loading (with selectin)
     db_session.expire_all()
 
-    # Retrieve profile and verify posts relationship loaded
+    # Retrieve profile and verify contents relationship loaded
     retrieved_profile = db_session.query(IntegrationProfile).filter_by(
         integration_profile_id=profile.integration_profile_id
     ).first()
@@ -757,14 +757,14 @@ def test_integration_profile_posts_relationship_loaded(db_session):
     loaded_content_ids = {content.content_id for content in retrieved_profile.contents}
     assert loaded_content_ids == expected_content_ids
 
-    # Verify post data is accessible
+    # Verify content data is accessible
     for content in retrieved_profile.contents:
         assert content.asset_url.startswith("https://example.com/")
         assert content.title.startswith("Test Content")
         assert content.description.startswith("Description")
 
 
-def test_integration_profile_posts_relationship_selectin_loading(db_session):
+def test_integration_profile_contents_relationship_selectin_loading(db_session):
     """Test that integration_profile.contents uses selectin loading (lazy='selectin')"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
@@ -788,7 +788,7 @@ def test_integration_profile_posts_relationship_selectin_loading(db_session):
     db_session.add(profile)
     db_session.commit()
 
-    # Create posts for this profile
+    # Create contents for this profile
     for i in range(5):
         content = Content(
             integration_profile_id=profile.integration_profile_id,
@@ -796,24 +796,24 @@ def test_integration_profile_posts_relationship_selectin_loading(db_session):
             title=f"Test Content {i}",
             description=f"Description {i}"
         )
-        db_session.add(post)
+        db_session.add(content)
     db_session.commit()
 
     # Clear session
     db_session.expire_all()
 
-    # Retrieve profile - posts should be loaded via selectin
+    # Retrieve profile - contents should be loaded via selectin
     retrieved_profile = db_session.query(IntegrationProfile).filter_by(
         integration_profile_id=profile.integration_profile_id
     ).first()
 
-    # Accessing posts should not trigger additional queries (already loaded)
-    # This is a behavioral test - with selectin, posts are preloaded
+    # Accessing contents should not trigger additional queries (already loaded)
+    # This is a behavioral test - with selectin, contents are preloaded
     assert len(retrieved_profile.contents) == 5
 
 
-def test_integration_profile_posts_count(db_session):
-    """Test counting posts associated with an integration profile"""
+def test_integration_profile_contents_count(db_session):
+    """Test counting contents associated with an integration profile"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
     db_session.add(tenant)
@@ -841,31 +841,31 @@ def test_integration_profile_posts_count(db_session):
     db_session.add_all([profile1, profile2])
     db_session.commit()
 
-    # Create different numbers of posts for each profile
+    # Create different numbers of contents for each profile
     for i in range(7):
         content = Content(
             integration_profile_id=profile1.integration_profile_id,
             asset_url=f"https://example.com/profile1_image{i}.jpg",
-            title=f"Profile 1 Post {i}",
+            title=f"Profile 1 Content {i}",
             description=f"Description {i}"
         )
-        db_session.add(post)
+        db_session.add(content)
 
     for i in range(3):
         content = Content(
             integration_profile_id=profile2.integration_profile_id,
             asset_url=f"https://example.com/profile2_image{i}.jpg",
-            title=f"Profile 2 Post {i}",
+            title=f"Profile 2 Content {i}",
             description=f"Description {i}"
         )
-        db_session.add(post)
+        db_session.add(content)
 
     db_session.commit()
 
     # Clear session
     db_session.expire_all()
 
-    # Retrieve profiles and verify post counts
+    # Retrieve profiles and verify content counts
     retrieved_profile1 = db_session.query(IntegrationProfile).filter_by(
         integration_profile_id=profile1.integration_profile_id
     ).first()
@@ -877,8 +877,8 @@ def test_integration_profile_posts_count(db_session):
     assert len(retrieved_profile2.contents) == 3
 
 
-def test_integration_profile_posts_with_different_statuses(db_session):
-    """Test accessing posts through integration_profile with different post statuses"""
+def test_integration_profile_contents_with_different_statuses(db_session):
+    """Test accessing contents through integration_profile with different content statuses"""
     # Create dependencies
     tenant = Tenant(name="Test Tenant")
     db_session.add(tenant)
@@ -901,45 +901,45 @@ def test_integration_profile_posts_with_different_statuses(db_session):
     db_session.add(profile)
     db_session.commit()
 
-    # Create posts with different statuses
+    # Create contents with different statuses
     from common.db_core.models import ContentStatus
 
     content1 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image1.jpg",
-        title="Generated Post",
+        title="Generated Content",
         description="Description",
-        status=ContentStatus.draft.value
+        status=ContentStatus.DRAFT.value
     )
     content2 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image2.jpg",
-        title="Ready Post",
+        title="Ready Content",
         description="Description",
-        status=ContentStatus.ready.value
+        status=ContentStatus.READY_TO_PUBLISH.value
     )
     content3 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image3.jpg",
-        title="Posted Post",
+        title="Published Content",
         description="Description",
-        status=ContentStatus.archived.value
+        status=ContentStatus.PUBLISHED.value
     )
-    db_session.add_all([post1, post2, post3])
+    db_session.add_all([content1, content2, content3])
     db_session.commit()
 
     # Clear session
     db_session.expire_all()
 
-    # Retrieve profile and verify all posts are accessible regardless of status
+    # Retrieve profile and verify all contents are accessible regardless of status
     retrieved_profile = db_session.query(IntegrationProfile).filter_by(
         integration_profile_id=profile.integration_profile_id
     ).first()
 
     assert len(retrieved_profile.contents) == 3
 
-    # Verify we can filter posts by status
+    # Verify we can filter contents by status
     statuses = {content.status for content in retrieved_profile.contents}
-    assert ContentStatus.draft.value in statuses
-    assert ContentStatus.ready.value in statuses
-    assert ContentStatus.archived.value in statuses
+    assert ContentStatus.DRAFT.value in statuses
+    assert ContentStatus.READY_TO_PUBLISH.value in statuses
+    assert ContentStatus.PUBLISHED.value in statuses

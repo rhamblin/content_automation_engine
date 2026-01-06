@@ -17,7 +17,7 @@ def test_keyword_auto_generated_fields(db_session):
     db_session.commit()
 
     # Create keyword
-    keyword = Keyword(niche_id=niche.niche_id, keyword="artificial intelligence")
+    keyword = Keyword(niche_id=niche.niche_id, name="artificial intelligence")
 
     db_session.add(keyword)
     db_session.flush()  # Trigger default value generation
@@ -44,7 +44,7 @@ def test_keyword_requires_niche_id(db_session):
     db_session.commit()
 
     # Try to create Keyword with niche_id = None
-    keyword = Keyword(keyword="machine learning")
+    keyword = Keyword(name="machine learning")
     keyword.niche_id = None  # Explicitly set to None
     db_session.add(keyword)
 
@@ -78,7 +78,7 @@ def test_keyword_requires_valid_niche_fk(db_session):
     """Test that keyword must reference an existing niche (FK constraint)"""
     # Try to create Keyword with fake niche_id
     fake_niche_id = uuid.uuid4()
-    keyword = Keyword(niche_id=fake_niche_id, keyword="invalid keyword")
+    keyword = Keyword(niche_id=fake_niche_id, name="invalid keyword")
     db_session.add(keyword)
 
     with pytest.raises(IntegrityError) as exc_info:
@@ -101,7 +101,7 @@ def test_keyword_niche_relationship(db_session):
     db_session.commit()
 
     # Create keyword
-    keyword = Keyword(niche_id=niche.niche_id, keyword="cloud computing")
+    keyword = Keyword(niche_id=niche.niche_id, name="cloud computing")
     db_session.add(keyword)
     db_session.commit()
 
@@ -131,9 +131,9 @@ def test_delete_niche_cascades_to_keywords(db_session):
     db_session.commit()
 
     # Create multiple keywords for the niche
-    keyword1 = Keyword(niche_id=niche.niche_id, keyword="yoga")
-    keyword2 = Keyword(niche_id=niche.niche_id, keyword="meditation")
-    keyword3 = Keyword(niche_id=niche.niche_id, keyword="nutrition")
+    keyword1 = Keyword(niche_id=niche.niche_id, name="yoga")
+    keyword2 = Keyword(niche_id=niche.niche_id, name="meditation")
+    keyword3 = Keyword(niche_id=niche.niche_id, name="nutrition")
     db_session.add_all([keyword1, keyword2, keyword3])
     db_session.commit()
 
@@ -175,7 +175,7 @@ def test_multiple_keywords_per_niche(db_session):
 
     keywords = []
     for kw_text in keywords_text:
-        keyword = Keyword(niche_id=niche.niche_id, keyword=kw_text)
+        keyword = Keyword(niche_id=niche.niche_id, name=kw_text)
         keywords.append(keyword)
 
     db_session.add_all(keywords)
@@ -208,7 +208,7 @@ def test_keyword_to_dict(db_session):
     db_session.commit()
 
     # Create keyword
-    keyword = Keyword(niche_id=niche.niche_id, keyword="backpacking")
+    keyword = Keyword(niche_id=niche.niche_id, name="backpacking")
     db_session.add(keyword)
     db_session.commit()
 
@@ -218,7 +218,7 @@ def test_keyword_to_dict(db_session):
     assert isinstance(keyword_dict, dict)
     assert "keyword_id" in keyword_dict
     assert "niche_id" in keyword_dict
-    assert "keyword" in keyword_dict
+    assert "name" in keyword_dict
 
     # Verify UUIDs are converted to strings
     assert keyword_dict["keyword_id"] == str(keyword.keyword_id)
@@ -238,7 +238,7 @@ def test_keyword_to_readable_with_loaded_niche(db_session):
     db_session.commit()
 
     # Create keyword
-    keyword = Keyword(niche_id=niche.niche_id, keyword="vegan recipes")
+    keyword = Keyword(niche_id=niche.niche_id, name="vegan recipes")
     db_session.add(keyword)
     db_session.commit()
 
@@ -261,7 +261,7 @@ def test_keyword_to_readable_without_loaded_niche(db_session):
     db_session.commit()
 
     # Create keyword
-    keyword = Keyword(niche_id=niche.niche_id, keyword="basketball")
+    keyword = Keyword(niche_id=niche.niche_id, name="basketball")
     db_session.add(keyword)
     db_session.commit()
 
@@ -271,7 +271,7 @@ def test_keyword_to_readable_without_loaded_niche(db_session):
     db_session.expunge(keyword)  # Detach from session
 
     # Create new keyword instance without loading niche
-    detached_keyword = Keyword(keyword_id=keyword_id, niche_id=niche_id, keyword="basketball")
+    detached_keyword = Keyword(keyword_id=keyword_id, niche_id=niche_id, name="basketball")
     detached_keyword.niche = None  # Explicitly set niche to None
 
     readable = detached_keyword.to_readable()
@@ -296,7 +296,7 @@ def test_keyword_empty_string(db_session):
     db_session.commit()
 
     # Try to create keyword with empty string
-    keyword = Keyword(niche_id=niche.niche_id, keyword="")
+    keyword = Keyword(niche_id=niche.niche_id, name="")
     db_session.add(keyword)
 
     # Should raise IntegrityError due to check constraint
@@ -316,7 +316,7 @@ def test_keyword_very_long_text(db_session):
 
     # Create keyword with very long text (500 characters)
     long_keyword = "a" * 500
-    keyword = Keyword(niche_id=niche.niche_id, keyword=long_keyword)
+    keyword = Keyword(niche_id=niche.niche_id, name=long_keyword)
     db_session.add(keyword)
     db_session.commit()
 
@@ -348,7 +348,7 @@ def test_keyword_special_characters(db_session):
 
     keywords = []
     for kw_text in special_keywords:
-        keyword = Keyword(niche_id=niche.niche_id, keyword=kw_text)
+        keyword = Keyword(niche_id=niche.niche_id, name=kw_text)
         keywords.append(keyword)
 
     db_session.add_all(keywords)
@@ -372,12 +372,12 @@ def test_duplicate_keywords_in_same_niche(db_session):
     niche_id = niche.niche_id
 
     # Create first keyword
-    keyword1 = Keyword(niche_id=niche_id, keyword="SEO")
+    keyword1 = Keyword(niche_id=niche_id, name="SEO")
     db_session.add(keyword1)
     db_session.commit()
 
     # Try to create duplicate keyword (same text, same niche)
-    keyword2 = Keyword(niche_id=niche_id, keyword="SEO")
+    keyword2 = Keyword(niche_id=niche_id, name="SEO")
     db_session.add(keyword2)
 
     # Should raise IntegrityError due to unique constraint
@@ -396,13 +396,13 @@ def test_duplicate_keywords_across_niches(db_session):
     db_session.commit()
 
     # Create same keyword text for different niches
-    keyword1 = Keyword(niche_id=niche1.niche_id, keyword="automation")
-    keyword2 = Keyword(niche_id=niche2.niche_id, keyword="automation")
+    keyword1 = Keyword(niche_id=niche1.niche_id, name="automation")
+    keyword2 = Keyword(niche_id=niche2.niche_id, name="automation")
     db_session.add_all([keyword1, keyword2])
     db_session.commit()
 
     # Should be allowed
-    all_automation = db_session.query(Keyword).filter_by(keyword="automation").all()
+    all_automation = db_session.query(Keyword).filter_by(name="automation").all()
     assert len(all_automation) == 2
     assert keyword1.niche_id != keyword2.niche_id
 
@@ -419,7 +419,7 @@ def test_keyword_create_read_update_delete(db_session):
     db_session.commit()
 
     # CREATE
-    keyword = Keyword(niche_id=niche.niche_id, keyword="online learning")
+    keyword = Keyword(niche_id=niche.niche_id, name="online learning")
     db_session.add(keyword)
     db_session.commit()
     keyword_id = keyword.keyword_id
@@ -427,15 +427,15 @@ def test_keyword_create_read_update_delete(db_session):
     # READ
     retrieved = db_session.query(Keyword).filter_by(keyword_id=keyword_id).first()
     assert retrieved is not None
-    assert retrieved.keyword == "online learning"
+    assert retrieved.name == "online learning"
     assert retrieved.niche_id == niche.niche_id
 
     # UPDATE
-    retrieved.keyword = "e-learning platforms"
+    retrieved.name = "e-learning platforms"
     db_session.commit()
 
     updated = db_session.query(Keyword).filter_by(keyword_id=keyword_id).first()
-    assert updated.keyword == "e-learning platforms"
+    assert updated.name == "e-learning platforms"
 
     # DELETE
     db_session.delete(updated)
@@ -457,9 +457,9 @@ def test_no_orphaned_keywords_after_niche_deletion(db_session):
     db_session.commit()
 
     # Create keywords
-    keyword1 = Keyword(niche_id=niche.niche_id, keyword="esports")
-    keyword2 = Keyword(niche_id=niche.niche_id, keyword="streaming")
-    keyword3 = Keyword(niche_id=niche.niche_id, keyword="multiplayer")
+    keyword1 = Keyword(niche_id=niche.niche_id, name="esports")
+    keyword2 = Keyword(niche_id=niche.niche_id, name="streaming")
+    keyword3 = Keyword(niche_id=niche.niche_id, name="multiplayer")
     db_session.add_all([keyword1, keyword2, keyword3])
     db_session.commit()
 
@@ -492,9 +492,9 @@ def test_keyword_query_by_niche_after_multiple_operations(db_session):
     db_session.commit()
 
     # Add initial keywords
-    kw1 = Keyword(niche_id=niche.niche_id, keyword="portrait")
-    kw2 = Keyword(niche_id=niche.niche_id, keyword="landscape")
-    kw3 = Keyword(niche_id=niche.niche_id, keyword="macro")
+    kw1 = Keyword(niche_id=niche.niche_id, name="portrait")
+    kw2 = Keyword(niche_id=niche.niche_id, name="landscape")
+    kw3 = Keyword(niche_id=niche.niche_id, name="macro")
     db_session.add_all([kw1, kw2, kw3])
     db_session.commit()
 
@@ -506,7 +506,7 @@ def test_keyword_query_by_niche_after_multiple_operations(db_session):
     db_session.commit()
 
     # Add new keyword
-    kw4 = Keyword(niche_id=niche.niche_id, keyword="street photography")
+    kw4 = Keyword(niche_id=niche.niche_id, name="street photography")
     db_session.add(kw4)
     db_session.commit()
 

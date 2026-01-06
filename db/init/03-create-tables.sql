@@ -1,4 +1,3 @@
--- Active: 1767067788563@@127.0.0.1@5432@contentengine_development
 -- 1. Identity Schema: Tenants, Users, Tenant-Users, Projects
 
 CREATE SCHEMA IF NOT EXISTS identity;
@@ -98,7 +97,7 @@ CREATE TABLE contents.contents (
   status                 TEXT         NOT NULL DEFAULT 'draft',
   created_at             TIMESTAMPTZ  NOT NULL DEFAULT now(),
   CONSTRAINT chk_content_status
-    CHECK (status IN ('draft','ready','archived'))
+    CHECK (status IN ('draft','ready_to_publish','published', 'failed'))
 );
 
 -- Content Publications table (tracks where content was published)

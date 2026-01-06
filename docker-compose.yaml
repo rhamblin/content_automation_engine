@@ -118,7 +118,7 @@ services:
   #   networks:
   #     - backend
   #   depends_on:
-  #     - post-worker
+  #     - content-generation-worker
 
   # analytics-capture:
   #   build:

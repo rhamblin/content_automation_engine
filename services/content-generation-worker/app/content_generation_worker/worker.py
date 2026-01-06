@@ -68,7 +68,7 @@ class ContentGenerationWorker:
                     title=title,
                     description=description,
                     hashtags=[f"#{keyword}"],
-                    status=ContentStatus.ready.value,
+                    status=ContentStatus.READY_TO_PUBLISH.value,
                 )
 
                 session.add(content)

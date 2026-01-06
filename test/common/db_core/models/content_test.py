@@ -120,9 +120,9 @@ def test_content_hashtags_stores_array(db_session):
 def test_content_status_enum_values(db_session):
     """Test that all ContentStatus enum values work correctly"""
     statuses = [
-        ContentStatus.draft,
-        ContentStatus.ready,
-        ContentStatus.archived,
+        ContentStatus.DRAFT,
+        ContentStatus.READY_TO_PUBLISH,
+        ContentStatus.PUBLISHED,
     ]
 
     for status in statuses:
@@ -258,20 +258,20 @@ def test_content_status_transition_workflow(db_session):
         asset_url="https://example.com/image.jpg",
         title="Test Content",
         description="Test description",
-        status=ContentStatus.draft.value
+        status=ContentStatus.DRAFT.value
     )
     db_session.add(content)
     db_session.commit()
 
     # Transition to ready
-    content.status = ContentStatus.ready.value
+    content.status = ContentStatus.READY_TO_PUBLISH.value
     db_session.commit()
-    assert content.status == ContentStatus.ready.value
+    assert content.status == ContentStatus.READY_TO_PUBLISH.value
 
-    # Transition to archived
-    content.status = ContentStatus.archived.value
+    # Transition to published
+    content.status = ContentStatus.PUBLISHED.value
     db_session.commit()
-    assert content.status == ContentStatus.archived.value
+    assert content.status == ContentStatus.PUBLISHED.value
 
 
 def test_multiple_contents_for_same_integration_profile(db_session):
