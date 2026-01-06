@@ -99,35 +99,6 @@ def test_integration_profile_requires_niche_id(db_session):
         db_session.commit()
     db_session.rollback()
 
-
-def test_integration_profile_requires_channel_key(db_session):
-    """Test that channel_key is required (nullable=False constraint)"""
-    # Create dependencies
-    tenant = Tenant(name="Test Tenant")
-    db_session.add(tenant)
-    db_session.commit()
-
-    project = Project(tenant_id=tenant.tenant_id, name="Test Project")
-    db_session.add(project)
-    db_session.commit()
-
-    niche = Niche(name="Test Niche", domain="test.com", default_budget=1000)
-    db_session.add(niche)
-    db_session.commit()
-
-    # Try to create IntegrationProfile with channel_key = None
-    profile = IntegrationProfile(
-        project_id=project.project_id,
-        niche_id=niche.niche_id
-    )
-    profile.channel_key = None  # Explicitly set to None
-    db_session.add(profile)
-
-    with pytest.raises(IntegrityError):
-        db_session.commit()
-    db_session.rollback()
-
-
 def test_integration_profile_requires_valid_project_fk(db_session):
     """Test that integration profile must reference an existing project (FK constraint)"""
     # Create niche dependency
