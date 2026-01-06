@@ -75,14 +75,15 @@ class ContentGenerationWorker:
                 await session.commit()
 
                 # Push to next queue using async Redis
+                queue_name = f"{constants.PREFIX_CONTENT_READY_FOR_PUBLICATION_QUEUE}{profile.channel_key}"
                 await self.broker.rpush(
-                    constants.CONTENT_READY_FOR_PUBLICATION_QUEUE,
+                    queue_name,
                     json.dumps({
                         "content_id": str(content.content_id),
                         "channel_key": profile.channel_key
                     })
                 )
-                self.logger.info(f"[JOB {job_id}] Pushed content {content.content_id} to {constants.CONTENT_READY_FOR_PUBLICATION_QUEUE}")
+                self.logger.info(f"[JOB {job_id}] Pushed content {content.content_id} to {queue_name}")
             self.logger.info(f"[JOB {job_id}] Completed content generation for profile {profile_id}")
 
     def getImage(self, niche_name: str, key: str):
