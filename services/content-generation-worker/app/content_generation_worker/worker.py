@@ -5,7 +5,7 @@ import asyncio
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from common.db_core.models import IntegrationProfile, Content, ContentStatus, Niche, Keyword
+from common.db_core.models import IntegrationProfile, Content, ContentGenerationStatus, Niche, Keyword
 from common.constants import constants
 
 class ContentGenerationWorker:
@@ -68,7 +68,7 @@ class ContentGenerationWorker:
                     title=title,
                     description=description,
                     hashtags=[f"#{keyword}"],
-                    status=ContentStatus.READY_TO_PUBLISH.value,
+                    status=ContentGenerationStatus.READY.value,
                 )
 
                 session.add(content)

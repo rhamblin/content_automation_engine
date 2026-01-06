@@ -6,8 +6,8 @@ from .user import User
 from .tenant_user import TenantUser
 from .project import Project
 from .integration_profile import IntegrationProfile
-from .content import Content, ContentStatus
-from .content_publication import ContentPublication
+from .content import Content, ContentGenerationStatus
+from .content_publication import ContentPublication, PublicationStatus
 from .metric import Metric
 
 __all__ = [
@@ -20,7 +20,8 @@ __all__ = [
     "Project",
     "IntegrationProfile",
     "Content",
-    "ContentStatus",
+    "ContentGenerationStatus",
     "ContentPublication",
+    "PublicationStatus",
     "Metric",
 ]

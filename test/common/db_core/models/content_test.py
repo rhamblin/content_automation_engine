@@ -3,7 +3,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
-from common.db_core.models import Content, IntegrationProfile, Project, Tenant, Niche, ContentStatus
+from common.db_core.models import Content, IntegrationProfile, Project, Tenant, Niche, ContentGenerationStatus
 
 
 def test_content_auto_generated_fields(db_session):
@@ -118,11 +118,11 @@ def test_content_hashtags_stores_array(db_session):
 
 
 def test_content_status_enum_values(db_session):
-    """Test that all ContentStatus enum values work correctly"""
+    """Test that all ContentGenerationStatus enum values work correctly"""
     statuses = [
-        ContentStatus.DRAFT,
-        ContentStatus.READY_TO_PUBLISH,
-        ContentStatus.PUBLISHED,
+        ContentGenerationStatus.DRAFT,
+        ContentGenerationStatus.READY,
+        ContentGenerationStatus.FAILED,
     ]
 
     for status in statuses:
@@ -253,25 +253,20 @@ def test_content_integration_profile_relationship(db_session):
 
 
 def test_content_status_transition_workflow(db_session):
-    """Test a typical content status transition workflow"""
+    """Test a typical content generation status transition workflow"""
     content = Content(
         asset_url="https://example.com/image.jpg",
         title="Test Content",
         description="Test description",
-        status=ContentStatus.DRAFT.value
+        status=ContentGenerationStatus.DRAFT.value
     )
     db_session.add(content)
     db_session.commit()
 
-    # Transition to ready
-    content.status = ContentStatus.READY_TO_PUBLISH.value
+    # Transition to ready when generation completes
+    content.status = ContentGenerationStatus.READY.value
     db_session.commit()
-    assert content.status == ContentStatus.READY_TO_PUBLISH.value
-
-    # Transition to published
-    content.status = ContentStatus.PUBLISHED.value
-    db_session.commit()
-    assert content.status == ContentStatus.PUBLISHED.value
+    assert content.status == ContentGenerationStatus.READY.value
 
 
 def test_multiple_contents_for_same_integration_profile(db_session):

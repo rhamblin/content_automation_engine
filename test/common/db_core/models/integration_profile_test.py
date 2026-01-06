@@ -902,28 +902,28 @@ def test_integration_profile_contents_with_different_statuses(db_session):
     db_session.commit()
 
     # Create contents with different statuses
-    from common.db_core.models import ContentStatus
+    from common.db_core.models import ContentGenerationStatus
 
     content1 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image1.jpg",
         title="Generated Content",
         description="Description",
-        status=ContentStatus.DRAFT.value
+        status=ContentGenerationStatus.DRAFT.value
     )
     content2 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image2.jpg",
         title="Ready Content",
         description="Description",
-        status=ContentStatus.READY_TO_PUBLISH.value
+        status=ContentGenerationStatus.READY.value
     )
     content3 = Content(
         integration_profile_id=profile.integration_profile_id,
         asset_url="https://example.com/image3.jpg",
-        title="Published Content",
+        title="Failed Content",
         description="Description",
-        status=ContentStatus.PUBLISHED.value
+        status=ContentGenerationStatus.FAILED.value
     )
     db_session.add_all([content1, content2, content3])
     db_session.commit()
@@ -940,6 +940,6 @@ def test_integration_profile_contents_with_different_statuses(db_session):
 
     # Verify we can filter contents by status
     statuses = {content.status for content in retrieved_profile.contents}
-    assert ContentStatus.DRAFT.value in statuses
-    assert ContentStatus.READY_TO_PUBLISH.value in statuses
-    assert ContentStatus.PUBLISHED.value in statuses
+    assert ContentGenerationStatus.DRAFT.value in statuses
+    assert ContentGenerationStatus.READY.value in statuses
+    assert ContentGenerationStatus.FAILED.value in statuses

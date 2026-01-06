@@ -3,11 +3,11 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
-from common.db_core.models import Content, ContentPublication, IntegrationProfile, Project, Tenant, Niche
+from common.db_core.models import Content, ContentPublication, IntegrationProfile, Project, Tenant, Niche, ContentGenerationStatus, PublicationStatus
 
 
 def test_content_publication_auto_generated_fields(db_session):
-    """Test that publication_id and published_at are auto-generated"""
+    """Test that publication_id is auto-generated and published_at starts as None"""
     content = Content(
         asset_url="https://example.com/image.jpg",
         title="Test Content",
@@ -25,13 +25,12 @@ def test_content_publication_auto_generated_fields(db_session):
 
     assert publication.publication_id is not None
     assert isinstance(publication.publication_id, uuid.UUID)
-    assert publication.published_at is not None
-    assert isinstance(publication.published_at, datetime)
+    assert publication.published_at is None
 
     db_session.commit()
 
     assert publication.publication_id is not None
-    assert publication.published_at is not None
+    assert publication.published_at is None
 
 
 def test_content_publication_requires_content_id(db_session):
@@ -365,3 +364,124 @@ def test_query_publications_by_channel(db_session):
         channel_key="instagram"
     ).all()
     assert len(instagram_results) == 1
+
+
+def test_content_and_publication_status_integration(db_session):
+    """Test that Content generation status is independent from Publication status"""
+    # Create content with READY status (generation complete)
+    content = Content(
+        asset_url="https://example.com/image.jpg",
+        title="Test Content",
+        description="Test description",
+        status=ContentGenerationStatus.READY.value
+    )
+    db_session.add(content)
+    db_session.commit()
+
+    # Create multiple publications with different statuses
+    pub_pending = ContentPublication(
+        content_id=content.content_id,
+        channel_key="pinterest",
+        status=PublicationStatus.PENDING.value
+    )
+    pub_publishing = ContentPublication(
+        content_id=content.content_id,
+        channel_key="instagram",
+        status=PublicationStatus.PUBLISHING.value
+    )
+    pub_published = ContentPublication(
+        content_id=content.content_id,
+        channel_key="tiktok",
+        status=PublicationStatus.PUBLISHED.value,
+        platform_post_id="tt_123",
+        published_at=datetime.utcnow()
+    )
+    pub_failed = ContentPublication(
+        content_id=content.content_id,
+        channel_key="facebook",
+        status=PublicationStatus.FAILED.value
+    )
+
+    db_session.add_all([pub_pending, pub_publishing, pub_published, pub_failed])
+    db_session.commit()
+
+    db_session.expire_all()
+
+    # Verify content status is independent from publication statuses
+    retrieved_content = db_session.query(Content).filter_by(
+        content_id=content.content_id
+    ).first()
+
+    assert retrieved_content.status == ContentGenerationStatus.READY.value
+    assert len(retrieved_content.publications) == 4
+
+    # Verify each publication has correct status
+    pub_statuses = {pub.channel_key: pub.status for pub in retrieved_content.publications}
+    assert pub_statuses["pinterest"] == PublicationStatus.PENDING.value
+    assert pub_statuses["instagram"] == PublicationStatus.PUBLISHING.value
+    assert pub_statuses["tiktok"] == PublicationStatus.PUBLISHED.value
+    assert pub_statuses["facebook"] == PublicationStatus.FAILED.value
+
+    # Verify published_at is only set for PUBLISHED status
+    for pub in retrieved_content.publications:
+        if pub.status == PublicationStatus.PUBLISHED.value:
+            assert pub.published_at is not None
+            assert pub.platform_post_id is not None
+        else:
+            # For non-published statuses, published_at should be None
+            if pub.status in [PublicationStatus.PENDING.value, PublicationStatus.PUBLISHING.value, PublicationStatus.FAILED.value]:
+                assert pub.published_at is None
+
+
+def test_republishing_workflow(db_session):
+    """Test that same content can be republished with independent publication statuses"""
+    # Create content that's ready for publishing
+    content = Content(
+        asset_url="https://example.com/image.jpg",
+        title="Republishable Content",
+        description="Content that will be published multiple times",
+        status=ContentGenerationStatus.READY.value
+    )
+    db_session.add(content)
+    db_session.commit()
+
+    # First publication - succeeds
+    first_pub = ContentPublication(
+        content_id=content.content_id,
+        channel_key="pinterest",
+        status=PublicationStatus.PUBLISHED.value,
+        platform_post_id="pin_first_123",
+        published_at=datetime.utcnow()
+    )
+    db_session.add(first_pub)
+    db_session.commit()
+
+    # Republish same content - currently in progress
+    second_pub = ContentPublication(
+        content_id=content.content_id,
+        channel_key="pinterest",
+        status=PublicationStatus.PUBLISHING.value
+    )
+    db_session.add(second_pub)
+    db_session.commit()
+
+    # Verify content status unchanged
+    assert content.status == ContentGenerationStatus.READY.value
+
+    # Verify both publications exist independently
+    publications = db_session.query(ContentPublication).filter_by(
+        content_id=content.content_id,
+        channel_key="pinterest"
+    ).all()
+
+    assert len(publications) == 2
+
+    # Verify first publication still shows as published
+    published_pubs = [p for p in publications if p.status == PublicationStatus.PUBLISHED.value]
+    assert len(published_pubs) == 1
+    assert published_pubs[0].platform_post_id == "pin_first_123"
+
+    # Verify second publication is still publishing
+    publishing_pubs = [p for p in publications if p.status == PublicationStatus.PUBLISHING.value]
+    assert len(publishing_pubs) == 1
+    assert publishing_pubs[0].published_at is None

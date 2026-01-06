@@ -13,10 +13,9 @@ from sqlalchemy.sql import func
 from .base import Base
 
 
-class ContentStatus(enum.Enum):
+class ContentGenerationStatus(enum.Enum):
     DRAFT = "draft"
-    READY_TO_PUBLISH = "ready_to_publish"
-    PUBLISHED = "published"
+    READY = "ready"
     FAILED = "failed"
 
 class Content(Base):
@@ -29,7 +28,7 @@ class Content(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     hashtags: Mapped[List[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
-    status: Mapped[ContentStatus] = mapped_column(String, nullable=False, default=ContentStatus.DRAFT.value)
+    status: Mapped[ContentGenerationStatus] = mapped_column(String, nullable=False, default=ContentGenerationStatus.DRAFT.value)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
     integration_profile: Mapped[Optional["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="contents")
