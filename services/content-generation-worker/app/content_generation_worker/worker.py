@@ -48,27 +48,34 @@ class ContentGenerationWorker:
             )
             profile = result.scalar_one()
 
-            # Text provider is hardcoded to Azure Foundry
             text_provider = self.provider_registry.get_text_provider()
+            image_provider = self.provider_registry.get_image_provider()
 
             niche_name = profile.niche.name
             channel = profile.channel_key
             for kw in profile.niche.keywords:
                 keyword = kw.name
-                # Generate title and description
-                generated_text = text_provider.generate_text(niche_name, keyword, channel)
-                title = generated_text.get("title", "")
-                description = generated_text.get("description", "")
 
-                # image_url = self.fetch_image_url(niche_name, kw)
+                image_url = ""
+                status = ContentGenerationStatus.DRAFT.value
+                try:
+                    generated_text = text_provider.generate_text(niche_name, keyword, channel)
+                    title = generated_text.get("title", "")
+                    description = generated_text.get("description", "")
+
+                    image_url = image_provider.fetch_image(kw)
+                    status = ContentGenerationStatus.READY.value
+                except Exception as e:
+                    self.logger.error(f"[JOB {job_id}] Error generatin/fetching content for keyword {keyword}: {e}")
+                    status = ContentGenerationStatus.FAILED.value
 
                 content = Content(
                     integration_profile_id=profile.integration_profile_id,
-                    asset_url="dummy_image_url",  # Placeholder for image URL
+                    asset_url=image_url,
                     title=title,
                     description=description,
                     hashtags=[f"#{keyword}"],
-                    status=ContentGenerationStatus.READY.value,
+                    status=status,
                 )
 
                 session.add(content)
@@ -85,8 +92,3 @@ class ContentGenerationWorker:
                 )
                 self.logger.info(f"[JOB {job_id}] Pushed content {content.content_id} to {queue_name}")
             self.logger.info(f"[JOB {job_id}] Completed content generation for profile {profile_id}")
-
-    def getImage(self, niche_name: str, key: str):
-        image_provider = self.provider_registry.get_image_provider()
-        image = image_provider.fetch_image(niche_name, key)
-        return image.regular_url

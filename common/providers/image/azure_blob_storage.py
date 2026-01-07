@@ -9,23 +9,7 @@ class AzureBlobStorageImageProvider(IImageProvider):
         self.blob_client = blob_client
         self.logger = logger
 
-    def fetch_image(self, niche: str, keyword: Keyword) -> str:
-        """
-        Fetch a random image from Azure Blob Storage for the given keyword.
-
-        Args:
-            niche: Niche name (not currently used in blob path)
-            keyword: Keyword UUID as string
-
-        Returns:
-            URL of the selected image blob.
-
-        Expected blob structure:
-            images/keywords/{keyword_uuid}/
-                keyword_name.txt
-                img1.png
-                img2.png
-        """
+    def fetch_image(self, keyword: Keyword) -> str:
         container_name = "images"
         prefix = f"keywords/{keyword.keyword_id}/"
 
@@ -38,7 +22,7 @@ class AzureBlobStorageImageProvider(IImageProvider):
             # Filter to get only image files (exclude .txt files)
             image_blobs = [
                 blob for blob in blob_list
-                if blob.name.endswith('.png')
+                if not blob.name.endswith('.txt')
             ]
 
             if not image_blobs:

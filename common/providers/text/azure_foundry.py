@@ -8,8 +8,10 @@ class AzureFoundryTextProvider(ITextProvider):
         self.logger = logger
 
     def generate_text(self, niche: str, keyword: str, channel: str) -> dict:
+        self.logger.info(f"Generating text for niche='{niche}', keyword='{keyword}', channel='{channel}'")
         model_name = "gpt-5-nano"
 
+        self.logger.info(f"Calling Azure OpenAI with model '{model_name}'")
         response = self.client.chat.completions.create(
             messages=[
                 {
@@ -31,6 +33,7 @@ class AzureFoundryTextProvider(ITextProvider):
         raw_result = response.choices[0].message.content
         json_equiv = json.loads(raw_result)
 
+        self.logger.info(f"Successfully generated text for niche='{niche}', keyword='{keyword}', channel='{channel}'")
         return json_equiv
 
     def __get_system_message(self) -> str:
