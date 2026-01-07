@@ -12,13 +12,11 @@ from sqlalchemy.sql import func
 
 from .base import Base
 
-
 class PublicationStatus(enum.Enum):
     PENDING = "pending"
     PUBLISHING = "publishing"
     PUBLISHED = "published"
     FAILED = "failed"
-
 
 class ContentPublication(Base):
     __tablename__ = "content_publications"

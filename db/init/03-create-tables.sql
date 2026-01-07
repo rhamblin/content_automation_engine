@@ -97,7 +97,7 @@ CREATE TABLE contents.contents (
   status                 TEXT         NOT NULL DEFAULT 'draft',
   created_at             TIMESTAMPTZ  NOT NULL DEFAULT now(),
   CONSTRAINT chk_content_status
-    CHECK (status IN ('draft','ready_to_publish','published', 'failed'))
+    CHECK (status IN ('draft','ready', 'failed'))
 );
 
 -- Content Publications table (tracks where content was published)
@@ -105,9 +105,12 @@ CREATE TABLE contents.content_publications (
   publication_id   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
   content_id       UUID         NOT NULL REFERENCES contents.contents(content_id) ON DELETE CASCADE,
   channel_key      TEXT         NOT NULL,
+  status           TEXT         NOT NULL DEFAULT 'pending',
   platform_post_id TEXT,
-  published_at     TIMESTAMPTZ  NOT NULL DEFAULT now(),
-  platform_metadata JSONB       DEFAULT '{}'
+  published_at     TIMESTAMPTZ,
+  platform_metadata JSONB       DEFAULT '{}',
+  CONSTRAINT chk_publication_status
+    CHECK (status IN ('pending','publishing','published','failed'))
 );
 
 -- Indexes for contents
