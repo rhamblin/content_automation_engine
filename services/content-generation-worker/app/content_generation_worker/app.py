@@ -5,6 +5,7 @@ import os
 from openai import AzureOpenAI
 from azure.storage.blob import BlobServiceClient
 from common.db_core.db_async import get_db_session
+from common.settings import load_settings
 from common.observability.logging_config import configure_logging
 from common.constants import constants
 from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel 
@@ -13,6 +14,7 @@ from .worker import ContentGenerationWorker
 
 async def main():
     configure_logging()
+    settings = load_settings()
     logger = logging.getLogger(__name__)
 
     try:
@@ -20,8 +22,12 @@ async def main():
         db_session_factory = get_db_session
 
         # provider registries
-        blob_client = __get_azure_blob_service_client()
-        azure_openai_client = __get_azure_openai_client()
+        blob_client = BlobServiceClient.from_connection_string(settings.azure_blob_storage_connection_string)()
+        azure_openai_client = AzureOpenAI(
+            api_version="2024-12-01-preview",
+            azure_endpoint=settings.azure_foundry_endpoint,
+            api_key=settings.azure_foundry_api_key,
+        )
 
         azure_blob_storage_image__provider = AzureBlobStorageImageProvider(blob_client, logger)
         azure_foundry_text_provider = AzureFoundryTextProvider(azure_openai_client, logger)
@@ -53,32 +59,6 @@ async def main():
         await worker.process_message()
     finally:
         await redis_broker.close()
-
-def __get_azure_blob_service_client():
-    connection_string_secret_path = os.getenv("AZURE_BLOB_STORAGE_CONNECTION_STRING")
-    connection_string = ""
-
-    with open(connection_string_secret_path, 'r') as f:
-        connection_string = f.read().strip()
-
-    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    return blob_service_client
-
-def __get_azure_openai_client() -> AzureOpenAI:
-    endpoint = os.getenv("AZURE_FOUNDRY_ENDPOINT")
-
-    api_key_secret_path = os.getenv('AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY')
-    azure_foundry_api_key = ""
-
-    with open(api_key_secret_path, 'r') as f:
-        azure_foundry_api_key = f.read().strip()
-
-    client = AzureOpenAI(
-            api_version="2024-12-01-preview",
-            azure_endpoint=endpoint,
-            api_key=azure_foundry_api_key,
-        )
-    return client
 
 if __name__ == "__main__":
     asyncio.run(main())

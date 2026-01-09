@@ -27,11 +27,12 @@ services:
       - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     environment:
-      OPENAI_API_KEY: /run/secrets/openai-api-key
-      AZURE_BLOB_STORAGE_CONNECTION_STRING: /run/secrets/azure-blob-storage-connection-string
-      AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY: /run/secrets/azure-foundry-proj-default-api-key
+      # Secrets are read by entrypoint.sh and exported as env vars
       AZURE_FOUNDRY_ENDPOINT: ${AZURE_FOUNDRY_ENDPOINT}
       DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
     networks:
       - backend
       - database
