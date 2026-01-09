@@ -9,7 +9,7 @@ class ContentReadyForPublication:
     channel_key: str
 
     @classmethod
-    def message_name(self) -> str:
+    def message_name(cls) -> str:
         return "content_ready_for_publication"
 
     def to_json(self) -> str:

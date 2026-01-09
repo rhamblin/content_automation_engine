@@ -11,7 +11,7 @@ class ContentReadyForStyling:
     style_profile_id: Optional[str] = None
 
     @classmethod
-    def message_name(self) -> str:
+    def message_name(cls) -> str:
         return "content_ready_for_styling"
 
     def to_json(self) -> str:

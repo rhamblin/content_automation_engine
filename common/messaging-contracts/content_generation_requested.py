@@ -12,7 +12,7 @@ class ContentGenerationRequested:
     data: Optional[Dict[str, Any]] = None
 
     @classmethod
-    def message_name(self) -> str:
+    def message_name(cls) -> str:
         return "content_generation_requested"
 
     def to_json(self) -> str:

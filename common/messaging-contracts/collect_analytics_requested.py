@@ -15,7 +15,7 @@ class CollectAnalyticsRequested:
     date_range_end: Optional[str] = None
 
     @classmethod
-    def message_name(self) -> str:
+    def message_name(cls) -> str:
         return "collect_analytics_requested"
 
     def to_json(self) -> str:

@@ -14,7 +14,7 @@ class ActivityReportRequested:
     report_format: Optional[str] = None
 
     @classmethod
-    def message_name(self) -> str:
+    def message_name(cls) -> str:
         return "activity_report_requested"
 
     def to_json(self) -> str:
