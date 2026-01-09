@@ -1,0 +1,9 @@
+-e common
+
+# for message queue
+redis
+
+# for DB
+SQLAlchemy>=2.0.30,<3.0.0
+asyncpg>=0.29.0,<1.0.0
+psycopg2-binary>=2.9,<3.0
