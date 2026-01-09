@@ -14,7 +14,7 @@ class Settings:
 
     # Azure Services
     azure_foundry_endpoint: str
-    azure_foundry_api_key: str
+    azure_foundry_proj_default_api_key: str
     azure_blob_storage_connection_string: str
 
     # OpenAI
@@ -37,7 +37,7 @@ def load_settings() -> Settings:
         "DB_URL": "db_url",
         "REDIS_URL": "redis_url",
         "AZURE_FOUNDRY_ENDPOINT": "azure_foundry_endpoint",
-        "AZURE_FOUNDRY_API_KEY": "azure_foundry_api_key",
+        "AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY": "azure_foundry_proj_default_api_key",
         "AZURE_BLOB_STORAGE_CONNECTION_STRING": "azure_blob_storage_connection_string",
         "OPENAI_API_KEY": "openai_api_key",
     }

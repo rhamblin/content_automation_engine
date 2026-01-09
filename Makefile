@@ -1,4 +1,16 @@
-.PHONY: local mq down push-message
+.PHONY: infra local down push-message
+
+infra:
+	docker compose \
+	  --env-file ./config/dev/variables.env \
+	  -f docker-compose.yaml \
+	  -f config/dev/docker-compose.override.yaml \
+	  up --build -d --no-deps db && \
+	docker compose \
+	  --env-file ./config/dev/variables.env \
+	  -f docker-compose.yaml \
+	  -f config/dev/docker-compose.override.yaml \
+	  up --build -d --no-deps redis
 
 local:
 	docker compose \
@@ -6,13 +18,6 @@ local:
 	  -f docker-compose.yaml \
 	  -f config/dev/docker-compose.override.yaml \
 	  up --build -d
-
-mq:
-	docker compose \
-	  --env-file ./config/dev/variables.env \
-	  -f docker-compose.yaml \
-	  -f config/dev/docker-compose.override.yaml \
-	  up --build -d --no-deps redis
 
 down:
 	docker compose \

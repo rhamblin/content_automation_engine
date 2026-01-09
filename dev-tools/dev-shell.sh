@@ -7,3 +7,4 @@ fi
 
 . .venv/bin/activate
 pip install -q redis
+pip install -q -e ./common
