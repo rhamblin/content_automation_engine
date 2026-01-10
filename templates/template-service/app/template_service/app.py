@@ -28,18 +28,17 @@ async def main():
             async with database.session() as session:
                 await session.execute("SELECT 1")
 
+            # Add additional providers as needed
+        registry = registry.ProviderRegistry(
+            image_providers={},
+            text_providers={},
+            distribution_channels={},
+            message_broker=RedisMessageBroker(redis_broker),
+            database=database
+        )
     except Exception as e:
         logger.error(f"Failed to initialize Service: {e}")
         return
-
-    # Add additional providers as needed
-    registry = registry.ProviderRegistry(
-        image_providers={},
-        text_providers={},
-        distribution_channels={},
-        message_broker=RedisMessageBroker(redis_broker),
-        database=database
-    )
 
     worker = TemplateServiceWorker(registry, logger)
 
