@@ -11,8 +11,8 @@ class TemplateServiceWorker:
         self.registry = registry
         self.logger = logger
 
-    async def process_message(self) -> None:
-        """Main worker loop - processes messages from Redis queue"""
+    async def work(self) -> None:
+        """Main worker loop - this example processes messages with message type of LocalMessage"""
         message_name = LocalMessage.message_name()
         payload = LocalMessage(message=f"Hello from {self.__class__.__name__ }!")
         while True:

@@ -7,6 +7,9 @@ class AzureFoundryTextProvider(ITextProvider):
         self.client = azure_open_ai_client
         self.logger = logger
 
+    def provider_name(self) -> str:
+        return "azure_foundry"
+    
     def generate_text(self, niche: str, keyword: str, channel: str) -> dict:
         self.logger.info(f"Generating text for niche='{niche}', keyword='{keyword}', channel='{channel}'")
         model_name = "gpt-5-nano"

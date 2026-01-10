@@ -9,6 +9,9 @@ class AzureBlobStorageImageProvider(IImageProvider):
         self.blob_client = blob_client
         self.logger = logger
 
+    def provider_name(self) -> str:
+        return "azure_blob_storage"
+    
     def fetch_image(self, keyword: Keyword) -> str:
         container_name = "images"
         prefix = f"keywords/{keyword.keyword_id}/"

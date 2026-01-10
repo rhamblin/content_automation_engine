@@ -5,6 +5,9 @@ class PinterestChannel(IDistributionChannel):
         super().__init__()
         self.logger = logger
 
+    def provider_name(self) -> str:
+        return "pinterest"
+    
     def publish(self, title: str, description: str, image_url: str, **kwargs) -> dict:
         # Placeholder publishing implementation
         hashtags = kwargs.get('hashtags', [])

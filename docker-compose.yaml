@@ -38,13 +38,6 @@ services:
         SERVICE_CMD: '["python","-m","app.template_service.app"]'
     env_file:
       - config/dev/variables.env
-    environment:
-      # Secrets are read by entrypoint.sh and exported as env vars
-      AZURE_FOUNDRY_ENDPOINT: ${AZURE_FOUNDRY_ENDPOINT}
-      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
-      REDIS_URL: redis://redis:6379
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      ENVIRONMENT: ${ENVIRONMENT:-development}
     secrets:
       - openai-api-key
       - azure-blob-storage-connection-string
