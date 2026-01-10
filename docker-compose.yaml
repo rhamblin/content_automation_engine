@@ -54,17 +54,6 @@ services:
       - db
     networks: [backend, database]
 
-  content-generation-scheduler:
-    build:
-      context: .
-      dockerfile: services/content-generation-scheduler/Dockerfile
-    restart: unless-stopped
-    networks:
-      - backend
-      - development
-    depends_on:
-      - content-generation-dispatcher
-
   content-generation-worker:
     build:
       context: .
@@ -88,20 +77,6 @@ services:
     depends_on:
       - redis
       - db
-
-  content-generation-dispatcher:
-    build:
-      context: .
-      dockerfile: services/content-generation-dispatcher/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8001:80"
-    networks:
-      - backend
-      - development
-    depends_on:
-      - redis
-      - content-generation-worker
 
   test-runner:
     build:
