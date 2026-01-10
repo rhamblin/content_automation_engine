@@ -5,13 +5,11 @@ from azure.storage.blob import BlobServiceClient, ContainerClient
 import random
 
 class AzureBlobStorageImageProvider(IImageProvider):
+    PROVIDER_NAME = "azure_blob_storage"
 
     def __init__(self, blob_client: BlobServiceClient):
         self.logger = AppLogger(__name__)
         self.blob_client = blob_client
-
-    def provider_name(self) -> str:
-        return "azure_blob_storage"
     
     def fetch_image(self, keyword: Keyword) -> str:
         container_name = "images"

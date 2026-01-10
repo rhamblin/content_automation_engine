@@ -2,12 +2,10 @@ from common.app_logger import AppLogger
 from common.contracts import IDistributionChannel
 
 class PinterestChannel(IDistributionChannel):
+    PROVIDER_NAME = "pinterest"
+
     def __init__(self):
         self.logger = AppLogger(__name__)
-    
-
-    def provider_name(self) -> str:
-        return "pinterest"
     
     def publish(self, title: str, description: str, image_url: str, **kwargs) -> dict:
         # Placeholder publishing implementation

@@ -20,13 +20,20 @@ async def main():
         database = None
         if settings.environment == ENVIRONMENT_LOCAL:
             redis_instance = Redis(host="localhost", port=6379)
-            redis_broker = RedisMessageBroker(redis_instance)
+            message_broker = RedisMessageBroker(redis_instance)
             
             database = SQLAlchemyDatabaseProvider(settings.database_url)
 
             image_providers = {
-                providers.LocalImageProvider.provider_name(): providers.LocalImageProvider()
+                providers.LocalImageProvider.PROVIDER_NAME: providers.LocalImageProvider()
+            }
 
+            text_providers = {
+                providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
+            }
+
+            distribution_channels = {
+                providers.LocalPinterestChannel.PROVIDER_NAME: providers.LocalPinterestChannel()
             }
 
         # Test DB Connection
@@ -34,14 +41,15 @@ async def main():
             async with database.session() as session:
                 await session.execute("SELECT 1")
 
-            # Add additional providers as needed
+        # Add additional providers as needed
         registry = registry.ProviderRegistry(
-            image_providers={},
-            text_providers={},
-            distribution_channels={},
-            message_broker=RedisMessageBroker(redis_broker),
+            image_providers=image_providers,
+            text_providers=text_providers,
+            distribution_channels=distribution_channels,
+            message_broker=message_broker,
             database=database
         )
+
     except Exception as e:
         logger.error(f"Failed to initialize Service: {e}")
         return
@@ -51,7 +59,7 @@ async def main():
     try:
         await worker.work()
     finally:
-        await redis_broker.close()
+        await message_broker.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

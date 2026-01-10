@@ -4,12 +4,11 @@ from openai import AzureOpenAI
 import json
 
 class AzureFoundryTextProvider(ITextProvider):
+    PROVIDER_NAME = "azure_foundry"
+
     def __init__(self, azure_open_ai_client: AzureOpenAI):
         self.logger = AppLogger(__name__)
         self.client = azure_open_ai_client
-    
-    def provider_name(self) -> str:
-        return "azure_foundry"
     
     def generate_text(self, niche: str, keyword: str, channel: str) -> dict:
         self.logger.info(f"Generating text for niche='{niche}', keyword='{keyword}', channel='{channel}'")
