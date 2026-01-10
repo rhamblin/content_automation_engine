@@ -10,6 +10,7 @@ from .message_consumer import IMessageConsumer
 from .text_provider import ITextProvider
 from .distribution_channel import IDistributionChannel
 from .image_provider import IImageProvider
+from .database import IDatabase
 
 __all__ = [
     "ContentGenerationRequested",
@@ -24,4 +25,5 @@ __all__ = [
     "ITextProvider",
     "IImageProvider",
     "IDistributionChannel",
+    "IDatabase"
 ]

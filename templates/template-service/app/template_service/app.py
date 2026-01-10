@@ -3,7 +3,7 @@ import logging
 import os
 
 
-from common.db_core.db_async import get_db_session
+from common.providers.database import SQLAlchemyDatabase
 from common.settings import load_settings
 from common.observability.logging_config import configure_logging
 from .worker import TemplateServiceWorker
@@ -20,6 +20,11 @@ async def main():
        # Initialize any dependencies
        # include cache and database connections here
         redis_broker = Redis(host="redis", port=6379)
+
+        database = SQLAlchemyDatabase(settings.database_url, logger)
+        async with database.session() as session:
+            await session.execute("SELECT 1")
+
     except Exception as e:
         logger.error(f"Failed to initialize Service: {e}")
         return
@@ -29,7 +34,8 @@ async def main():
         text_providers={},
         distribution_channels={},
         message_consumer=RedisMessageConsumer(redis_broker, logger),
-        message_publisher=RedisMessagePublisher(redis_broker, logger)
+        message_publisher=RedisMessagePublisher(redis_broker, logger),
+        database=database
     )
 
     worker = TemplateServiceWorker(registry, logger)
