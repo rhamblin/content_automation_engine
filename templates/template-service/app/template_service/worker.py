@@ -1,6 +1,6 @@
 import asyncio
 from common.app_logger import AppLogger
-from common.contracts import LocalMessage, MessageConsumer, IMessagePublisher, message_broker, message_publisher
+from common.contracts import LocalMessage
 from common.providers import registry
 
 class TemplateServiceWorker:
@@ -15,10 +15,11 @@ class TemplateServiceWorker:
         """Main worker loop - this example processes messages with message type of LocalMessage"""
         message_name = LocalMessage.message_name()
         payload = LocalMessage(message=f"Hello from {self.__class__.__name__ }!")
+
         while True:
             try:
-                # Use async blpop
-                result = await self.broker.blpop(message_name, timeout=0)
+                result = await self.registry.get_message_broker.publish(message_name, payload.to_json()) #consume or publish?
+
                 if result:
                     _, message = result
                     try:
@@ -26,6 +27,7 @@ class TemplateServiceWorker:
                         self.logger.info(f"Received message: {payload.message}")
                     except Exception as e:
                         self.logger.error(f"Failed to process message {message}: {e}")
+
             except Exception as e:
                 self.logger.error(f"Worker loop error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying

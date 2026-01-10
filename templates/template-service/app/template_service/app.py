@@ -1,5 +1,6 @@
 import asyncio
 
+import common.providers as providers
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.settings import load_settings
@@ -22,6 +23,11 @@ async def main():
             redis_broker = RedisMessageBroker(redis_instance)
             
             database = SQLAlchemyDatabaseProvider(settings.database_url)
+
+            image_providers = {
+                providers.LocalImageProvider.provider_name(): providers.LocalImageProvider()
+
+            }
 
         # Test DB Connection
         if database:
