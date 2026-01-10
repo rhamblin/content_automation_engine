@@ -1,15 +1,14 @@
 import asyncio
 import logging
-import os
 
-
-from common.providers.database import SQLAlchemyDatabase
+from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
+from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.settings import load_settings
-from common.observability.logging_config import configure_logging
+from common.logging_config import configure_logging
 from common.constants import ENVIRONMENT_LOCAL
+
 from .worker import TemplateServiceWorker
-from common.providers.messaging import RedisMessageConsumer
-from common.providers.messaging import RedisMessagePublisher
+
 from redis.asyncio import Redis
 
 async def main():
@@ -22,7 +21,7 @@ async def main():
         database = None
         if settings.environment == ENVIRONMENT_LOCAL:
             redis_broker = Redis(host="redis", port=6379)
-            database = SQLAlchemyDatabase(settings.database_url, logger)
+            database = SQLAlchemyDatabaseProvider(settings.database_url, logger)
 
         # Test DB Connection
         if database:
@@ -38,8 +37,7 @@ async def main():
         image_providers={},
         text_providers={},
         distribution_channels={},
-        message_consumer=RedisMessageConsumer(redis_broker, logger),
-        message_publisher=RedisMessagePublisher(redis_broker, logger),
+        message_broker=RedisMessageBroker(redis_broker),
         database=database
     )
 

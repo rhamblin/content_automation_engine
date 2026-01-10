@@ -1,7 +1,6 @@
 import os
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Settings:
     """Application settings loaded once at startup from environment variables."""

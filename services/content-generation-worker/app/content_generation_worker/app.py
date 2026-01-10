@@ -5,7 +5,7 @@ import os
 from openai import AzureOpenAI
 from azure.storage.blob import BlobServiceClient
 from common.settings import load_settings
-from common.observability.logging_config import configure_logging
+from common.logging_config import configure_logging
 from common.constants import constants
 from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel 
 from redis.asyncio import Redis

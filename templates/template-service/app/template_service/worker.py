@@ -1,5 +1,5 @@
 import asyncio
-from common.contracts import LocalMessage, MessageConsumer, IMessagePublisher, message_consumer, message_publisher
+from common.contracts import LocalMessage, MessageConsumer, IMessagePublisher, message_broker, message_publisher
 from common.providers import registry
 
 class TemplateServiceWorker:

@@ -6,10 +6,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession,
 )
-from common.contracts.database import Database
+from common.contracts.database import IDatabase
 
-
-class SQLAlchemyDatabase(Database):
+class SQLAlchemyDatabaseProvider(IDatabase):
     def __init__(self, db_url: str, logger: logging.Logger):
         self.logger = logger
         self.logger.info("Creating database engine")

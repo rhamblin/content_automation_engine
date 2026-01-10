@@ -1,5 +1,5 @@
 from common.contracts import IImageProvider
-from common.contracts.database import Keyword
+from common.contracts.database_models import Keyword
 from azure.storage.blob import BlobServiceClient, ContainerClient
 import random
 
