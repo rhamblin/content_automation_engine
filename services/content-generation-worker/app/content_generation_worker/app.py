@@ -40,7 +40,7 @@ async def main():
             text_providers={
                 constants.TEXT_PROVIDER_AZURE_FOUNDRY: azure_foundry_text_provider,
             },
-            channels={
+            distribution_channels={
                 constants.CHANNEL_PINTEREST: pinterest_channel_provider,
             }
         )

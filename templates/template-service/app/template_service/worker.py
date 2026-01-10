@@ -1,10 +1,14 @@
 import asyncio
-from common.messaging_contracts import LocalMessage
+from common.contracts import LocalMessage, MessageConsumer, IMessagePublisher, message_consumer, message_publisher
+from common.providers import registry
 
 class TemplateServiceWorker:
-    """Worker to generate content based on messages from Redis queue"""
-    def __init__(self, redis_broker, logger):
-        self.broker = redis_broker
+    """Template Worker Description"""
+    def __init__(
+            self, 
+            registry: registry.ProviderRegistry,
+            logger):
+        self.registry = registry
         self.logger = logger
 
     async def process_message(self) -> None:

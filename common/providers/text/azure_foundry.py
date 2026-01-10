@@ -1,4 +1,4 @@
-from . import ITextProvider
+from common.contracts import ITextProvider
 from openai import AzureOpenAI
 import json
 

@@ -8,9 +8,11 @@ from common.db_core.db_async import get_db_session
 from common.settings import load_settings
 from common.observability.logging_config import configure_logging
 from common.constants import constants
-from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel 
+from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel
 from redis.asyncio import Redis
-from .worker import ContentGenerationWorker
+from .worker import TemplateServiceWorker
+from common.providers.messaging import RedisMessageConsumer
+from common.providers.messaging import RedisMessagePublisher
 
 async def main():
     configure_logging()
@@ -20,16 +22,25 @@ async def main():
     try:
        # Initialize any dependencies
        # include cache and database connections here
-       pass
+        redis_broker = Redis(host="redis", port=6379)
     except Exception as e:
         logger.error(f"Failed to initialize Service: {e}")
         return
 
-  #  worker = ServiceWorker(    )
-    # try:
-    #     await worker.process_message()
-    # finally:
-    #     await redis_broker.close()
+    registry = registry.ProviderRegistry(
+        image_providers={},
+        text_providers={},
+        distribution_channels={},
+        message_consumer=RedisMessageConsumer(redis_broker, logger),
+        message_publisher=RedisMessagePublisher(redis_broker, logger)
+    )
+
+    worker = TemplateServiceWorker(registry, logger)
+    
+    try:
+        await worker.process_message()
+    finally:
+        await redis_broker.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,6 +1,6 @@
 import redis
 from datetime import UTC, datetime
-from common.messaging_contracts import ContentGenerationRequested 
+from common.contracts import ContentGenerationRequested 
 
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 

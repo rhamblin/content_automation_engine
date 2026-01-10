@@ -1,6 +1,6 @@
-from . import IChannel
+from common.contracts import IDistributionChannel
 
-class PinterestChannel(IChannel):
+class PinterestChannel(IDistributionChannel):
     def __init__(self, logger):
         super().__init__()
         self.logger = logger

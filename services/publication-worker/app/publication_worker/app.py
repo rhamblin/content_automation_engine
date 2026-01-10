@@ -22,7 +22,7 @@ async def main():
         provider_registry = registry.ProviderRegistry(
             image_providers={},
             text_providers={},
-            channels={
+            distribution_channels={
                 constants.CHANNEL_PINTEREST: pinterest_channel_provider,
             }
         )

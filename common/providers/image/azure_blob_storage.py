@@ -1,4 +1,4 @@
-from . import IImageProvider
+from common.contracts import IImageProvider
 from common.db_core.models import Keyword
 from azure.storage.blob import BlobServiceClient, ContainerClient
 import random
