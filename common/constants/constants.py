@@ -4,6 +4,6 @@ PROJECT_ID = "project_id"
 INTEGRATION_ID = "integration_id"
 
 # Environments
-ENVIRONMENT_LOCAL = "local"
-ENVIRONMENT_DEV = "development"
-ENVIRONMENT_PROD = "production"
+ENVIRONMENT_LOCAL = "local" # computer
+ENVIRONMENT_DEV = "development" # cloud
+ENVIRONMENT_PROD = "production"# cloud
