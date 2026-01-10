@@ -6,8 +6,28 @@ services:
       - backend
       - development
 
+  db:
+    image: postgres:16-alpine3.22
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB:       "${POSTGRES_DB_NAME}"
+      APP_DB_USER:       "${APP_DB_USER}"
+      APP_DB_PASSWORD:   "${APP_DB_PASSWORD}"
+      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
+      ANALYTICS_DB_PASSWORD: "${ANALYTICS_DB_PASSWORD}"
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - database
+      - development
+
   # --------------------
-  # Template App Services
+  # Template App Service
   # --------------------
   template-app:
     build:
@@ -93,116 +113,6 @@ services:
       - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal  
     profiles:
       - test  # Only runs when explicitly requested
-
-  # integration-profiles-api:
-  #   build:
-  #     context: .
-  #     dockerfile: services/integration-profiles-api/Dockerfile
-  #   restart: unless-stopped
-  #   environment:
-  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
-  #   ports:
-  #     - "8003:80"
-  #   networks:
-  #     - backend
-  #     - database
-  #   depends_on:
-  #     - db
-
-  # org-service:
-  #   build:
-  #     context: .
-  #     dockerfile: services/org-service/Dockerfile
-  #   restart: unless-stopped
-  #   environment:
-  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
-  #     DEV_AUTH_BYPASS: ${DEV_AUTH_BYPASS}
-  #   ports:
-  #     - "8004:80"
-  #   networks:
-  #     - backend
-  #     - database
-  #   depends_on:
-  #     - db
-
-  # projects-api:
-  #   build:
-  #     context: .
-  #     dockerfile: services/projects-api/Dockerfile
-  #   restart: unless-stopped
-  #   environment:
-  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
-  #   ports:
-  #     - "8005:80"
-  #   networks:
-  #     - backend
-  #     - database
-  #   depends_on:
-  #     - db
-
-  # ad-automation:
-  #   build:
-  #     context: ./services/ad-automation
-  #   restart: unless-stopped
-  #   networks:
-  #     - backend
-  #   depends_on:
-  #     - content-generation-worker
-
-  # analytics-capture:
-  #   build:
-  #     context: ./services/analytics-capture
-  #   restart: unless-stopped
-  #   networks:
-  #     - backend
-  #     - database
-  #   depends_on:
-  #     - db
-
-  # pruner:
-  #   build:
-  #     context: ./services/pruner
-  #   restart: unless-stopped
-  #   networks:
-  #     - backend
-  #     - database
-  #   depends_on:
-  #     - db
-
-  # niches-api:
-  #   build:
-  #     context: .
-  #     dockerfile: services/entity-apis/niches/Dockerfile
-  #   restart: unless-stopped
-  #   environment:
-  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB}
-  #   ports:
-  #     - "8002:80"
-  #   networks:
-  #     - backend
-  #     - database
-  #   depends_on:
-  #     - db
-
-  db:
-    image: postgres:16-alpine3.22
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER:     "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB:       "${POSTGRES_DB_NAME}"
-      APP_DB_USER:       "${APP_DB_USER}"
-      APP_DB_PASSWORD:   "${APP_DB_PASSWORD}"
-      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
-      ANALYTICS_DB_PASSWORD: "${ANALYTICS_DB_PASSWORD}"
-    volumes:
-      - ./db/init:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - database
-      - development
 
 secrets:
   openai-api-key:

@@ -4,7 +4,6 @@ import os
 
 from openai import AzureOpenAI
 from azure.storage.blob import BlobServiceClient
-from common.db_core.db_async import get_db_session
 from common.settings import load_settings
 from common.observability.logging_config import configure_logging
 from common.constants import constants

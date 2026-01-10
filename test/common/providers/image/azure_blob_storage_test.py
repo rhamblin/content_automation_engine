@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock, MagicMock, patch
 from common.providers.image.azure_blob_storage import AzureBlobStorageImageProvider
-from common.db_core.models import Keyword
+from common.contracts.database import Keyword
 
 
 @pytest.fixture

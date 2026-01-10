@@ -5,7 +5,7 @@ import asyncio
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from common.db_core.models import IntegrationProfile, Content, ContentGenerationStatus, Niche, Keyword
+from common.contracts.database import IntegrationProfile, Content, ContentGenerationStatus, Niche, Keyword
 from common.constants import constants
 
 class ContentGenerationWorker:

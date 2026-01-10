@@ -6,7 +6,6 @@ WORKDIR /app
 COPY test/requirements.txt /app/test/requirements.txt
 RUN pip install --no-cache-dir -r test/requirements.txt
 
-# Copy common modules (your db_core, providers, etc.)
 COPY common/ /app/common/
 
 # Copy test files

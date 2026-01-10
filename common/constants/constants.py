@@ -1,6 +1,3 @@
-GENERATE_CONTENT_QUEUE_NAME = "generate_content_queue"
-PREFIX_CONTENT_READY_FOR_PUBLICATION_QUEUE = "content_ready_for_publication_queue_"
-
 # Database Models Constants
 NICHE_ID_FULL_QUALIFIER = "niches.niches.niche_id"
 PROJECT_ID = "project_id"

@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from testcontainers.postgres import PostgresContainer
-from common.db_core.models.base import Base
+from common.contracts.database.base import Base
 
 @pytest.fixture(scope="session")
 def postgres_container():
