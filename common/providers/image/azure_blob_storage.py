@@ -1,3 +1,4 @@
+from common.app_logger import AppLogger
 from common.contracts import IImageProvider
 from common.contracts.database_models import Keyword
 from azure.storage.blob import BlobServiceClient, ContainerClient
@@ -5,9 +6,9 @@ import random
 
 class AzureBlobStorageImageProvider(IImageProvider):
 
-    def __init__(self, blob_client: BlobServiceClient, logger):
+    def __init__(self, blob_client: BlobServiceClient):
+        self.logger = AppLogger(__name__)
         self.blob_client = blob_client
-        self.logger = logger
 
     def provider_name(self) -> str:
         return "azure_blob_storage"

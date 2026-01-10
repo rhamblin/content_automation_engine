@@ -1,12 +1,13 @@
+from common.app_logger import AppLogger
 from common.contracts import ITextProvider
 from openai import AzureOpenAI
 import json
 
 class AzureFoundryTextProvider(ITextProvider):
-    def __init__(self, azure_open_ai_client: AzureOpenAI, logger):
+    def __init__(self, azure_open_ai_client: AzureOpenAI):
+        self.logger = AppLogger(__name__)
         self.client = azure_open_ai_client
-        self.logger = logger
-
+    
     def provider_name(self) -> str:
         return "azure_foundry"
     

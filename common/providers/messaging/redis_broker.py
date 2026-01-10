@@ -1,8 +1,10 @@
+from common.app_logger import AppLogger
 from common.contracts import IMessageBroker
 
 class RedisMessageBroker(IMessageBroker):
     """Redis implementation of IMessageBroker"""
     def __init__(self, redis_client):
+        self.logger = AppLogger(__name__)
         self.redis = redis_client
 
     def consume(self, topic: str) -> dict:

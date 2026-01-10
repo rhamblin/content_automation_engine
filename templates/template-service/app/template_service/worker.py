@@ -1,4 +1,5 @@
 import asyncio
+from common.app_logger import AppLogger
 from common.contracts import LocalMessage, MessageConsumer, IMessagePublisher, message_broker, message_publisher
 from common.providers import registry
 
@@ -6,10 +7,9 @@ class TemplateServiceWorker:
     """Template Worker Description"""
     def __init__(
             self, 
-            registry: registry.ProviderRegistry,
-            logger):
+            registry: registry.ProviderRegistry):
+        self.logger = AppLogger(__name__)
         self.registry = registry
-        self.logger = logger
 
     async def work(self) -> None:
         """Main worker loop - this example processes messages with message type of LocalMessage"""

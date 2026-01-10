@@ -1,10 +1,9 @@
 import asyncio
-import logging
 
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.settings import load_settings
-from common.logging_config import configure_logging
+from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
 
 from .worker import TemplateServiceWorker
@@ -12,16 +11,17 @@ from .worker import TemplateServiceWorker
 from redis.asyncio import Redis
 
 async def main():
-    configure_logging()
+    logger = AppLogger(__name__)
     settings = load_settings()
-    logger = logging.getLogger(__name__)
 
     # Initialize any needed providers in this block
     try:
         database = None
         if settings.environment == ENVIRONMENT_LOCAL:
-            redis_broker = Redis(host="redis", port=6379)
-            database = SQLAlchemyDatabaseProvider(settings.database_url, logger)
+            redis_instance = Redis(host="localhost", port=6379)
+            redis_broker = RedisMessageBroker(redis_instance)
+            
+            database = SQLAlchemyDatabaseProvider(settings.database_url)
 
         # Test DB Connection
         if database:

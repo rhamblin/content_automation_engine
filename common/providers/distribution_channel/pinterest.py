@@ -1,9 +1,10 @@
+from common.app_logger import AppLogger
 from common.contracts import IDistributionChannel
 
 class PinterestChannel(IDistributionChannel):
-    def __init__(self, logger):
-        super().__init__()
-        self.logger = logger
+    def __init__(self):
+        self.logger = AppLogger(__name__)
+    
 
     def provider_name(self) -> str:
         return "pinterest"

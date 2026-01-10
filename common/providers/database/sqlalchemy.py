@@ -1,5 +1,5 @@
 # common/providers/sqlalchemy/database.py
-import logging
+from common.app_logger import AppLogger
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import (
 from common.contracts.database import IDatabase
 
 class SQLAlchemyDatabaseProvider(IDatabase):
-    def __init__(self, db_url: str, logger: logging.Logger):
-        self.logger = logger
+    def __init__(self, db_url: str):
+        self.logger = AppLogger(__name__)
         self.logger.info("Creating database engine")
 
         self.engine = create_async_engine(

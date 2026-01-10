@@ -1,3 +1,4 @@
+from common.app_logger import AppLogger
 from common.contracts import IDatabase, IImageProvider, ITextProvider, IDistributionChannel, IMessageConsumer, IMessagePublisher   
 from ..constants import constants
 
@@ -10,6 +11,7 @@ class ProviderRegistry:
                 , message_publisher: IMessagePublisher
                 , database: IDatabase
                 ):
+        self.logger = AppLogger(__name__)
         self.image_providers = image_providers
         self.text_providers = text_providers
         self.channels = distribution_channels
