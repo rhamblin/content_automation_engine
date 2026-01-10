@@ -2,17 +2,14 @@ import asyncio
 import logging
 import os
 
-from openai import AzureOpenAI
-from azure.storage.blob import BlobServiceClient
+
 from common.db_core.db_async import get_db_session
 from common.settings import load_settings
 from common.observability.logging_config import configure_logging
-from common.constants import constants
-from common.providers import registry, AzureBlobStorageImageProvider, AzureFoundryTextProvider, PinterestChannel
-from redis.asyncio import Redis
 from .worker import TemplateServiceWorker
 from common.providers.messaging import RedisMessageConsumer
 from common.providers.messaging import RedisMessagePublisher
+from redis.asyncio import Redis
 
 async def main():
     configure_logging()
@@ -36,7 +33,7 @@ async def main():
     )
 
     worker = TemplateServiceWorker(registry, logger)
-    
+
     try:
         await worker.process_message()
     finally:
