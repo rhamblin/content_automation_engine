@@ -5,14 +5,12 @@ import re
 import json
 
 class IMessage(ABC):
-    """Base class for messages"""
+    """Base class for message contracts.
+    
+    All subclasses MUST use @dataclass decorator.
 
-    def __init_subclass__(cls, **kwargs):
-        """Called when a subclass is defined"""
-        super().__init_subclass__(**kwargs)
-        if not is_dataclass(cls):
-            raise TypeError(f"{cls.__name__} must be a dataclass. Add @dataclass decorator.")
-        
+    """
+    
     @classmethod
     def topic(cls) -> str:
         """Auto-convert ClassName to snake_case"""

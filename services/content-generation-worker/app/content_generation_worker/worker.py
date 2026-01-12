@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import IntegrationProfile, Content, ContentGenerationStatus, Niche, Keyword
-from common.constants import constants
+import common.constants as constants
 
 class ContentGenerationWorker:
     """Worker to generate content based on messages from Redis queue"""

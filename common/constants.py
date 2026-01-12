@@ -1,3 +1,4 @@
+
 # Database Models Constants
 NICHE_ID_FULL_QUALIFIER = "niches.niches.niche_id"
 PROJECT_ID = "project_id"
