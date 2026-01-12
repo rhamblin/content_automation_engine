@@ -7,15 +7,10 @@ COPY docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Shared code
+# Platform - install common package with all dependencies
 COPY common ./common
+RUN pip install --no-cache-dir -e ./common
 ENV PYTHONPATH=/app
-
-# --------
-# Platform deps (cached across all services)
-# --------
-COPY platform-requirements.txt ./platform-requirements.txt
-RUN pip install --no-cache-dir -r platform-requirements.txt
 
 # --------
 # Service deps + code
