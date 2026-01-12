@@ -22,6 +22,6 @@ ENV SERVICE_NAME=${SERVICE_NAME}
 COPY services/${SERVICE_NAME}/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY services/${SERVICE_NAME}/app/ ./app
+COPY services/${SERVICE_NAME}/ ./
 
-CMD sh -c "python -m app.$(echo $SERVICE_NAME | tr '-' '_').app"
+CMD sh -c "python -m $(echo $SERVICE_NAME | tr '-' '_').app"
