@@ -1,7 +1,10 @@
 from . import registry
-from .image.azure_blob_storage import AzureBlobStorageImageProvider, LocalImageProvider
-from .text.azure_foundry import AzureFoundryTextProvider, LocalTextProvider
-from .distribution_channel.pinterest import PinterestChannel, LocalPinterestChannel
+from .image.azure_blob_storage import AzureBlobStorageImageProvider
+from .image.local_image_provider import LocalImageProvider
+from .text.azure_foundry import AzureFoundryTextProvider
+from .text.local_text_provider import LocalTextProvider
+from .distribution_channel.pinterest import PinterestChannel
+from .distribution_channel.local_channel import LocalDistributionChannel
 from .messaging.redis_broker import RedisMessageBroker
 from .database.sqlalchemy import SQLAlchemyDatabaseProvider
 
@@ -14,5 +17,5 @@ __all__ = [
     'SQLAlchemyDatabaseProvider',
     'LocalImageProvider',
     'LocalTextProvider',
-    'LocalPinterestChannel'
+    'LocalDistributionChannel'
 ]
