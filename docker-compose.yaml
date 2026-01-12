@@ -29,15 +29,15 @@ services:
   # --------------------
   # Template App Service
   # --------------------
-  template-app:
+  template-service:
     build:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        SERVICE_NAME: template-app
+        SERVICE_NAME: template-service
         SERVICE_CMD: '["python","-m","app.template_service.app"]'
     env_file:
-      - config/dev/variables.env
+      - config/local/variables.env
     secrets:
       - openai-api-key
       - azure-blob-storage-connection-string
@@ -47,40 +47,40 @@ services:
       - db
     networks: [backend, database]
 
-  content-generation-worker:
-    build:
-      context: .
-      dockerfile: services/content-generation-worker/Dockerfile
-    restart: unless-stopped
-    secrets:
-      - openai-api-key
-      - azure-blob-storage-connection-string
-      - azure-foundry-proj-default-api-key
-    environment:
-      # Secrets are read by entrypoint.sh and exported as env vars
-      AZURE_FOUNDRY_ENDPOINT: ${AZURE_FOUNDRY_ENDPOINT}
-      DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
-      REDIS_URL: redis://redis:6379
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      ENVIRONMENT: ${ENVIRONMENT:-development}
-    networks:
-      - backend
-      - database
-      - development
-    depends_on:
-      - redis
-      - db
+  # content-generation-worker:
+  #   build:
+  #     context: .
+  #     dockerfile: services/content-generation-worker/Dockerfile
+  #   restart: unless-stopped
+  #   secrets:
+  #     - openai-api-key
+  #     - azure-blob-storage-connection-string
+  #     - azure-foundry-proj-default-api-key
+  #   environment:
+  #     # Secrets are read by entrypoint.sh and exported as env vars
+  #     AZURE_FOUNDRY_ENDPOINT: ${AZURE_FOUNDRY_ENDPOINT}
+  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
+  #     REDIS_URL: redis://redis:6379
+  #     LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  #     ENVIRONMENT: ${ENVIRONMENT:-development}
+  #   networks:
+  #     - backend
+  #     - database
+  #     - development
+  #   depends_on:
+  #     - redis
+  #     - db
 
-  test-runner:
-    build:
-      context: .
-      dockerfile: test/Dockerfile
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # Required for testcontainers
-    environment:
-      - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal  
-    profiles:
-      - test  # Only runs when explicitly requested
+  # test-runner:
+  #   build:
+  #     context: .
+  #     dockerfile: test/Dockerfile
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock  # Required for testcontainers
+  #   environment:
+  #     - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal  
+  #   profiles:
+  #     - test  # Only runs when explicitly requested
 
 secrets:
   openai-api-key:
@@ -92,7 +92,7 @@ secrets:
 
 volumes:
   db_data:
-    name: "${APP_NAME}_${APP_ENV}_db_data"
+    name: "${APP_NAME}_${APP_ENVIRONMENT}_db_data"
 
 networks:
   database:

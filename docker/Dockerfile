@@ -14,8 +14,8 @@ ENV PYTHONPATH=/app
 # --------
 # Platform deps (cached across all services)
 # --------
-COPY requirements.platform.txt ./requirements.platform.txt
-RUN pip install --no-cache-dir -r requirements.platform.txt
+COPY platform-requirements.txt ./platform-requirements.txt
+RUN pip install --no-cache-dir -r platform-requirements.txt
 
 # --------
 # Service deps + code
