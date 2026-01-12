@@ -6,7 +6,6 @@ class Settings:
     """Application settings loaded once at startup from environment variables."""
     app_environment: str
     database_url: str
-    redis_url: str
 
     # Azure Services
     azure_foundry_endpoint: str
@@ -28,7 +27,6 @@ def load_settings() -> Settings:
     required_vars = {
         "APP_ENVIRONMENT": "app_environment",
         "DATABASE_URL": "database_url",
-        "REDIS_URL": "redis_url",
         "AZURE_FOUNDRY_ENDPOINT": "azure_foundry_endpoint",
         "AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY": "azure_foundry_proj_default_api_key",
         "AZURE_BLOB_STORAGE_CONNECTION_STRING": "azure_blob_storage_connection_string",

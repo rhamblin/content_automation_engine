@@ -13,7 +13,7 @@ if [ -f /run/secrets/azure-blob-storage-connection-string ]; then
 fi
 
 if [ -f /run/secrets/azure-foundry-proj-default-api-key ]; then
-  export AZURE_FOUNDRY_API_KEY="$(cat /run/secrets/azure-foundry-proj-default-api-key)"
+  export AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY="$(cat /run/secrets/azure-foundry-proj-default-api-key)"
 fi
 
 # Start the real process

@@ -16,12 +16,12 @@ class TemplateServiceWorker:
 
         while True:
             try:
-                data: LocalInputMessage = await self.registry.get_message_broker.consume(LocalInputMessage)
+                data: LocalInputMessage = await self.registry.get_message_broker().consume(LocalInputMessage)
 
                 if data:
                     contents = data.message
                     message = LocalOutputMessage(message=f"Message Received. Hello from {self.__class__.__name__ }! For record, your message was {contents}")
-                    await self.registry.get_message_broker.publish(message)
+                    await self.registry.get_message_broker().publish(message)
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying
