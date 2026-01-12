@@ -59,7 +59,9 @@ async def main():
     try:
         await worker.work()
     finally:
+        logger.info("Shutting down worker...")
         await message_broker.close()
-
+        logger.info("Shutdown complete")
+        
 if __name__ == "__main__":
     asyncio.run(main())

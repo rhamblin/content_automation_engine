@@ -12,9 +12,9 @@ class RedisMessageBroker(IMessageBroker):
         message = self.redis.blpop(topic.topic())
         if message:
             topic_name, payload = message
-            return topic.from_json(payload)
+            return topic.deserialize(payload)
         return None
 
     def publish(self, message: IMessage) -> None:
         """Publish a message to the specified topic"""
-        self.redis.rpush(message.topic(), message.to_json())
+        self.redis.rpush(message.topic(), message.serialize())

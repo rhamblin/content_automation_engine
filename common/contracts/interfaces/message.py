@@ -21,10 +21,10 @@ class IMessage(ABC):
         return name
 
     @classmethod
-    def from_json(cls, json_str: str) -> Self:
+    def deserialize(cls, json_str: str) -> Self:
         """Deserialize from JSON string"""
         return cls(**json.loads(json_str))
     
-    def to_json(self) -> str:
+    def serialize(self) -> str:
         """Serialize to JSON string"""
         return json.dumps(asdict(self))

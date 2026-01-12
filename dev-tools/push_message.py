@@ -11,6 +11,6 @@ payload = ContentGenerationRequested(
     data={"key": "value"},
 )
 
-r.xadd(ContentGenerationRequested.message_name(), payload.to_json())
+r.xadd(ContentGenerationRequested.message_name(), payload.serialize())
 
 print("Message pushed")
