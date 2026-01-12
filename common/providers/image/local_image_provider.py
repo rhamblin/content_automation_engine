@@ -1,5 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts.image_provider import IImageProvider
+from common.contracts.interfaces.image_provider import IImageProvider
 
 class LocalImageProvider(IImageProvider):
     PROVIDER_NAME = "LocalImageProvider"

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession,
 )
-from common.contracts.database import IDatabase
+from common.contracts.interfaces.database import IDatabase
 
 class SQLAlchemyDatabaseProvider(IDatabase):
     def __init__(self, db_url: str):

@@ -1,5 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts.text_provider import ITextProvider
+from common.contracts.interfaces.text_provider import ITextProvider
 
 class LocalTextProvider(ITextProvider):
     PROVIDER_NAME = "LocalTextProvider"
