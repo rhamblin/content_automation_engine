@@ -67,10 +67,9 @@ async def main(logger: AppLogger):
         await worker.work()
     finally:
         logger.info("Shutting down worker...")
-        if message_broker:
-            await message_broker.close()
+        await registry.shutdown()
         logger.info("Shutdown complete")
-
+        
 @retry(
     stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=2, max=10)
