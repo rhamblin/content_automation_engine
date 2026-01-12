@@ -25,7 +25,7 @@ teardown:
 	  down -v
 
 push-message:
-	. local-tools/local-shell.sh && python local-tools/push_message.py
+	. dev-tools/dev-shell.sh && python dev-tools/push_message.py
 
 logs:
 	docker compose logs -f
