@@ -11,7 +11,6 @@ from sqlalchemy.sql import func
 
 from .base import Base
 from common.constants import NICHE_ID_FULL_QUALIFIER
-from common.providers import PinterestChannel
 
 class IntegrationProfile(Base):
     __tablename__ = "integration_profiles"
@@ -28,7 +27,7 @@ class IntegrationProfile(Base):
     integration_profile_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("identity.projects.project_id", ondelete="CASCADE"), nullable=False)
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey(NICHE_ID_FULL_QUALIFIER, ondelete="CASCADE"), nullable=False)
-    channel_key: Mapped[str] = mapped_column(String, nullable=False, default=PinterestChannel.PROVIDER_NAME)
+    channel_key: Mapped[str] = mapped_column(String, nullable=False, default="pinterest")
     settings: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
 
