@@ -1,0 +1,58 @@
+# ConfigMap: Non-sensitive configuration shared across all services
+# These are plain-text values (use Secrets for sensitive data)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+  namespace: content-automation
+  labels:
+    app: content-engine
+data:
+  # Environment Configuration
+  ENVIRONMENT: "development"
+  LOG_LEVEL: "INFO"
+
+  # Redis Configuration (assuming Redis runs on host for local dev)
+  REDIS_HOST: "host.docker.internal"
+  REDIS_PORT: "6379"
+  REDIS_URL: "redis://host.docker.internal:6379"
+
+  # Database Configuration (non-sensitive parts)
+  # Sensitive values (user, password) come from Secret
+  DB_HOST: "host.docker.internal"
+  DB_PORT: "5432"
+  DB_NAME: "content_automation_db"
+
+  # Application Settings
+  APP_NAME: "content-automation-engine"
+  API_VERSION: "v1"
+
+  # Feature Flags (example)
+  FEATURE_ANALYTICS_ENABLED: "true"
+  FEATURE_CONTENT_GENERATION_ENABLED: "true"
+
+  # Timeouts and Limits (example)
+  REQUEST_TIMEOUT_SECONDS: "30"
+  MAX_CONCURRENT_REQUESTS: "100"
+
+---
+# How services use this ConfigMap:
+#
+# Option 1 - Load all values as environment variables:
+#   envFrom:
+#   - configMapRef:
+#       name: shared-config
+#
+# Option 2 - Load specific values:
+#   env:
+#   - name: ENVIRONMENT
+#     valueFrom:
+#       configMapKeyRef:
+#         name: shared-config
+#         key: ENVIRONMENT
+#
+# Option 3 - Mount as files:
+#   volumes:
+#   - name: config
+#     configMap:
+#       name: shared-config

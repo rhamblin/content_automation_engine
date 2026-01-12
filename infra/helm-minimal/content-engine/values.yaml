@@ -19,3 +19,4 @@ services:
   promotion-orchestrator:
     port: 8004
     replicas: 2
+  

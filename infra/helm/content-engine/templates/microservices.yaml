@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: {{ $name }}
-        image: {{ include "content-engine.image" $service }}
+        image: {{ $.Values.global.imageRegistry }}/{{ $service.image }}:{{ $service.tag | default "latest" }}
         imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
         {{- if $service.port }}
         ports:
