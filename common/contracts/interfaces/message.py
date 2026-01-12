@@ -20,11 +20,11 @@ class IMessage(ABC):
         name = re.sub('([A-Z])', r'_\1', cls.__name__).lower().lstrip('_')
         return name
 
-    def to_json(self) -> str:
-        """Serialize to JSON string"""
-        return json.dumps(asdict(self))
-
     @classmethod
     def from_json(cls, json_str: str) -> Self:
         """Deserialize from JSON string"""
         return cls(**json.loads(json_str))
+    
+    def to_json(self) -> str:
+        """Serialize to JSON string"""
+        return json.dumps(asdict(self))

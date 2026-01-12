@@ -5,6 +5,7 @@ from .messages.activity_report_requested import ActivityReportRequested
 from .messages.content_ready_for_styling import ContentReadyForStyling
 from .messages.content_ready_for_publication import ContentReadyForPublication
 from .messages.local_input_message import LocalInputMessage
+from .messages.local_output_message import LocalOutputMessage
 from .interfaces.message_broker import IMessageBroker
 from .interfaces.message import IMessage
 from .interfaces.text_provider import ITextProvider
@@ -20,6 +21,7 @@ __all__ = [
     "ContentReadyForStyling",
     "ContentReadyForPublication",
     "LocalInputMessage",
+    "LocalOutputMessage",
     "IMessageBroker",
     "IMessage",
     "ITextProvider",

@@ -1,5 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts import IMessageBroker
+from common.contracts import IMessageBroker, IMessage
 
 class RedisMessageBroker(IMessageBroker):
     """Redis implementation of IMessageBroker"""
@@ -7,13 +7,14 @@ class RedisMessageBroker(IMessageBroker):
         self.logger = AppLogger(__name__)
         self.redis = redis_client
 
-    def consume(self, topic: str) -> dict:
+    def consume(self, topic: type[IMessage]) -> IMessage:
         """Consume a message from the specified topic"""
-        message = self.redis.blpop(topic)
+        message = self.redis.blpop(topic.topic())
         if message:
-            return message
-        return {}
-    
-    def publish(self, topic: str, payload: dict) -> None:
+            topic_name, payload = message
+            return topic.from_json(payload)
+        return None
+
+    def publish(self, message: IMessage) -> None:
         """Publish a message to the specified topic"""
-        self.redis.rpush(topic, payload)
+        self.redis.rpush(message.topic(), message.to_json())
