@@ -32,7 +32,7 @@ services:
   template-service:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: infra/docker/Dockerfile
       args:
         SERVICE_NAME: template-service
         SERVICE_CMD: '["python","-m","app.template_service.app"]'
