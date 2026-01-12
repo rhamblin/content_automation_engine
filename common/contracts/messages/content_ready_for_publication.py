@@ -1,22 +1,9 @@
-from dataclasses import dataclass, asdict
-import json
-
+from common.contracts import IMessage
+from dataclasses import dataclass
 
 @dataclass
-class ContentReadyForPublication:
+class ContentReadyForPublication(IMessage):
     """Message contract for content ready for publication"""
+
     content_id: str
     channel_key: str
-
-    @classmethod
-    def message_name(cls) -> str:
-        return "content_ready_for_publication"
-
-    def to_json(self) -> str:
-        """Serialize to JSON string"""
-        return json.dumps(asdict(self))
-
-    @classmethod
-    def from_json(cls, json_str: str) -> 'ContentReadyForPublication':
-        """Deserialize from JSON string"""
-        return cls(**json.loads(json_str))

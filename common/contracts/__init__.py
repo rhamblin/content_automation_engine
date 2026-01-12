@@ -4,12 +4,13 @@ from .messages.collect_analytics_requested import CollectAnalyticsRequested
 from .messages.activity_report_requested import ActivityReportRequested
 from .messages.content_ready_for_styling import ContentReadyForStyling
 from .messages.content_ready_for_publication import ContentReadyForPublication
-from .messages.local_message import LocalMessage
-from .message_broker import IMessageBroker
-from .text_provider import ITextProvider
-from .distribution_channel import IDistributionChannel
-from .image_provider import IImageProvider
-from .database import IDatabase
+from .messages.local_input_message import LocalInputMessage
+from .interfaces.message_broker import IMessageBroker
+from .interfaces.message import IMessage
+from .interfaces.text_provider import ITextProvider
+from .interfaces.distribution_channel import IDistributionChannel
+from .interfaces.image_provider import IImageProvider
+from .interfaces.database import IDatabase
 
 __all__ = [
     "ContentGenerationRequested",
@@ -18,8 +19,9 @@ __all__ = [
     "ActivityReportRequested",
     "ContentReadyForStyling",
     "ContentReadyForPublication",
-    "LocalMessage",
+    "LocalInputMessage",
     "IMessageBroker",
+    "IMessage",
     "ITextProvider",
     "IImageProvider",
     "IDistributionChannel",
