@@ -10,7 +10,6 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 # Platform - install common package with all dependencies
 COPY common ./common
 RUN pip install --no-cache-dir -e ./common
-ENV PYTHONPATH=/app
 
 # --------
 # Service deps + code
