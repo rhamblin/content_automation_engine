@@ -1,4 +1,4 @@
-.PHONY: infra local teardown publish consume logs k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: infra local cleanup publish consume logs k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -26,7 +26,7 @@ local:
 	  -f config/local/docker-compose.override.yaml \
 	  up --build -d
 
-teardown:
+cleanup:
 	docker compose \
 	  --env-file ./config/local/variables.env \
 	  down -v
