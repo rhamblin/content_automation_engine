@@ -1,6 +1,6 @@
-from common.contracts import IMessage
 from dataclasses import dataclass
 from typing import Optional, Dict, Any
+from ..interfaces.message import IMessage
 
 @dataclass
 class ContentGenerationRequested(IMessage):

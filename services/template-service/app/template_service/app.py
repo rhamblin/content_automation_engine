@@ -15,11 +15,13 @@ async def main():
     logger = AppLogger(__name__)
     settings = load_settings()
 
+    logger.info(f"Starting Template Service in {settings.app_environment} environment.")
+    
     # Initialize any needed providers in this block
     try:
         database = None
-        if settings.environment == ENVIRONMENT_LOCAL:
-            redis_instance = Redis(host="localhost", port=6379)
+        if settings.app_environment == ENVIRONMENT_LOCAL:
+            redis_instance = Redis(host="redis", port=6379)
             message_broker = RedisMessageBroker(redis_instance)
             
             database = SQLAlchemyDatabaseProvider(settings.database_url)
@@ -54,7 +56,7 @@ async def main():
         logger.error(f"Failed to initialize Service: {e}")
         return
 
-    worker = TemplateServiceWorker(registry, logger)
+    worker = TemplateServiceWorker(registry)
 
     try:
         await worker.work()

@@ -36,6 +36,7 @@ services:
       args:
         SERVICE_NAME: template-service
         SERVICE_CMD: '["python","-m","app.template_service.app"]'
+    restart: unless-stopped
     env_file:
       - config/local/variables.env
     secrets:

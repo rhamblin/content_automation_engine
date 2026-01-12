@@ -5,7 +5,7 @@ from dataclasses import dataclass
 class Settings:
     """Application settings loaded once at startup from environment variables."""
     app_environment: str
-    db_url: str
+    database_url: str
     redis_url: str
 
     # Azure Services
@@ -27,7 +27,7 @@ def load_settings() -> Settings:
     # Required environment variables
     required_vars = {
         "APP_ENVIRONMENT": "app_environment",
-        "DB_URL": "db_url",
+        "DATABASE_URL": "database_url",
         "REDIS_URL": "redis_url",
         "AZURE_FOUNDRY_ENDPOINT": "azure_foundry_endpoint",
         "AZURE_FOUNDRY_PROJ_DEFAULT_API_KEY": "azure_foundry_proj_default_api_key",

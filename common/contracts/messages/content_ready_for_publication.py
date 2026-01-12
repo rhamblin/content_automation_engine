@@ -1,4 +1,4 @@
-from common.contracts import IMessage
+from ..interfaces.message import IMessage
 from dataclasses import dataclass
 
 @dataclass
