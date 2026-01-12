@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 setup(
     name="common",
     version="0.1.0",
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     install_requires=[
         # Database
         "SQLAlchemy>=2.0.30,<3.0.0",

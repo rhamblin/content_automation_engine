@@ -20,8 +20,12 @@ class TemplateServiceWorker:
 
                 if data:
                     contents = data.message
+                    self.logger.info(f"Received message: {data}")
+                    
                     message = LocalOutputMessage(message=f"Message Received. Hello from {self.__class__.__name__ }! For record, your message was {contents}")
+                    
                     await self.registry.get_message_broker().publish(message)
+                    self.logger.info(f"Published response message!")
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying

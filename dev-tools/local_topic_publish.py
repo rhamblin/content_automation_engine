@@ -5,18 +5,18 @@ from common.contracts import LocalInputMessage
 from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.app_logger import AppLogger
 
-async def push_local_message():
+async def publish_local_message():
     logger = AppLogger(__name__)
     logger.info("Pushing test message to Redis broker...")
 
     redis_instance = Redis(host="localhost", port=6379)
     message_broker = RedisMessageBroker(redis_instance)
 
-    payload = LocalInputMessage(message="Are you there?")
+    payload = LocalInputMessage(message="This is DevTools. Are you there?")
 
     await message_broker.publish(payload)
-    logger.info("Message published successfully.")
+    logger.info(f"Message published successfully. Message content: {payload}")
 
-asyncio.run(push_local_message())
+asyncio.run(publish_local_message())
 
 

@@ -7,6 +7,4 @@ fi
 
 . .venv/bin/activate
 pip install -q redis
-# pip install -q -e ./common
-pip install --no-cache-dir -e ./common
-
+pip install -q -e ./common

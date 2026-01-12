@@ -24,8 +24,11 @@ teardown:
 	  --env-file ./config/local/variables.env \
 	  down -v
 
-push-message:
-	. dev-tools/dev-shell.sh && python dev-tools/push_message.py
+publish:
+	. dev-tools/dev-shell.sh && python dev-tools/local_topic_publish.py
 
+consume:
+	. dev-tools/dev-shell.sh && python dev-tools/local_topic_consume.py
+	
 logs:
 	docker compose logs -f
