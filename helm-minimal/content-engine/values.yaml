@@ -1,0 +1,21 @@
+registry: your-registry.io
+
+services:
+  content-producer:
+    port: 8002
+    replicas: 2
+  visual-composer:
+    port: 8003
+    replicas: 2
+  analytics-collector:
+    port: 8005
+    replicas: 1
+  publication-worker:
+    port: 8006
+    replicas: 2
+  activity-reporter:
+    port: 8007
+    replicas: 2
+  promotion-orchestrator:
+    port: 8004
+    replicas: 2

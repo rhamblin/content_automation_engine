@@ -1,0 +1,246 @@
+# Global configuration
+global:
+  namespace: content-engine
+  imageRegistry: "your-registry.io"  # CHANGE THIS
+  imagePullPolicy: Always
+  environment: development
+
+# Redis configuration
+redis:
+  enabled: true
+  image: redis:latest
+  port: 6379
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+
+# PostgreSQL configuration
+postgres:
+  enabled: true
+  image: postgres:16-alpine3.22
+  port: 5432
+  storage: 10Gi
+  # Set to null in production, use ConfigMap or Secret instead
+  initScriptsHostPath: /Users/rhamblin/Desktop/content-engine/content_automation_engine/db/init
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# Secrets (create separately with kubectl)
+secrets:
+  dbCredentials:
+    name: db-credentials
+  openaiApiKey:
+    name: openai-api-key
+    key: key
+  azureBlobStorage:
+    name: azure-blob-storage
+    key: connection-string
+  azureFoundryApiKey:
+    name: azure-foundry-api-key
+    key: key
+
+# Shared ConfigMap
+configMap:
+  LOG_LEVEL: INFO
+  ENVIRONMENT: development
+  REDIS_URL: redis://redis:6379
+  # For local dev, use host.docker.internal to reach host machine
+  # For cluster, use postgres service name
+  DB_HOST: postgres  # Change to 'host.docker.internal' for local dev
+  DB_PORT: "5432"
+
+# Microservices - all controlled here!
+services:
+  management-api:
+    enabled: true
+    replicas: 2
+    image: management-api
+    tag: latest
+    port: 8000
+    serviceType: LoadBalancer
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    env:
+      APP_NAME: management-api
+    secrets:
+      - openai-api-key
+      - azure-blob-storage
+      - azure-foundry-api-key
+      - db-credentials
+
+  scheduler:
+    enabled: true
+    replicas: 1
+    image: scheduler
+    tag: latest
+    port: 8001
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "50m"
+      limits:
+        memory: "256Mi"
+        cpu: "100m"
+    env:
+      APP_NAME: scheduler
+    secrets:
+      - db-credentials
+
+  content-producer:
+    enabled: true
+    replicas: 3
+    image: content-producer
+    tag: latest
+    port: 8002
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    env:
+      APP_NAME: content-producer
+    secrets:
+      - openai-api-key
+      - azure-blob-storage
+      - azure-foundry-api-key
+      - db-credentials
+
+  visual-composer:
+    enabled: true
+    replicas: 2
+    image: visual-composer
+    tag: latest
+    port: 8003
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    env:
+      APP_NAME: visual-composer
+    secrets:
+      - openai-api-key
+      - azure-blob-storage
+      - db-credentials
+
+  promotion-orchestrator:
+    enabled: true
+    replicas: 2
+    image: promotion-orchestrator
+    tag: latest
+    port: 8004
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"
+    env:
+      APP_NAME: promotion-orchestrator
+    secrets:
+      - openai-api-key
+      - azure-blob-storage
+      - db-credentials
+
+  analytics-collector:
+    enabled: true
+    replicas: 1
+    image: analytics-collector
+    tag: latest
+    port: 8005
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"
+    env:
+      APP_NAME: analytics-collector
+    secrets:
+      - db-credentials
+
+  publication-worker:
+    enabled: true
+    replicas: 2
+    image: publication-worker
+    tag: latest
+    port: 8006
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"
+    env:
+      APP_NAME: publication-worker
+    secrets:
+      - azure-blob-storage
+      - db-credentials
+
+  activity-reporter:
+    enabled: true
+    replicas: 2
+    image: activity-reporter
+    tag: latest
+    port: 8007
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"
+    env:
+      APP_NAME: activity-reporter
+    secrets:
+      - db-credentials
+
+  template-service:
+    enabled: true
+    replicas: 2
+    image: template-service
+    tag: latest
+    port: 8008
+    serviceType: ClusterIP
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"
+    env:
+      APP_NAME: template-service
+    secrets:
+      - openai-api-key
+      - azure-blob-storage
+      - azure-foundry-api-key
+      - db-credentials
