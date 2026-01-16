@@ -1,4 +1,4 @@
-.PHONY: setup infra local cleanup publish consume logs k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: setup infra deploy-local-setup seed-images local cleanup publish consume logs k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -31,18 +31,36 @@ infra:
 	  --env-file ./config/local/variables.env \
 	  -f docker-compose.yaml \
 	  -f config/local/docker-compose.override.yaml \
-	  up --build -d --no-deps redis
+	  up --build -d --no-deps redis && \
+	docker compose \
+	  --env-file ./config/local/variables.env \
+	  -f docker-compose.yaml \
+	  -f config/local/docker-compose.override.yaml \
+	  up --build -d --no-deps azurite
 
-local:
+seed-images:
+	docker run --rm \
+	-v $(PWD)/config/local/seed-images:/seed \
+	--network content_automation_engine_backend \
+	-e AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;" \
+	mcr.microsoft.com/azure-cli \
+	sh -c "az storage container create -n images && az storage blob upload-batch -s /seed -d images"
+
+deploy-local-setup:
 	docker compose \
 	  --env-file ./config/local/variables.env \
 	  -f docker-compose.yaml \
 	  -f config/local/docker-compose.override.yaml \
 	  up --build -d
 
+local:
+	$(MAKE) deploy-local-setup && $(MAKE) seed-images
+
 cleanup:
 	docker compose \
 	  --env-file ./config/local/variables.env \
+	  -f docker-compose.yaml \
+	  -f config/local/docker-compose.override.yaml \
 	  down -v
 
 publish:

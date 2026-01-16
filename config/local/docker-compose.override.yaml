@@ -2,3 +2,11 @@ services:
   redis:
     ports:
       - "6379:6379"
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite --blobHost 0.0.0.0 --skipApiVersionCheck
+    ports:
+      - "10000:10000"
+    networks:
+      - backend

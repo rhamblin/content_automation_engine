@@ -10,11 +10,11 @@ services:
     image: postgres:16-alpine3.22
     restart: unless-stopped
     environment:
-      POSTGRES_USER:     "${POSTGRES_USER}"
+      POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB:       "${POSTGRES_DB_NAME}"
-      APP_DB_USER:       "${APP_DB_USER}"
-      APP_DB_PASSWORD:   "${APP_DB_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB_NAME}"
+      APP_DB_USER: "${APP_DB_USER}"
+      APP_DB_PASSWORD: "${APP_DB_PASSWORD}"
       ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
       ANALYTICS_DB_PASSWORD: "${ANALYTICS_DB_PASSWORD}"
     volumes:
@@ -40,7 +40,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -58,7 +57,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -76,7 +74,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -94,7 +91,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -112,7 +108,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -130,7 +125,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -148,7 +142,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -166,7 +159,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -184,7 +176,6 @@ services:
       - config/local/variables.env
     secrets:
       - openai-api-key
-      - azure-blob-storage-connection-string
       - azure-foundry-proj-default-api-key
     depends_on:
       - redis
@@ -198,7 +189,6 @@ services:
   #   restart: unless-stopped
   #   secrets:
   #     - openai-api-key
-  #     - azure-blob-storage-connection-string
   #     - azure-foundry-proj-default-api-key
   #   environment:
   #     # Secrets are read by entrypoint.sh and exported as env vars
@@ -222,15 +212,13 @@ services:
   #   volumes:
   #     - /var/run/docker.sock:/var/run/docker.sock  # Required for testcontainers
   #   environment:
-  #     - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal  
+  #     - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal
   #   profiles:
   #     - test  # Only runs when explicitly requested
 
 secrets:
   openai-api-key:
     file: ./secrets/openai-api-key.txt
-  azure-blob-storage-connection-string:
-    file: ./secrets/azure-blob-storage-connection-string.txt
   azure-foundry-proj-default-api-key:
     file: ./secrets/azure-foundry-proj-default-api-key.txt
 

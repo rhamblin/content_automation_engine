@@ -4,6 +4,14 @@ A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Content
 
 See system diagram for full context of system design. (Doc)[./doc_assets/system-diagram.png]
 
+## Dev Onboarding
+
+The following applications are requirements
+- (VS Code)[https://code.visualstudio.com/download]
+- (Docker Desktop)[https://docs.docker.com/desktop/#next-steps]
+- (Microsoft Azure Storage Explorer)[https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4]
+- Git e.g. (GitHub Desktop)[https://github.com/apps/desktop]
+
 ## Onboarding a Niche and Keywords
 The Niche API can be used to add a net new Niche or to add a keyword to a niche
 
@@ -33,9 +41,9 @@ images/
     azure-foundry-proj-default-api-key.txt
     openai-api-key.txt
 
-3. **Build & run services**  
+3. **Build & run services**
 ```bash
-    # Build & run entire application: 
+    # Build & run entire application:
     docker compose --env-file ./config/dev/variables.env up --build -d
 
     # Spin up a single service:
@@ -103,14 +111,14 @@ PYTHONPATH=/app/services/content-generation-worker/app:/app/common:/app python -
 
 ### Tracking Logs On Local
 
-Once docker containers are running you can track logs by running  
-```bash 
+Once docker containers are running you can track logs by running
+```bash
 make logs
 ```
 
 ## Assumptions made
 1.  Channel is being passed into common/providers/text/azure_foundry.py generate_text method which is the implementation of the interface but we don't use it as of yet.The system messages was tailored to be Pinterest centric. This can be decoupled at a later time if expansion to other channels is desired. **Currently, Pinterest is the only supported channel**
-  
+
 ## Data Model
 
 ### High-Level Relationships
@@ -197,7 +205,7 @@ erDiagram
       TEXT[] hashtags
       TEXT status
       TIMESTAMPTZ last_posted_at
-      TIMESTAMPTZ created_at 
+      TIMESTAMPTZ created_at
     }
     analytics_metrics {
       SERIAL id PK
