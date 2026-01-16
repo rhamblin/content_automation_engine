@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+from .enums import ScheduleExecutionStatus
 
 
 class ScheduleExecution(Base):
@@ -24,7 +25,7 @@ class ScheduleExecution(Base):
     schedule_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("schedules.id", ondelete="CASCADE"), nullable=False)
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("niches.id", ondelete="CASCADE"), nullable=False)
     keyword_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("keywords.id", ondelete="SET NULL"), nullable=True)
-    status: Mapped[str] = mapped_column(String, nullable=False)  # ENUM: pending, running, completed, failed
+    status: Mapped[ScheduleExecutionStatus] = mapped_column(String, nullable=False, default=ScheduleExecutionStatus.PENDING.value)
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 

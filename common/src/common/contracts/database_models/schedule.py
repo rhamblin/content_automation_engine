@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+from .enums import ScheduleMessageType
 
 
 class Schedule(Base):
@@ -25,7 +26,7 @@ class Schedule(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
     cron_expression: Mapped[str] = mapped_column(String, nullable=False)
-    message_type: Mapped[str] = mapped_column(String, nullable=False)  # ENUM: content_generation, publication, analytics_collection, promotion
+    message_type: Mapped[ScheduleMessageType] = mapped_column(String, nullable=False, default=ScheduleMessageType.CONTENT_GENERATION.value)
     message_payload: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     last_run_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     next_run_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)

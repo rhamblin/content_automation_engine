@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+from .enums import RenderStatus
 
 
 class Render(Base):
@@ -27,7 +28,7 @@ class Render(Base):
     input_image_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("images.id", ondelete="SET NULL"), nullable=True)
     output_image_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("images.id", ondelete="SET NULL"), nullable=True)
     style_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    status: Mapped[str] = mapped_column(String, nullable=False)  # ENUM: pending, processing, completed, failed
+    status: Mapped[RenderStatus] = mapped_column(String, nullable=False, default=RenderStatus.PENDING.value)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships

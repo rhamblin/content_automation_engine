@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+from .enums import ImageKind
 
 
 class Image(Base):
@@ -23,7 +24,7 @@ class Image(Base):
     tenant_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("niches.id", ondelete="CASCADE"), nullable=False)
     keyword_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("keywords.id", ondelete="CASCADE"), nullable=False)
-    kind: Mapped[str] = mapped_column(String, nullable=False)  # ENUM: original, styled, thumbnail
+    kind: Mapped[ImageKind] = mapped_column(String, nullable=False, default=ImageKind.ORIGINAL.value)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
