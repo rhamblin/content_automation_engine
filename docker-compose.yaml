@@ -27,7 +27,7 @@ services:
       - development
 
   # --------------------
-  # Template App Service
+  # Services
   # --------------------
   template-service:
     build:
@@ -35,7 +35,150 @@ services:
       dockerfile: infra/docker/Dockerfile
       args:
         SERVICE_NAME: template-service
-        SERVICE_CMD: '["python","-m","app.template_service.app"]'
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  activity-reporter:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: activity-reporter
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  analytics-collector:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: analytics-collector
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  content-producer:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: content-producer
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  management-api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: management-api
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  promotion-orchestrator:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: promotion-orchestrator
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  publication-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: publication-worker
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: scheduler
+    restart: unless-stopped
+    env_file:
+      - config/local/variables.env
+    secrets:
+      - openai-api-key
+      - azure-blob-storage-connection-string
+      - azure-foundry-proj-default-api-key
+    depends_on:
+      - redis
+      - db
+    networks: [backend, database]
+
+  visual-composer:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: visual-composer
     restart: unless-stopped
     env_file:
       - config/local/variables.env
