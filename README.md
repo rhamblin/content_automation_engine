@@ -149,84 +149,127 @@ erDiagram
   schedules     ||--o{  schedule_executions: triggers
 
   tenants {
-
-  }
-
-  tenants_users {
+    uuid id pk
+    uuid external_id
 
   }
 
   users {
-
-  }
-
-  users_providers {
-
-  }
-
-  tenant_providers {
-
-  }
-
-  projects {
-
-  }
-
-  reports {
-    UUID  id  PK
-    uuid  tenant_id FK
-  }
-
-  integration_profiles {
-
-  }
-
-  niches {
-
-  }
-
-  keywords {
-
-  }
-
-  images {
-
-  }
-
-  contents {
-
-  }
-
-  renders {
-
-  }
-
-  tenants_channels {
+    uuid id pk
+    uuid external_id
 
   }
 
   channels {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  %% The section below are junction tables
+  tenants_users {
+    uuid id pk
+
+  }
+
+  users_providers {
+    uuid id pk
+
+  }
+
+  tenant_providers {
+    uuid id pk
+
+  }
+
+  tenants_channels {
+    uuid id pk
+
+  }
+  %% This is the end of the junction tables sections
+
+  projects {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  reports {
+    uuid  id  pk
+    uuid report_uuid
+    uuid  tenant_id fk
+    jsonb content
+    text[] recipients
+    timestamp sent_at
+  }
+
+  integration_profiles {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  niches {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  keywords {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  images {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  contents {
+    uuid id pk
+    uuid external_id
+
+  }
+
+  renders {
+    uuid id pk
+    uuid external_id
 
   }
 
   publications {
+    uuid id pk
+    uuid external_id
+
 
   }
 
   promotions {
+    uuid id pk
+    uuid external_id
 
   }
 
   publication_metrics {
+    uuid id pk
+    uuid external_id
 
   }
 
   schedules {
+    uuid id pk
+    uuid external_id
+    uuid tenant_id fk
+    uuid niche_id fk
+    text type
 
   }
 
   schedule_executions {
-
+    uuid id pk
+    uuid external_id
   }
 
 ```
