@@ -103,18 +103,9 @@ PYTHONPATH=/app/services/content-generation-worker/app:/app/common:/app python -
 
 ### Tracking Logs On Local
 
-Once docker containers are running you can track logs by either
-
-1. Look at a specific container
-
-```bash
-  docker compose logs -f content-generation-worker content-generation-dispatcher content-generation-scheduler
-```
-
-2. Look at all logs
-
-```bash
-  docker compose logs -f
+Once docker containers are running you can track logs by running  
+```bash 
+make logs
 ```
 
 ## Assumptions made
@@ -126,14 +117,27 @@ Once docker containers are running you can track logs by either
 
 ```mermaid
 erDiagram
-    tenants ||--o{ tenant_users : has
-    users   ||--|| tenant_users : belongs_to
-    tenants ||--o{ projects    : owns
-    projects ||--o{ integration_profiles : contains
-    niches    ||--o{ keywords      : defines
-    niches    ||--o{ integration_profiles : referenced_by
-    integration_profiles ||--o{ posts        : generates
-    posts      ||--o{ analytics_metrics   : measured_by
+    tenants       ||--o{  tenants_users : "has"
+    users         ||--|{  tenants_users : belongs_to
+    users         ||--o{  users_providers: integrates_with
+    tenants       ||--o{  tenant_providers : integrates_with
+    tenants       ||--o{  projects : manages
+    tenants       ||--o{  reports  : receives
+    projects      ||--o{  integration_profiles : configures
+    niches        ||--o{  integration_profiles : targets
+    niches        ||--|{  keywords : defines
+    keywords      ||--|{  images : generates
+    keywords      ||--o{  contents : produces
+    images        ||--o{  renders: styles_into
+    contents      ||--o{  renders: styles_into
+    channels      ||--o{  tenants_channels: available_to
+    channels      ||--o{  integration_profiles: configured_in
+    channels      ||--o{  publications: distributes
+    renders       ||--o{  publications: published_in
+    contents      ||--o{  publications: published_in
+    publications  ||--o{  promotions: promoted_via
+    publications  ||--o{  publication_metrics: performs
+    schedules     ||--o{  schedule_executions: triggers
 ```
 
 ### Data Objects
