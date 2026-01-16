@@ -127,8 +127,8 @@ make logs
 erDiagram
   tenants       ||--o{  tenants_users : "has"
   users         ||--|{  tenants_users : belongs_to
-  users         ||--o{  users_providers: integrates_with
-  tenants       ||--o{  tenant_providers : integrates_with
+  users         ||--o{  users_identity_providers: integrates_with
+  tenants       ||--o{  tenant_identity_providers : integrates_with
   tenants       ||--o{  projects : manages
   tenants       ||--o{  reports  : receives
   tenants       ||--o{  schedules: works_based_on
@@ -151,13 +151,15 @@ erDiagram
   tenants {
     uuid id pk
     uuid external_id
+    text title
 
   }
 
   users {
     uuid id pk
     uuid external_id
-
+    boolean is_active
+    text email
   }
 
   channels {
@@ -169,15 +171,18 @@ erDiagram
   %% The section below are junction tables
   tenants_users {
     uuid id pk
+    uuid  tenant_id fk
+    uuid  user_id fk
+    string  role
 
   }
 
-  users_providers {
+  users_identity_providers {
     uuid id pk
 
   }
 
-  tenant_providers {
+  tenant_identity_providers {
     uuid id pk
 
   }
