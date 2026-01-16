@@ -12,7 +12,7 @@ setup:  ## Create venv and install dependencies
 	pyenv install 3.12.12
 	python -m venv .venv
 	.venv/bin/pip install --upgrade pip
-	.venv/bin/pip install -e common/ --config-settings editable_mode=strict
+	.venv/bin/pip install -e common/
 	@for req in services/*/requirements.txt; do .venv/bin/pip install -r $$req; done
 	.venv/bin/pip install -r test/requirements.txt
 	@echo "Done! Activate with: source .venv/bin/activate"

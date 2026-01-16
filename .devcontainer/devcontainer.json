@@ -34,7 +34,7 @@
   "remoteEnv": {
     "DB_URL": "postgresql+asyncpg://${containerEnv:APP_DB_USER}:${containerEnv:APP_DB_PASSWORD}@db:5432/${containerEnv:APP_NAME}_${containerEnv:APP_ENV}"
   },
-  
+
   "forwardPorts": [5678],
 
   "customizations": {
@@ -47,5 +47,5 @@
     }
   },
 
-  "postCreateCommand": "pip install debugpy && pip install -e /app/common --config-settings editable_mode=strict"
+  "postCreateCommand": "pip install debugpy && pip install -e /app/common"
 }
