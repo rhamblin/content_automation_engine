@@ -2,7 +2,6 @@ import asyncio
 
 from common.app_logger import AppLogger
 from common.contracts import ContentReadyForPublication
-from common.contracts.messages.content_ready_for_styling import ContentReadyForStyling
 from common.providers import registry
 
 
@@ -26,20 +25,12 @@ class PublicationWorker:
                 )
 
                 if incoming_msg:
+                    self.logger.info("zzReceived Message!")
+
                     tenant_id = incoming_msg.tenant_id
 
                     # do work here to publish content
 
-                    outgoing_msg = ContentReadyForStyling(
-                        tenant_id=tenant_id,
-                        keyword_id="",
-                        niche_id="",
-                        channel_id="",
-                        content_id="",
-                        base_image_id="",
-                    ).chain_from(incoming_msg)
-
-                    await self.registry.get_message_broker().publish(outgoing_msg)
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying

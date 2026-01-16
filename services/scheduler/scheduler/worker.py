@@ -39,13 +39,16 @@ class SchedulerWorker:
                         )
                     )
 
-                    outgoing_msgs.append(PromotionOrchestratorRequested(tenant_id=""))
+                    outgoing_msgs.append(
+                        PromotionOrchestratorRequested(tenant_id=tenant)
+                    )
 
-                    outgoing_msgs.append(CollectAnalyticsRequested(tenant_id=""))
+                    outgoing_msgs.append(CollectAnalyticsRequested(tenant_id=tenant))
 
-                    outgoing_msgs.append(ActivityReportRequested(tenant_id=""))
+                    outgoing_msgs.append(ActivityReportRequested(tenant_id=tenant))
 
                     for msg in outgoing_msgs:
+                        self.logger.info("zzMessage Going!")
                         await self.registry.get_message_broker().publish(msg)
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
@@ -57,4 +60,4 @@ class SchedulerWorker:
 
     def __getTenantsToSchedule(self) -> list:
         # placeholder - implement logic to get tenants to schedule from DB
-        return []
+        return ["test-tenant"]

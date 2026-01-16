@@ -5,6 +5,10 @@
         , "**/*.egg-info/": true
     },
 
+    "python.analysis.extraPaths": [
+      "./common/src"
+    ],
+
     "python.defaultInterpreterPath": ".venv/bin/python",
     "python.terminal.activateEnvironment": true,
     "python.analysis.typeCheckingMode": "basic",

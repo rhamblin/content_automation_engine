@@ -1,6 +1,7 @@
 import asyncio
-from common.contracts import ActivityReportRequested
+
 from common.app_logger import AppLogger
+from common.contracts import ActivityReportRequested
 from common.providers import registry
 
 
@@ -24,6 +25,8 @@ class ActivityReporterWorker:
                 )
 
                 if incoming_msg:
+                    self.logger.info("zzReceived Message!")
+
                     tenant_id = incoming_msg.tenant_id
 
                     # do work here to generate report

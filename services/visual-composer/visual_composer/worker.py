@@ -28,20 +28,21 @@ class VisualComposerWorker:
                 )
 
                 if incoming_msg:
+                    self.logger.info("zzReceived Message!")
                     tenant_id = incoming_msg.tenant_id
 
-                # do work here to compose visuals
+                    # do work here to compose visuals
 
-                outgoing_msg = ContentReadyForPublication(
-                    tenant_id=tenant_id,
-                    keyword_id="",
-                    niche_id="",
-                    channel_id="",
-                    content_id="",
-                    rendered_image_id="",
-                ).chain_from(incoming_msg)
+                    outgoing_msg = ContentReadyForPublication(
+                        tenant_id=tenant_id,
+                        keyword_id="",
+                        niche_id="",
+                        channel_id="",
+                        content_id="",
+                        rendered_image_id="",
+                    ).chain_from(incoming_msg)
 
-                await self.registry.get_message_broker().publish(outgoing_msg)
+                    await self.registry.get_message_broker().publish(outgoing_msg)
 
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")

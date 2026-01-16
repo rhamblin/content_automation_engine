@@ -1,6 +1,7 @@
 import asyncio
-from common.contracts import CollectAnalyticsRequested
+
 from common.app_logger import AppLogger
+from common.contracts import CollectAnalyticsRequested
 from common.providers import registry
 
 
@@ -24,6 +25,8 @@ class AnalyticsCollectorWorker:
                 )
 
                 if incoming_msg:
+                    self.logger.info("zzReceived Message!")
+
                     tenant_id = incoming_msg.tenant_id
 
                     # do work here to collect analytics
