@@ -3,8 +3,8 @@
         // Python - core language support
         "ms-python.python",
 
-        // Black Formatter - auto-format on save
-        "ms-python.black-formatter",
+        // Ruff - fast linter, formatter, import organizer
+        "charliermarsh.ruff",
 
         // Docker - container management and Dockerfile support
         "ms-azuretools.vscode-docker",

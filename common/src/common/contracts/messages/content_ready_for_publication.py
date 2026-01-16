@@ -1,5 +1,6 @@
-from ..interfaces.message import IMessage
 from dataclasses import dataclass
+
+from ..interfaces.message import IMessage
 
 
 @dataclass(kw_only=True)

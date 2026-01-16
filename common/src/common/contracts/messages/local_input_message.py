@@ -1,5 +1,6 @@
+from dataclasses import dataclass
+
 from ..interfaces.message import IMessage
-from dataclasses import dataclass, asdict
 
 
 @dataclass(kw_only=True)

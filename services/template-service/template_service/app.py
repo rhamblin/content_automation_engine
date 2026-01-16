@@ -1,5 +1,8 @@
 import asyncio
 
+from common.contracts.interfaces.distribution_channel import IDistributionChannel
+from common.contracts.interfaces.image_provider import IImageProvider
+from common.contracts.interfaces.text_provider import ITextProvider
 import common.providers as providers
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
@@ -13,6 +16,7 @@ from .worker import TemplateServiceWorker
 from redis.asyncio import Redis
 from sqlalchemy import text
 from tenacity import retry, stop_after_attempt, wait_exponential
+
 
 async def main(logger: AppLogger):
     settings = load_settings()
@@ -30,18 +34,18 @@ async def main(logger: AppLogger):
         if settings.app_environment == ENVIRONMENT_LOCAL:
             redis_instance = Redis(host="redis", port=6379)
             message_broker = RedisMessageBroker(redis_instance)
-            
+
             database = SQLAlchemyDatabaseProvider(settings.database_url)
 
-            image_providers = {
+            image_providers: dict[str, IImageProvider] = {
                 providers.LocalImageProvider.PROVIDER_NAME: providers.LocalImageProvider()
             }
 
-            text_providers = {
+            text_providers: dict[str, ITextProvider] = {
                 providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
             }
 
-            distribution_channels = {
+            distribution_channels: dict[str, IDistributionChannel] = {
                 providers.LocalDistributionChannel.PROVIDER_NAME: providers.LocalDistributionChannel()
             }
 
@@ -54,7 +58,7 @@ async def main(logger: AppLogger):
             text_providers=text_providers,
             distribution_channels=distribution_channels,
             message_broker=message_broker,
-            database=database
+            database=database,
         )
 
     except Exception as e:
@@ -67,17 +71,16 @@ async def main(logger: AppLogger):
         await worker.work()
     finally:
         logger.info("Shutting down worker...")
-        await registry.shutdown()
+        await provider_registry.shutdown()
         logger.info("Shutdown complete")
 
-@retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, min=2, max=10)
-)
+
+@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=2, max=10))
 async def test_db_connection(database, logger: AppLogger):
     async with database.session() as session:
         await session.execute(text("SELECT 1"))
         logger.info("Database connection successful")
+
 
 if __name__ == "__main__":
     logger = AppLogger(__name__)

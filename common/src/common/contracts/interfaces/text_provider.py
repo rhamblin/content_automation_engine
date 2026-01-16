@@ -1,5 +1,7 @@
 from abc import abstractmethod
+
 from .base_provider_with_name import IBaseProviderWithName
+
 
 class ITextProvider(IBaseProviderWithName):
     @abstractmethod

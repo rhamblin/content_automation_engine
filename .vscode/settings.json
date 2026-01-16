@@ -12,6 +12,10 @@
     "files.insertFinalNewline": true,
 
     "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "always",
+      "source.organizeImports.ruff": "always"
+    },
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     }

@@ -1,6 +1,10 @@
 import asyncio
-from common.contracts import ContentReadyForStyling
+
 from common.app_logger import AppLogger
+from common.contracts import ContentReadyForStyling
+from common.contracts.messages.content_ready_for_publication import (
+    ContentReadyForPublication,
+)
 from common.providers import registry
 
 
@@ -26,7 +30,18 @@ class VisualComposerWorker:
                 if incoming_msg:
                     tenant_id = incoming_msg.tenant_id
 
-                    # do work here to compose visuals
+                # do work here to compose visuals
+
+                outgoing_msg = ContentReadyForPublication(
+                    tenant_id=tenant_id,
+                    keyword_id="",
+                    niche_id="",
+                    channel_id="",
+                    content_id="",
+                    rendered_image_id="",
+                ).chain_from(incoming_msg)
+
+                await self.registry.get_message_broker().publish(outgoing_msg)
 
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")

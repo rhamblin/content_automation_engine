@@ -1,14 +1,14 @@
-from abc import ABC
-from typing import Self, Optional
-from dataclasses import asdict, is_dataclass, dataclass, field
-import re
 import json
+import re
 import uuid
+from abc import ABC
+from dataclasses import asdict, dataclass, field
+from typing import Optional, Self
 
 
 @dataclass
 class IMessage(ABC):
-    """Base class for message contracts.
+    """Base class for message contracts
 
     All subclasses MUST use @dataclass decorator.
     """

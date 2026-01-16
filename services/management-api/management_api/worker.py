@@ -1,5 +1,5 @@
 import asyncio
-from common.contracts import LocalInputMessage
+
 from common.app_logger import AppLogger
 from common.providers import registry
 
@@ -17,17 +17,8 @@ class ManagementApiWorker:
 
         while True:
             try:
-                incoming_msg: (
-                    LocalInputMessage
-                ) = await self.registry.get_message_broker().consume(
-                    LocalInputMessage
-                )
-
-                if incoming_msg:
-                    # do work here
-
-                    pass
-
+                # Implement management API tasks here
+                pass
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying
