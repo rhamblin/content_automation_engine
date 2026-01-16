@@ -24,7 +24,7 @@ class SchedulerWorker:
     async def work(self) -> None:
         """Main worker loop"""
         self.logger.info("SchedulerWorker started.")
-
+        await asyncio.sleep(10)  # Initial delay before starting scheduling loop
         while True:
             try:
                 # get schedule information from DB
@@ -47,10 +47,10 @@ class SchedulerWorker:
 
                     for msg in outgoing_msgs:
                         await self.registry.get_message_broker().publish(msg)
-
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying
+            await asyncio.sleep(30)  # Wait before next scheduling cycle
 
     def __get_logger(self):
         return AppLogger(__name__)
