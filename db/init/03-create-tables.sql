@@ -42,7 +42,7 @@ CREATE SCHEMA IF NOT EXISTS niches;
 
 CREATE TABLE niches.niches (
   niche_id       UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
-  name           TEXT       NOT NULL UNIQUE,
+  title           TEXT       NOT NULL UNIQUE,
   domain         TEXT       NOT NULL UNIQUE,
   default_budget INTEGER    NOT NULL,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()

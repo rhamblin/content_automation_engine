@@ -5,4 +5,4 @@ __pycache__/
 .idea
 .DS_Store
 .venv
-common/common.egg-info/
+*.egg-info/

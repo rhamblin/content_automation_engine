@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 
+
 class AppLogger:
     def __init__(self, name: str):
         self._configure_logging()
@@ -13,7 +14,7 @@ class AppLogger:
             level=log_level,
             handlers=[logging.StreamHandler(sys.stdout)],
         )
-    
+
     # Delegate to internal logger
     def info(self, msg, *args, **kwargs):
         self.logger.info(msg, *args, **kwargs)
@@ -26,7 +27,7 @@ class AppLogger:
 
     def warning(self, msg, *args, **kwargs):
         self.logger.warning(msg, *args, **kwargs)
-    
+
     def critical(self, msg, *args, **kwargs):
         self.logger.critical(msg, *args, **kwargs)
 

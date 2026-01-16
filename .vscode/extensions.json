@@ -1,0 +1,24 @@
+{
+    "recommendations": [
+        // Python - core language support
+        "ms-python.python",
+
+        // Black Formatter - auto-format on save
+        "ms-python.black-formatter",
+
+        // Docker - container management and Dockerfile support
+        "ms-azuretools.vscode-docker",
+
+        // Claude Code - AI coding assistant
+        "anthropic.claude-code",
+
+        // Database Client - query databases in VS Code
+        "cweijan.vscode-database-client2",
+
+        // Thunder Client - REST API testing
+        "rangav.vscode-thunder-client",
+
+        // Excalidraw - whiteboard diagrams
+        "pomdtr.excalidraw-editor",
+    ]
+}

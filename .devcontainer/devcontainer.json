@@ -47,5 +47,5 @@
     }
   },
 
-  "postCreateCommand": "pip install debugpy && pip install -e /app/common"
+  "postCreateCommand": "pip install debugpy && pip install -e /app/common --config-settings editable_mode=strict"
 }
