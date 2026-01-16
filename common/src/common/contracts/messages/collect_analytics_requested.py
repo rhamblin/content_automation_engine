@@ -2,14 +2,9 @@ from ..interfaces.message import IMessage
 from dataclasses import dataclass
 from typing import Optional
 
-@dataclass
+
+@dataclass(kw_only=True)
 class CollectAnalyticsRequested(IMessage):
     """Message contract for analytics collection requests"""
 
-    schedule_id: str
-    schedule_type: str
-    scope_type: str
-    scope_id: str
-    triggered_at: str
-    date_range_start: Optional[str] = None
-    date_range_end: Optional[str] = None
+    tenant_id: str

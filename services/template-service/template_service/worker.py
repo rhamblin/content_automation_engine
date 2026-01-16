@@ -4,8 +4,10 @@ from common.contracts import LocalOutputMessage
 from common.contracts.messages.local_input_message import LocalInputMessage
 from common.providers import registry
 
+
 class TemplateServiceWorker:
     """Template Worker Description"""
+
     def __init__(self, registry: registry.ProviderRegistry):
         self.logger = self.__get_logger()
         self.registry = registry
@@ -16,14 +18,18 @@ class TemplateServiceWorker:
 
         while True:
             try:
-                data: LocalInputMessage = await self.registry.get_message_broker().consume(LocalInputMessage)
+                data: LocalInputMessage = (
+                    await self.registry.get_message_broker().consume(LocalInputMessage)
+                )
 
                 if data:
                     contents = data.message
                     self.logger.info(f"Received message: {data}")
-                    
-                    message = LocalOutputMessage(message=f"Message Received. Hello from {self.__class__.__name__ }! For record, your message was {contents}")
-                    
+
+                    message = LocalOutputMessage(
+                        message=f"Message Received. Hello from {self.__class__.__name__ }! For record, your message was {contents}"
+                    ).chain_from(data)
+
                     await self.registry.get_message_broker().publish(message)
                     self.logger.info(f"Published response message!")
             except Exception as e:

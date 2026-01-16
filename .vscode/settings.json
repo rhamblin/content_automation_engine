@@ -2,6 +2,7 @@
     "files.exclude": {
         "**/__pycache__": true
         , "**/.pytest_cache": true
+        , "**/*.egg-info/": true
     },
 
     "python.defaultInterpreterPath": ".venv/bin/python",

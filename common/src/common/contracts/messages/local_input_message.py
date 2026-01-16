@@ -1,7 +1,8 @@
 from ..interfaces.message import IMessage
 from dataclasses import dataclass, asdict
 
-@dataclass
+
+@dataclass(kw_only=True)
 class LocalInputMessage(IMessage):
     """Base class for test local message contracts. This topic is used for input messages to microservices."""
 
