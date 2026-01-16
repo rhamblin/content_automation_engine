@@ -5,6 +5,7 @@ from .interfaces.image_provider import IBlobStorage
 from .interfaces.message import IMessage
 from .interfaces.message_broker import IMessageBroker
 from .interfaces.text_provider import ITextProvider
+from .interfaces.repository import IRepository, ITenantScopedRepository
 from .messages.activity_report_requested import ActivityReportRequested
 from .messages.collect_analytics_requested import CollectAnalyticsRequested
 
@@ -23,6 +24,8 @@ __all__ = [
     "IBlobStorage",
     "IDistributionChannel",
     "IDatabase",
+    "IRepository",
+    "ITenantScopedRepository",
     "ContentGenerationRequested",
     "PromotionOrchestratorRequested",
     "CollectAnalyticsRequested",
