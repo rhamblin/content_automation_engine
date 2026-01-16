@@ -1,7 +1,7 @@
 import asyncio
 
 from common.contracts.interfaces.distribution_channel import IDistributionChannel
-from common.contracts.interfaces.image_provider import IImageProvider
+from common.contracts.interfaces.image_provider import IBlobStorage
 from common.contracts.interfaces.text_provider import ITextProvider
 import common.providers as providers
 from common.providers import registry
@@ -28,7 +28,7 @@ async def main(logger: AppLogger):
     try:
         database = None
         message_broker = None
-        image_providers = {}
+        blob_storage = None
         text_providers = {}
         distribution_channels = {}
         if settings.app_environment == ENVIRONMENT_LOCAL:
@@ -37,9 +37,7 @@ async def main(logger: AppLogger):
 
             database = SQLAlchemyDatabaseProvider(settings.database_url)
 
-            image_providers: dict[str, IImageProvider] = {
-                providers.LocalImageProvider.PROVIDER_NAME: providers.LocalImageProvider()
-            }
+            blob_storage = providers.LocalImageProvider()
 
             text_providers: dict[str, ITextProvider] = {
                 providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
@@ -54,7 +52,7 @@ async def main(logger: AppLogger):
 
         # Add additional providers as needed
         provider_registry = registry.ProviderRegistry(
-            image_providers=image_providers,
+            blob_storage=blob_storage,
             text_providers=text_providers,
             distribution_channels=distribution_channels,
             message_broker=message_broker,

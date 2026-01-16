@@ -1,7 +1,7 @@
 # Import interfaces first to avoid circular imports
 from .interfaces.database import IDatabase
 from .interfaces.distribution_channel import IDistributionChannel
-from .interfaces.image_provider import IImageProvider
+from .interfaces.image_provider import IBlobStorage
 from .interfaces.message import IMessage
 from .interfaces.message_broker import IMessageBroker
 from .interfaces.text_provider import ITextProvider
@@ -20,7 +20,7 @@ __all__ = [
     "IMessage",
     "IMessageBroker",
     "ITextProvider",
-    "IImageProvider",
+    "IBlobStorage",
     "IDistributionChannel",
     "IDatabase",
     "ContentGenerationRequested",
