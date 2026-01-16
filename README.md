@@ -152,6 +152,10 @@ erDiagram
     uuid id pk
     uuid external_id
     text title
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
 
   }
 
@@ -160,12 +164,20 @@ erDiagram
     uuid external_id
     boolean is_active
     text email
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
   }
 
   channels {
     uuid id pk
     uuid external_id
     text  identifier
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
   }
 
   %% The section below are junction tables
@@ -173,6 +185,10 @@ erDiagram
     uuid  tenant_id fk
     uuid  user_id fk
     string  role
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
     %% This Juction table needs a unique constraint of (tenant_id, user_id)
   }
 
@@ -180,6 +196,7 @@ erDiagram
     uuid user_id  fk
     uuid identity_provider_user_id
     text identity_provider
+    timestamp created_at
     %% This Juction table needs a unique constraint of (identity_provider_user_id, user_id)
   }
 
@@ -187,12 +204,17 @@ erDiagram
     uuid tenant_id  fk
     uuid identity_provider_tenant_id
     text identity_provider
+    timestamp created_at
     %% This Juction table needs a unique constraint of (identity_provider_tenant_id, user_id)
   }
 
   tenants_channels {
     uuid tenant_id  fk
-    uuid  channel_id  fk
+    uuid  channel_id
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
     %% This Juction table needs a unique constraint of (tenant_id, channel_id)
   }
   %% This is the end of the junction tables sections
@@ -203,7 +225,11 @@ erDiagram
     uuid tenant_id fk
     text name
     boolean is_active
-  }
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
+   }
 
   reports {
     uuid id  pk
@@ -211,7 +237,7 @@ erDiagram
     uuid tenant_id fk
     jsonb content
     text[] recipients
-    timestamp sent_at
+    timestamp created_at
   }
 
   integration_profiles {
@@ -222,6 +248,10 @@ erDiagram
     uuid project_id fk
     uuid channel_id fk
     boolean is_active
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
   }
 
   niches {
@@ -230,6 +260,10 @@ erDiagram
     uuid tenant_id fk
     text title
     boolean is_active
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
   }
 
   keywords {
@@ -239,6 +273,10 @@ erDiagram
     uuid  niche_id  fk
     text  term
     boolean is_active
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
   }
 
   images {
@@ -248,6 +286,7 @@ erDiagram
     uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
     uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
     text  kind
+    timestamp created_at
   }
 
   contents {
@@ -258,6 +297,7 @@ erDiagram
     uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
     text  title
     text  description
+    timestamp created_at
   }
 
   renders {
@@ -271,6 +311,7 @@ erDiagram
     uuid  output_image_id fk
     text  style_name
     text  status
+    timestamp created_at
   }
 
   publications {
@@ -282,7 +323,7 @@ erDiagram
     uuid  content_id  fk
     text  post_id %% The ID from channel after posting
     text  status
-    timestamp published_at
+    timestamp created_at
   }
 
   promotions {
@@ -324,6 +365,10 @@ erDiagram
     text  message_payload
     timestamp last_run_at
     timestamp next_run_at
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
   }
 
   schedule_executions {
