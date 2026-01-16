@@ -125,27 +125,109 @@ make logs
 
 ```mermaid
 erDiagram
-    tenants       ||--o{  tenants_users : "has"
-    users         ||--|{  tenants_users : belongs_to
-    users         ||--o{  users_providers: integrates_with
-    tenants       ||--o{  tenant_providers : integrates_with
-    tenants       ||--o{  projects : manages
-    tenants       ||--o{  reports  : receives
-    projects      ||--o{  integration_profiles : configures
-    niches        ||--o{  integration_profiles : targeted_by
-    niches        ||--|{  keywords : defines
-    keywords      ||--|{  images : generates
-    keywords      ||--o{  contents : produces
-    images        ||--o{  renders: styles_into
-    contents      ||--o{  renders: styles_into
-    channels      ||--o{  tenants_channels: available_to
-    channels      ||--o{  integration_profiles: configured_in
-    channels      ||--o{  publications: distributes
-    renders       ||--o{  publications: published_in
-    contents      ||--o{  publications: published_in
-    publications  ||--o{  promotions: promoted_via
-    publications  ||--o{  publication_metrics: performs
-    schedules     ||--o{  schedule_executions: triggers
+  tenants       ||--o{  tenants_users : "has"
+  users         ||--|{  tenants_users : belongs_to
+  users         ||--o{  users_providers: integrates_with
+  tenants       ||--o{  tenant_providers : integrates_with
+  tenants       ||--o{  projects : manages
+  tenants       ||--o{  reports  : receives
+  tenants       ||--o{  schedules: works_based_on
+  projects      ||--o{  integration_profiles : configures
+  niches        ||--o{  integration_profiles : targeted_by
+  niches        ||--|{  keywords : defines
+  keywords      ||--|{  images : generates
+  keywords      ||--o{  contents : produces
+  images        ||--o{  renders: styles_into
+  contents      ||--o{  renders: styles_into
+  channels      ||--o{  tenants_channels: available_to
+  channels      ||--o{  integration_profiles: configured_in
+  channels      ||--o{  publications: distributes
+  renders       ||--o{  publications: published_in
+  contents      ||--o{  publications: published_in
+  publications  ||--o{  promotions: promoted_via
+  publications  ||--o{  publication_metrics: performs
+  schedules     ||--o{  schedule_executions: triggers
+
+  tenants {
+
+  }
+
+  tenants_users {
+
+  }
+
+  users {
+
+  }
+
+  users_providers {
+
+  }
+
+  tenant_providers {
+
+  }
+
+  projects {
+
+  }
+
+  reports {
+
+  }
+
+  integration_profiles {
+
+  }
+
+  niches {
+
+  }
+
+  keywords {
+
+  }
+
+  images {
+
+  }
+
+  contents {
+
+  }
+
+  renders {
+
+  }
+
+  tenants_channels {
+
+  }
+
+  channels {
+
+  }
+
+  publications {
+
+  }
+
+  promotions {
+
+  }
+
+  publication_metrics {
+
+  }
+
+  schedules {
+
+  }
+
+  schedule_executions {
+
+  }
+
 ```
 
 ### Data Object Tables & Columns
