@@ -171,7 +171,7 @@ CREATE TABLE images (
   tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   niche_id    UUID        NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
   keyword_id  UUID        NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
-  kind        TEXT        NOT NULL,
+  kind        TEXT        NOT NULL DEFAULT 'original',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT uq_images_external_id UNIQUE (external_id)
 );
@@ -187,8 +187,8 @@ CREATE TABLE contents (
   tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   niche_id    UUID        NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
   keyword_id  UUID        NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
-  title       TEXT        NOT NULL,
-  description TEXT        NOT NULL,
+  title       TEXT        NOT NULL DEFAULT '[Untitled]',
+  description TEXT        NOT NULL DEFAULT '[No description]',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT uq_contents_external_id UNIQUE (external_id)
 );
@@ -208,7 +208,7 @@ CREATE TABLE renders (
   input_image_id  UUID          REFERENCES images(id) ON DELETE SET NULL,
   output_image_id UUID          REFERENCES images(id) ON DELETE SET NULL,
   style_name      TEXT,
-  status          TEXT          NOT NULL,
+  status          TEXT          NOT NULL DEFAULT 'pending',
   created_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
   CONSTRAINT uq_renders_external_id UNIQUE (external_id)
 );
@@ -226,7 +226,7 @@ CREATE TABLE publications (
   channel_id  UUID               NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
   content_id  UUID               NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
   post_id     TEXT,
-  status      TEXT               NOT NULL,
+  status      TEXT               NOT NULL DEFAULT 'pending',
   created_at  TIMESTAMPTZ        NOT NULL DEFAULT now(),
   CONSTRAINT uq_publications_external_id UNIQUE (external_id)
 );
@@ -244,8 +244,8 @@ CREATE TABLE promotions (
   publication_id UUID                   NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
   channel_id     UUID                   NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
   payload        JSONB,
-  action_taken   TEXT                   NOT NULL,
-  status         TEXT                   NOT NULL,
+  action_taken   TEXT                   NOT NULL DEFAULT 'boost',
+  status         TEXT                   NOT NULL DEFAULT 'pending',
   created_at     TIMESTAMPTZ            NOT NULL DEFAULT now(),
   executed_at    TIMESTAMPTZ,
   CONSTRAINT uq_promotions_external_id UNIQUE (external_id)
@@ -282,7 +282,7 @@ CREATE TABLE schedules (
   is_active       BOOLEAN               NOT NULL DEFAULT true,
   title           TEXT                  NOT NULL,
   cron_expression TEXT                  NOT NULL,
-  message_type    TEXT                  NOT NULL,
+  message_type    TEXT                  NOT NULL DEFAULT 'content_generation',
   message_payload TEXT,
   last_run_at     TIMESTAMPTZ,
   next_run_at     TIMESTAMPTZ,
@@ -305,7 +305,7 @@ CREATE TABLE schedule_executions (
   schedule_id  UUID                      NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
   niche_id     UUID                      NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
   keyword_id   UUID                      REFERENCES keywords(id) ON DELETE SET NULL,
-  status       TEXT                      NOT NULL,
+  status       TEXT                      NOT NULL DEFAULT 'pending',
   started_at   TIMESTAMPTZ,
   completed_at TIMESTAMPTZ,
   CONSTRAINT uq_schedule_executions_external_id UNIQUE (external_id)

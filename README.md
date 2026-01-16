@@ -2,7 +2,7 @@
 
 A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Content generation; Phases 2 & 3 add Posting/Ads and Analytics/Pruning.
 
-See system diagram for full context of system design. (Doc)[./doc_assets/system-diagram.png]
+See system diagram for full context of system design. [Doc](./doc_assets/system-diagram.png)
 
 ## Dev Onboarding
 
@@ -37,25 +37,14 @@ images/
     Visit Docker (website)[https://www.docker.com/products/docker-desktop/]
 
 2. **Ensure the following API keys / secrets are in place under <<APP ROOT>>/secrets**
-    azure-blob-storage-connection-string.txt
     azure-foundry-proj-default-api-key.txt
     openai-api-key.txt
 
-3. **Build & run services**
-```bash
-    # Build & run entire application:
-    docker compose --env-file ./config/dev/variables.env up --build -d
-
-    # Spin up a single service:
-    docker compose --env-file ./config/dev/variables.env up --build -d service_name
-
-    # Tear down everything including volumes
-    docker compose --env-file ./config/dev/variables.env down -v
-
-    # Tear down everything while keeping persisted volumes as the same
-    docker compose --env-file ./config/dev/variables.env down
-```
-1. **See db/init/05-seed-db.sql for sample data**
+3. Run "make setup" at project root
+4. Open VSCode
+5. Edit as needed
+6. Run "make local" for full builds. Rest of commands are found in Makefile
+7. **See db/init/05-seed-db.sql for sample data**
 
 ## Testing
 
