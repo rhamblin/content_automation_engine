@@ -124,7 +124,7 @@ erDiagram
     tenants       ||--o{  projects : manages
     tenants       ||--o{  reports  : receives
     projects      ||--o{  integration_profiles : configures
-    niches        ||--o{  integration_profiles : targets
+    niches        ||--o{  integration_profiles : targeted_by
     niches        ||--|{  keywords : defines
     keywords      ||--|{  images : generates
     keywords      ||--o{  contents : produces
@@ -139,35 +139,6 @@ erDiagram
     publications  ||--o{  publication_metrics: performs
     schedules     ||--o{  schedule_executions: triggers
 ```
-
-### Data Objects
-
-- **Tenant** (`identity.tenants`)  
-  Represents an isolated customer or organization.
-
-- **User** (`identity.users`)  
-  External identity (email + provider) mapped to internal `user_id`.
-
-- **TenantUser** (`identity.tenant_users`)  
-  Links a user to a tenant with a specific role (`admin`, `editor`, `viewer`).
-
-- **Project** (`identity.projects`)  
-  A workspace under a tenant, grouping integration profiles and posts.
-
-- **Niche** (`niches.niches`)  
-  A topical domain (name + domain) with a default budget for content.
-
-- **Keyword** (`niches.keywords`)  
-  Individual search terms associated with a niche.
-
-- **IntegrationProfile** (`integration_profiles`)
-  Bundles one niche + one channel + settings.
-
-- **Post** (`posts.posts`)  
-  A generated asset/text item tied to an integration profile and channel.
-
-- **Metric** (`analytics.metrics`)  
-  Daily performance data (impressions, clicks, saves) for each publication.
 
 ### Data Object Tables & Columns
 
