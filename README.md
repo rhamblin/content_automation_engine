@@ -292,7 +292,7 @@ erDiagram
     uuid tenant_id fk
     uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
     uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
-    text  kind
+    text  kind %% This is an ENUM
     timestamp created_at
     %% Unique constraint: (external_id)
   }
@@ -319,7 +319,7 @@ erDiagram
     uuid  input_image_id  fk
     uuid  output_image_id fk
     text  style_name
-    text  status
+    text  status %% This is an ENUM
     timestamp created_at
     %% Unique constraint: (external_id)
   }
@@ -332,7 +332,7 @@ erDiagram
     uuid  channel_id  fk
     uuid  content_id  fk
     text  post_id %% The ID from channel after posting
-    text  status
+    text  status %% This is an ENUM
     timestamp created_at
     %% Unique constraint: (external_id)
   }
@@ -344,8 +344,8 @@ erDiagram
     uuid  publication_id  fk
     uuid  channel_id  fk
     jsonb payload %% Channel specific API parameters
-    text  action_taken
-    text  status
+    text  action_taken %% This is an ENUM
+    text  status %% This is an ENUM
     timestamp created_at
     timestamp executed_at
     %% Unique constraint: (external_id)
@@ -368,11 +368,10 @@ erDiagram
     uuid external_id
     uuid tenant_id fk
     uuid niche_id fk
-    text type
     boolean is_active
     text  title
     text  cron_expression
-    text  message_type
+    text  message_type %% This is an ENUM
     text  message_payload
     timestamp last_run_at
     timestamp next_run_at
@@ -390,7 +389,7 @@ erDiagram
     uuid schedule_id  fk
     uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
     uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
-    text  status
+    text  status %% This is an ENUM
     timestamp started_at
     timestamp completed_at
     %% Unique constraint: (external_id)
