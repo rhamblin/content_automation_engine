@@ -121,14 +121,14 @@ make logs
 
 ## Data Model
 
-### High-Level Relationships
+### Entity Relationship Diagram
 
 ```mermaid
 erDiagram
   tenants       ||--o{  tenants_users : "has"
   users         ||--|{  tenants_users : belongs_to
   users         ||--o{  users_identity_providers: integrates_with
-  tenants       ||--o{  tenant_identity_providers : integrates_with
+  tenants       ||--o{  tenants_identity_providers : integrates_with
   tenants       ||--o{  projects : manages
   tenants       ||--o{  reports  : receives
   tenants       ||--o{  schedules: works_based_on
@@ -165,44 +165,50 @@ erDiagram
   channels {
     uuid id pk
     uuid external_id
-
+    text  identifier
   }
 
   %% The section below are junction tables
   tenants_users {
-    uuid id pk
     uuid  tenant_id fk
     uuid  user_id fk
     string  role
-
+    %% This Juction table needs a unique constraint of (tenant_id, user_id)
   }
 
   users_identity_providers {
-    uuid id pk
-
+    uuid user_id  fk
+    uuid identity_provider_user_id
+    text identity_provider
+    %% This Juction table needs a unique constraint of (identity_provider_user_id, user_id)
   }
 
-  tenant_identity_providers {
-    uuid id pk
-
+  tenants_identity_providers {
+    uuid tenant_id  fk
+    uuid identity_provider_tenant_id
+    text identity_provider
+    %% This Juction table needs a unique constraint of (identity_provider_tenant_id, user_id)
   }
 
   tenants_channels {
-    uuid id pk
-
+    uuid tenant_id  fk
+    uuid  channel_id  fk
+    %% This Juction table needs a unique constraint of (tenant_id, channel_id)
   }
   %% This is the end of the junction tables sections
 
   projects {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    text name
+    boolean is_active
   }
 
   reports {
-    uuid  id  pk
-    uuid report_uuid
-    uuid  tenant_id fk
+    uuid id  pk
+    uuid external_id
+    uuid tenant_id fk
     jsonb content
     text[] recipients
     timestamp sent_at
@@ -211,56 +217,98 @@ erDiagram
   integration_profiles {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    uuid niche_id fk %% Used to denormalize data and aid in faster queries without joins
+    uuid project_id fk
+    uuid channel_id fk
+    boolean is_active
   }
 
   niches {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    text title
+    boolean is_active
   }
 
   keywords {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    uuid  niche_id  fk
+    text  term
+    boolean is_active
   }
 
   images {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
+    text  kind
   }
 
   contents {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
+    text  title
+    text  description
   }
 
   renders {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    uuid  content_id fk
+    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  input_image_id  fk
+    uuid  output_image_id fk
+    text  style_name
+    text  status
   }
 
   publications {
     uuid id pk
     uuid external_id
-
-
+    uuid tenant_id fk
+    uuid  render_id fk
+    uuid  channel_id  fk
+    uuid  content_id  fk
+    text  post_id %% The ID from channel after posting
+    text  status
+    timestamp published_at
   }
 
   promotions {
     uuid id pk
     uuid external_id
-
+    uuid tenant_id fk
+    uuid  publication_id  fk
+    uuid  channel_id  fk
+    jsonb payload %% Channel specific API parameters
+    text  action_taken
+    text  status
+    timestamp created_at
+    timestamp executed_at
   }
 
   publication_metrics {
     uuid id pk
     uuid external_id
+    uuid tenant_id fk
+    uuid  publication_id  fk
+    uuid  channel_id  fk
+    timestamp snapshot_date
+    jsonb metrics
+    timestamp fetched_at
 
+    %% Should have a unique constraint of (publication_id, snapshot_date)
   }
 
   schedules {
@@ -269,90 +317,25 @@ erDiagram
     uuid tenant_id fk
     uuid niche_id fk
     text type
-
+    boolean is_active
+    text  title
+    text  cron_expression
+    text  message_type
+    text  message_payload
+    timestamp last_run_at
+    timestamp next_run_at
   }
 
   schedule_executions {
     uuid id pk
     uuid external_id
+    uuid tenant_id fk
+    uuid schedule_id  fk
+    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
+    text  status
+    timestamp started_at
+    timestamp completed_at
   }
 
-```
-
-### Data Object Tables & Columns
-
-```mermaid
-erDiagram
-    tenants {
-      UUID tenant_id PK
-      TEXT name
-      TIMESTAMPTZ created_at
-    }
-    users {
-      UUID user_id PK
-      TEXT email
-      TEXT provider
-      TEXT provider_sub
-      TIMESTAMPTZ created_at
-    }
-    tenant_users {
-      UUID tenant_id FK
-      UUID user_id FK
-      TEXT role
-    }
-    projects {
-      UUID project_id PK
-      UUID tenant_id FK
-      TEXT name
-      TIMESTAMPTZ created_at
-    }
-    niches {
-      UUID niche_id PK
-      TEXT name
-      TEXT domain
-      INTEGER default_budget
-      TIMESTAMPTZ created_at
-    }
-    keywords {
-      UUID keyword_id PK
-      UUID niche_id FK
-      TEXT keyword
-      TEXT image_match_confidence
-    }
-    integration_profiles {
-      UUID integration_profile_id PK
-      UUID project_id FK
-      UUID niche_id FK
-      TEXT channel_key
-      JSONB settings
-      TIMESTAMPTZ created_at
-    }
-    posts {
-      UUID post_id PK
-      UUID integration_profile_id FK
-      TEXT asset_url
-      TEXT title
-      TEXT description
-      TEXT[] hashtags
-      TEXT status
-      TIMESTAMPTZ last_posted_at
-      TIMESTAMPTZ created_at
-    }
-    analytics_metrics {
-      SERIAL id PK
-      UUID post_id FK
-      DATE date
-      BIGINT impressions
-      BIGINT clicks
-      BIGINT saves
-    }
-
-    tenants ||--o{ tenant_users : ""
-    users   ||--o{ tenant_users : ""
-    tenants ||--o{ projects    : ""
-    projects ||--o{ integration_profiles : ""
-    niches    ||--o{ keywords      : ""
-    niches    ||--o{ integration_profiles : ""
-    integration_profiles ||--o{ posts        : ""
-    posts      ||--o{ analytics_metrics   : ""
 ```
