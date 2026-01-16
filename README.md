@@ -173,7 +173,8 @@ erDiagram
   }
 
   reports {
-
+    UUID  id  PK
+    uuid  tenant_id FK
   }
 
   integration_profiles {
