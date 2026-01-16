@@ -156,7 +156,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
-
+    %% Unique constraint: (external_id)
   }
 
   users {
@@ -168,6 +168,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
+    %% Unique constraints: (external_id), (email)
   }
 
   channels {
@@ -178,6 +179,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
+    %% Unique constraints: (external_id), (identifier)
   }
 
   %% The section below are junction tables
@@ -229,7 +231,8 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
-   }
+    %% Unique constraints: (external_id), (tenant_id, name)
+  }
 
   reports {
     uuid id  pk
@@ -238,6 +241,7 @@ erDiagram
     jsonb content
     text[] recipients
     timestamp created_at
+    %% Unique constraint: (external_id)
   }
 
   integration_profiles {
@@ -252,6 +256,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
+    %% Unique constraints: (external_id), (project_id, niche_id, channel_id)
   }
 
   niches {
@@ -264,6 +269,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
+    %% Unique constraints: (external_id), (tenant_id, title)
   }
 
   keywords {
@@ -277,6 +283,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
+    %% Unique constraints: (external_id), (niche_id, term)
   }
 
   images {
@@ -287,6 +294,7 @@ erDiagram
     uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
     text  kind
     timestamp created_at
+    %% Unique constraint: (external_id)
   }
 
   contents {
@@ -298,6 +306,7 @@ erDiagram
     text  title
     text  description
     timestamp created_at
+    %% Unique constraint: (external_id)
   }
 
   renders {
@@ -312,6 +321,7 @@ erDiagram
     text  style_name
     text  status
     timestamp created_at
+    %% Unique constraint: (external_id)
   }
 
   publications {
@@ -324,6 +334,7 @@ erDiagram
     text  post_id %% The ID from channel after posting
     text  status
     timestamp created_at
+    %% Unique constraint: (external_id)
   }
 
   promotions {
@@ -337,6 +348,7 @@ erDiagram
     text  status
     timestamp created_at
     timestamp executed_at
+    %% Unique constraint: (external_id)
   }
 
   publication_metrics {
@@ -348,8 +360,7 @@ erDiagram
     timestamp snapshot_date
     jsonb metrics
     timestamp fetched_at
-
-    %% Should have a unique constraint of (publication_id, snapshot_date)
+    %% Unique constraints: (external_id), (publication_id, snapshot_date)
   }
 
   schedules {
@@ -369,6 +380,7 @@ erDiagram
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
+    %% Unique constraint: (external_id)
   }
 
   schedule_executions {
@@ -381,6 +393,7 @@ erDiagram
     text  status
     timestamp started_at
     timestamp completed_at
+    %% Unique constraint: (external_id)
   }
 
 ```
