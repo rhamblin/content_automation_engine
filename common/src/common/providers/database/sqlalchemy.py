@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from common.contracts.interfaces.database import IDatabase
 
+
 class SQLAlchemyDatabaseProvider(IDatabase):
     def __init__(self, db_url: str):
         self.logger = AppLogger(__name__)
@@ -32,3 +33,6 @@ class SQLAlchemyDatabaseProvider(IDatabase):
     async def session(self):
         async with self.session_factory() as session:
             yield session
+
+    async def close(self) -> None:
+        await self.engine.dispose()

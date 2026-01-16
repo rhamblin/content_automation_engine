@@ -1,11 +1,12 @@
 import asyncio
+from common.contracts import ActivityReportRequested
 from common.app_logger import AppLogger
-from common.contracts import LocalOutputMessage
-from common.contracts.messages.local_input_message import LocalInputMessage
 from common.providers import registry
 
-class TemplateServiceWorker:
-    """Template Worker Description"""
+
+class ActivityReporterWorker:
+    """Activity Reporter Worker Description"""
+
     def __init__(self, registry: registry.ProviderRegistry):
         self.logger = self.__get_logger()
         self.registry = registry
@@ -16,16 +17,17 @@ class TemplateServiceWorker:
 
         while True:
             try:
-                data: LocalInputMessage = await self.registry.get_message_broker().consume(LocalInputMessage)
+                incoming_msg: (
+                    ActivityReportRequested
+                ) = await self.registry.get_message_broker().consume(
+                    ActivityReportRequested
+                )
 
-                if data:
-                    contents = data.message
-                    self.logger.info(f"Received message: {data}")
-                    
-                    message = LocalOutputMessage(message=f"Message Received. Hello from {self.__class__.__name__ }! For record, your message was {contents}")
-                    
-                    await self.registry.get_message_broker().publish(message)
-                    self.logger.info(f"Published response message!")
+                if incoming_msg:
+                    tenant_id = incoming_msg.tenant_id
+
+                    # do work here to generate report
+
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying
