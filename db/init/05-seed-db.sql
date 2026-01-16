@@ -1,96 +1,87 @@
 -- seed_data.sql
--- Only seed if identity.tenants is empty
+-- Only seed if tenants is empty
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM identity.tenants) THEN
+  IF NOT EXISTS (SELECT 1 FROM tenants) THEN
 
-    -- 1. Identity: Tenant, User, Tenant-User mapping, Project
-    INSERT INTO identity.tenants (tenant_id, name, created_at)
+    -- 1. Core entities: Tenant, User, Channel
+    INSERT INTO tenants (id, external_id, title, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000001', 'DevTenant', NOW());
+      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000101', 'DevTenant', NOW());
 
-    INSERT INTO identity.users (user_id, email, provider, provider_sub, created_at)
+    INSERT INTO users (id, external_id, is_active, email, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000002', 'dev-admin@example.com', 'dev-bypass', 'dev-admin', NOW());
+      ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000102', true, 'dev-admin@example.com', NOW());
 
-    INSERT INTO identity.tenant_users (tenant_id, user_id, role)
+    INSERT INTO channels (id, external_id, identifier, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'admin');
+      ('00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000110', 'pinterest', NOW()),
+      ('00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000111', 'instagram', NOW());
 
-    INSERT INTO identity.projects (project_id, tenant_id, name, created_at)
+    -- 2. Junction tables
+    INSERT INTO tenants_users (tenant_id, user_id, role, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Phase1Project', NOW());
+      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'admin', NOW());
 
-    -- 2. Domain Data: Niche & Keywords
-    INSERT INTO niches.niches (niche_id, name, domain, default_budget, created_at)
+    INSERT INTO users_identity_providers (user_id, identity_provider_user_id, identity_provider, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000004', 'Sports Sneakers', 'https://www.chefexotic.com', 100, NOW());
+      ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000202', 'azure_b2c', NOW());
 
-    INSERT INTO niches.keywords (keyword_id, niche_id, name)
+    INSERT INTO tenants_channels (tenant_id, channel_id, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000004', 'running shoes'),
-      ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000004', 'basketball sneakers'),
-      ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000004', 'squishy soccer cleats with no laces');
+      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', NOW()),
+      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000011', NOW());
 
-    -- 3. Integration Profile for Pinterest
-    INSERT INTO integration_profiles (
-      integration_profile_id,
-      project_id,
-      niche_id,
-      channel_key,
-      settings,
-      created_at
-    ) VALUES (
-      '00000000-0000-0000-0000-000000000007',
-      '00000000-0000-0000-0000-000000000003',
-      '00000000-0000-0000-0000-000000000004',
-      'pinterest',
-      '{"default_budget":50,"publish_dimensions":"1000x1500"}',
-      NOW()
-    );
-
-    -- 4. Sample Content
-    INSERT INTO contents.contents (
-      content_id,
-      integration_profile_id,
-      asset_url,
-      title,
-      description,
-      hashtags,
-      status,
-      created_at
-    ) VALUES (
-      '00000000-0000-0000-0000-000000000008',
-      '00000000-0000-0000-0000-000000000007',
-      's3://dev-bucket/sneaker1.png',
-      'Top-Rated Running Shoes',
-      'Check out these top-rated running shoes for ultimate comfort and style.',
-      ARRAY['running','sneakers','fitness'],
-      'draft',
-      NOW()
-    );
-
-    -- 5. Sample Content Publication (published to Pinterest)
-    INSERT INTO contents.content_publications (
-      publication_id,
-      content_id,
-      channel_key,
-      platform_post_id,
-      published_at,
-      platform_metadata
-    ) VALUES (
-      '00000000-0000-0000-0000-000000000009',
-      '00000000-0000-0000-0000-000000000008',
-      'pinterest',
-      '1234567890',
-      NOW() - INTERVAL '1 day',
-      '{"board_id": "abc123", "section_id": null}'
-    );
-
-    -- 6. Sample Analytics Metric (for yesterday)
-    INSERT INTO analytics.metrics (content_id, date, impressions, clicks, saves)
+    -- 3. Project
+    INSERT INTO projects (id, external_id, tenant_id, name, is_active, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000008', CURRENT_DATE - INTERVAL '1 day', 150, 12, 3);
+      ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000103', '00000000-0000-0000-0000-000000000001', 'Phase1Project', true, NOW());
+
+    -- 4. Niche & Keywords
+    INSERT INTO niches (id, external_id, tenant_id, title, is_active, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000001', 'Sports Sneakers', true, NOW());
+
+    INSERT INTO keywords (id, external_id, tenant_id, niche_id, term, is_active, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000105', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', 'running shoes', true, NOW()),
+      ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000106', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', 'basketball sneakers', true, NOW()),
+      ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000107', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', 'soccer cleats', true, NOW());
+
+    -- 5. Integration Profile
+    INSERT INTO integration_profiles (id, external_id, tenant_id, niche_id, project_id, channel_id, is_active, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000108', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000010', true, NOW());
+
+    -- 6. Sample Image
+    INSERT INTO images (id, external_id, tenant_id, niche_id, keyword_id, kind, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000120', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'original', NOW());
+
+    -- 7. Sample Content
+    INSERT INTO contents (id, external_id, tenant_id, niche_id, keyword_id, title, description, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-000000000130', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'Top-Rated Running Shoes', 'Check out these top-rated running shoes for ultimate comfort and style.', NOW());
+
+    -- 8. Sample Render
+    INSERT INTO renders (id, external_id, tenant_id, content_id, niche_id, keyword_id, input_image_id, style_name, status, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000040', '00000000-0000-0000-0000-000000000140', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000020', 'modern', 'completed', NOW());
+
+    -- 9. Sample Publication
+    INSERT INTO publications (id, external_id, tenant_id, render_id, channel_id, content_id, post_id, status, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000150', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000040', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000030', '1234567890', 'published', NOW());
+
+    -- 10. Sample Publication Metric
+    INSERT INTO publication_metrics (id, external_id, tenant_id, publication_id, channel_id, snapshot_date, metrics, fetched_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000060', '00000000-0000-0000-0000-000000000160', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000010', NOW() - INTERVAL '1 day', '{"impressions": 150, "clicks": 12, "saves": 3}', NOW());
+
+    -- 11. Sample Schedule
+    INSERT INTO schedules (id, external_id, tenant_id, niche_id, is_active, title, cron_expression, message_type, created_at)
+    VALUES
+      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', true, 'Daily Content Generation', '0 9 * * *', 'content_generation', NOW());
 
   END IF;
 END

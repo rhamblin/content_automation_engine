@@ -1,37 +1,36 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional
+from datetime import datetime
+from typing import List, Optional
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint, CheckConstraint
+from sqlalchemy import String, ForeignKey, UniqueConstraint, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from common.constants import NICHE_ID_FULL_QUALIFIER
+from sqlalchemy.sql import func
 
 from .base import Base
+
 
 class Keyword(Base):
     __tablename__ = "keywords"
     __table_args__ = (
-        UniqueConstraint('niche_id', 'name', name='uq_keyword_per_niche'),
-        CheckConstraint("name != ''", name='ck_keyword_not_empty'),
-        {"schema": "niches"}
+        UniqueConstraint("external_id", name="uq_keywords_external_id"),
+        UniqueConstraint("niche_id", "term", name="uq_keywords_niche_term"),
     )
 
-    keyword_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey(NICHE_ID_FULL_QUALIFIER), nullable=False)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    external_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False, default=uuid.uuid4)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("niches.id", ondelete="CASCADE"), nullable=False)
+    term: Mapped[str] = mapped_column(String, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created_by: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    updated_by: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
 
-    niche: Mapped["Niche"] = relationship(back_populates="keywords", lazy="selectin")
-
-    def to_dict(self) -> dict:
-        return {
-            "keyword_id": str(self.keyword_id),
-            "niche_id": str(self.niche_id),
-            "name": self.name,
-        }
-
-    def to_readable(self) -> str:
-        niche_name = getattr(self.niche, "name", None)
-        niche_part = f" (niche='{niche_name}')" if niche_name else ""
-        return f"Keyword[{self.keyword_id}]: '{self.name}'{niche_part} | niche_id={self.niche_id}"
+    # Relationships
+    niche: Mapped["Niche"] = relationship("Niche", back_populates="keywords")
+    images: Mapped[List["Image"]] = relationship("Image", back_populates="keyword", cascade="all, delete", lazy="selectin")
+    contents: Mapped[List["Content"]] = relationship("Content", back_populates="keyword", cascade="all, delete", lazy="selectin")

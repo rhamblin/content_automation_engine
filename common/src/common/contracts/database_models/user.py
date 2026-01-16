@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import List, Optional
 
-from sqlalchemy import String, DateTime, UniqueConstraint
+from sqlalchemy import String, DateTime, Boolean
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -13,15 +14,16 @@ from .base import Base
 
 class User(Base):
     __tablename__ = "users"
-    __table_args__ = (
-        UniqueConstraint("email", name="uq_users_email"),
-        {"schema": "identity"}
-        )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email: Mapped[str] = mapped_column(String, nullable=False)
-    provider: Mapped[str] = mapped_column(String, nullable=False)
-    provider_sub: Mapped[str] = mapped_column(String, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), default=datetime.utcnow, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    external_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created_by: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    updated_by: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
 
-    tenant: Mapped["TenantUser"] = relationship("TenantUser", back_populates="user", cascade="all, delete", lazy="selectin", uselist=False)
+    # Relationships
+    tenants_users: Mapped[List["TenantsUsers"]] = relationship("TenantsUsers", back_populates="user", cascade="all, delete", lazy="selectin")
+    users_identity_providers: Mapped[List["UsersIdentityProviders"]] = relationship("UsersIdentityProviders", back_populates="user", cascade="all, delete", lazy="selectin")

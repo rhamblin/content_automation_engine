@@ -1,5 +1,5 @@
-# Database Models Constants
-NICHE_ID_FULL_QUALIFIER = "niches.niches.niche_id"
+# Database Models Constants (public schema - no schema prefix needed)
+NICHE_ID_FULL_QUALIFIER = "niches.id"
 PROJECT_ID = "project_id"
 INTEGRATION_ID = "integration_id"
 
