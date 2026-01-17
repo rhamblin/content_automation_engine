@@ -21,10 +21,11 @@ class TestTenantRepository:
         assert result is None
 
     @pytest.mark.asyncio
-    async def test_get_by_id_with_users(self, tenant_repo, user_repo):
+    async def test_get_by_id_with_users(self, tenant_repo, user_repo, async_db_session):
         tenant = await tenant_repo.add(title="Tenant With Users")
         user = await user_repo.add(email="user@test.com")
         await tenant_repo.add_user_to_tenant(tenant.id, user.id, "admin")
+        async_db_session.expire(tenant)
 
         result = await tenant_repo.get_by_id_with_users(tenant.external_id)
 

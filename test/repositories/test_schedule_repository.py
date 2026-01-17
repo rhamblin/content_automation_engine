@@ -13,6 +13,7 @@ class TestScheduleRepository:
         execution = ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
+            niche_id=schedule.niche_id,
             started_at=datetime.utcnow()
         )
         await schedule_repo.add_execution(execution)
@@ -93,6 +94,7 @@ class TestScheduleRepository:
         execution = ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
+            niche_id=schedule.niche_id,
             started_at=datetime.utcnow()
         )
 
@@ -106,11 +108,13 @@ class TestScheduleRepository:
         await schedule_repo.add_execution(ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
+            niche_id=schedule.niche_id,
             started_at=datetime.utcnow()
         ))
         await schedule_repo.add_execution(ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
+            niche_id=schedule.niche_id,
             started_at=datetime.utcnow()
         ))
 
@@ -124,6 +128,7 @@ class TestScheduleRepository:
         execution = ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
+            niche_id=schedule.niche_id,
             started_at=datetime.utcnow(),
             status=ScheduleExecutionStatus.RUNNING.value
         )
@@ -139,6 +144,7 @@ class TestScheduleRepository:
         execution = ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
+            niche_id=schedule.niche_id,
             started_at=datetime.utcnow()
         )
         exec_result = await schedule_repo.add_execution(execution)
