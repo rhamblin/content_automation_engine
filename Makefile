@@ -1,4 +1,4 @@
-.PHONY: setup infra deploy-local-setup seed-images local cleanup publish consume logs k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: setup infra deploy-local-setup seed-images local cleanup publish consume logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -73,6 +73,13 @@ logs:
 	docker compose logs -f
 
 # ==========================================
+# Testing
+# ==========================================
+
+tests:  ## Run tests in Docker container
+	docker compose --env-file ./config/local/variables.env --profile test run --rm --build test-runner
+
+# ==========================================
 # Kubernetes
 # ==========================================
 
@@ -109,8 +116,11 @@ help:  ## Show this help message
 	@echo "Docker Compose:"
 	@echo "  make infra          - Start PostgreSQL and Redis"
 	@echo "  make local          - Start all services"
-	@echo "  make teardown       - Stop and remove all containers"
+	@echo "  make cleanup        - Stop and remove all containers"
 	@echo "  make logs           - Tail docker-compose logs"
+	@echo ""
+	@echo "Testing:"
+	@echo "  make tests          - Run all tests in Docker"
 	@echo ""
 	@echo "Kubernetes:"
 	@echo "  make k8s-deploy     - Deploy everything to K8s"

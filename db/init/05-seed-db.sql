@@ -77,7 +77,7 @@ BEGIN
     -- 11. Sample Schedule
     INSERT INTO schedules (id, external_id, tenant_id, niche_id, is_active, title, cron_expression, message_type, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', true, 'Daily Content Generation', '0 9 * * *', 'content_generation', NOW());
+      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', true, 'Daily Content Generation', '0 9 * * *', 'content_generation_requested', NOW());
 
   END IF;
 END
