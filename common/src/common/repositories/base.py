@@ -21,11 +21,6 @@ class BaseRepository(IRepository[T], Generic[T]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_external_id(self, external_id: UUID) -> Optional[T]:
-        stmt = select(self._model).where(self._model.external_id == external_id)
-        result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
-
     async def get_all(self, limit: int = 100, offset: int = 0) -> List[T]:
         stmt = select(self._model).limit(limit).offset(offset)
         result = await self._session.execute(stmt)

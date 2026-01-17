@@ -10,11 +10,6 @@ class IRepository(ABC, Generic[T]):
 
     @abstractmethod
     async def get_by_id(self, id: UUID) -> Optional[T]:
-        """Get entity by primary key."""
-        pass
-
-    @abstractmethod
-    async def get_by_external_id(self, external_id: UUID) -> Optional[T]:
         """Get entity by external ID."""
         pass
 
