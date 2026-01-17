@@ -21,7 +21,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         stmt = (
             select(Publication)
             .options(selectinload(Publication.promotions))
-            .where(Publication.id == id)
+            .where(Publication.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
@@ -30,7 +30,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         stmt = (
             select(Publication)
             .options(selectinload(Publication.publication_metrics))
-            .where(Publication.id == id)
+            .where(Publication.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

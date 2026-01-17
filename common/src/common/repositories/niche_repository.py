@@ -19,7 +19,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         stmt = (
             select(Niche)
             .options(selectinload(Niche.keywords))
-            .where(Niche.id == id)
+            .where(Niche.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

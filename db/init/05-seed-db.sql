@@ -15,9 +15,7 @@ BEGIN
 
     INSERT INTO channels (id, external_id, identifier, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000110', 'pinterest', NOW()),
-      ('00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000111', 'instagram', NOW());
-
+      ('00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000110', 'pinterest', NOW())
     -- 2. Junction tables
     INSERT INTO tenants_users (tenant_id, user_id, role, created_at)
     VALUES
@@ -29,9 +27,7 @@ BEGIN
 
     INSERT INTO tenants_channels (tenant_id, channel_id, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', NOW()),
-      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000011', NOW());
-
+      ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', NOW())
     -- 3. Project
     INSERT INTO projects (id, external_id, tenant_id, name, is_active, created_at)
     VALUES

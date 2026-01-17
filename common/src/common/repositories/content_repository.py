@@ -19,7 +19,7 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
         stmt = (
             select(Content)
             .options(selectinload(Content.renders))
-            .where(Content.id == id)
+            .where(Content.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
@@ -28,7 +28,7 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
         stmt = (
             select(Content)
             .options(selectinload(Content.publications))
-            .where(Content.id == id)
+            .where(Content.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

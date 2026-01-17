@@ -24,7 +24,7 @@ class UserRepository(BaseRepository[User]):
         stmt = (
             select(User)
             .options(selectinload(User.users_identity_providers))
-            .where(User.id == id)
+            .where(User.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

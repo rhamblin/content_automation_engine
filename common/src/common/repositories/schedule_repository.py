@@ -21,7 +21,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         stmt = (
             select(Schedule)
             .options(selectinload(Schedule.schedule_executions))
-            .where(Schedule.id == id)
+            .where(Schedule.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

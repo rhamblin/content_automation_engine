@@ -17,7 +17,9 @@ class BaseRepository(IRepository[T], Generic[T]):
         self._model = model
 
     async def get_by_id(self, id: UUID) -> Optional[T]:
-        return await self._session.get(self._model, id)
+        stmt = select(self._model).where(self._model.external_id == id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_by_external_id(self, external_id: UUID) -> Optional[T]:
         stmt = select(self._model).where(self._model.external_id == external_id)
@@ -41,7 +43,7 @@ class BaseRepository(IRepository[T], Generic[T]):
         return entity
 
     async def delete(self, id: UUID) -> bool:
-        stmt = delete(self._model).where(self._model.id == id)
+        stmt = delete(self._model).where(self._model.external_id == id)
         result = await self._session.execute(stmt)
         return result.rowcount > 0
 

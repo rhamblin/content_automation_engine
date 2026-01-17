@@ -19,7 +19,7 @@ class TenantRepository(BaseRepository[Tenant]):
         stmt = (
             select(Tenant)
             .options(selectinload(Tenant.tenants_users))
-            .where(Tenant.id == id)
+            .where(Tenant.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
@@ -28,7 +28,7 @@ class TenantRepository(BaseRepository[Tenant]):
         stmt = (
             select(Tenant)
             .options(selectinload(Tenant.tenants_channels))
-            .where(Tenant.id == id)
+            .where(Tenant.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

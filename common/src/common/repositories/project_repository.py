@@ -19,7 +19,7 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         stmt = (
             select(Project)
             .options(selectinload(Project.integration_profiles))
-            .where(Project.id == id)
+            .where(Project.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

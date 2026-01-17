@@ -20,7 +20,7 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         stmt = (
             select(Render)
             .options(selectinload(Render.input_image), selectinload(Render.output_image))
-            .where(Render.id == id)
+            .where(Render.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
