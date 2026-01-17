@@ -19,11 +19,6 @@ class IRepository(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def add(self, entity: T) -> T:
-        """Add a new entity."""
-        pass
-
-    @abstractmethod
     async def update(self, entity: T) -> T:
         """Update an existing entity."""
         pass

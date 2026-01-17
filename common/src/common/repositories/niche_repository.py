@@ -15,6 +15,13 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Niche)
 
+    async def add(self, tenant_id: UUID, title: str) -> Niche:
+        niche = Niche(tenant_id=tenant_id, title=title)
+        self._session.add(niche)
+        await self._session.flush()
+        await self._session.refresh(niche)
+        return niche
+
     async def get_by_id_with_keywords(self, id: UUID) -> Optional[Niche]:
         stmt = (
             select(Niche)

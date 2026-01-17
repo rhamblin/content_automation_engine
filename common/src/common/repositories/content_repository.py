@@ -15,6 +15,26 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Content)
 
+    async def add(
+        self,
+        tenant_id: UUID,
+        niche_id: UUID,
+        keyword_id: UUID,
+        title: str = "[Untitled]",
+        description: str = "[No description]"
+    ) -> Content:
+        content = Content(
+            tenant_id=tenant_id,
+            niche_id=niche_id,
+            keyword_id=keyword_id,
+            title=title,
+            description=description
+        )
+        self._session.add(content)
+        await self._session.flush()
+        await self._session.refresh(content)
+        return content
+
     async def get_by_id_with_renders(self, id: UUID) -> Optional[Content]:
         stmt = (
             select(Content)

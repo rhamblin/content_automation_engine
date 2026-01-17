@@ -15,6 +15,13 @@ class UserRepository(BaseRepository[User]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, User)
 
+    async def add(self, email: str) -> User:
+        user = User(email=email)
+        self._session.add(user)
+        await self._session.flush()
+        await self._session.refresh(user)
+        return user
+
     async def get_by_email(self, email: str) -> Optional[User]:
         stmt = select(User).where(User.email == email)
         result = await self._session.execute(stmt)

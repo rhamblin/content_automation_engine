@@ -26,12 +26,6 @@ class BaseRepository(IRepository[T], Generic[T]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def add(self, entity: T) -> T:
-        self._session.add(entity)
-        await self._session.flush()
-        await self._session.refresh(entity)
-        return entity
-
     async def update(self, entity: T) -> T:
         await self._session.flush()
         await self._session.refresh(entity)

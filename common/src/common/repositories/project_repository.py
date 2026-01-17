@@ -15,6 +15,13 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Project)
 
+    async def add(self, tenant_id: UUID, name: str) -> Project:
+        project = Project(tenant_id=tenant_id, name=name)
+        self._session.add(project)
+        await self._session.flush()
+        await self._session.refresh(project)
+        return project
+
     async def get_by_id_with_profiles(self, id: UUID) -> Optional[Project]:
         stmt = (
             select(Project)

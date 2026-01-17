@@ -15,6 +15,13 @@ class TenantRepository(BaseRepository[Tenant]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Tenant)
 
+    async def add(self, title: str) -> Tenant:
+        tenant = Tenant(title=title)
+        self._session.add(tenant)
+        await self._session.flush()
+        await self._session.refresh(tenant)
+        return tenant
+
     async def get_by_id_with_users(self, id: UUID) -> Optional[Tenant]:
         stmt = (
             select(Tenant)
@@ -38,7 +45,8 @@ class TenantRepository(BaseRepository[Tenant]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def add_user_to_tenant(self, tenant_user: TenantsUsers) -> TenantsUsers:
+    async def add_user_to_tenant(self, tenant_id: UUID, user_id: UUID, role: str) -> TenantsUsers:
+        tenant_user = TenantsUsers(tenant_id=tenant_id, user_id=user_id, role=role)
         self._session.add(tenant_user)
         await self._session.flush()
         return tenant_user

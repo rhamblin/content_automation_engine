@@ -14,6 +14,13 @@ class ChannelRepository(BaseRepository[Channel]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Channel)
 
+    async def add(self, identifier: str) -> Channel:
+        channel = Channel(identifier=identifier)
+        self._session.add(channel)
+        await self._session.flush()
+        await self._session.refresh(channel)
+        return channel
+
     async def get_by_identifier(self, identifier: str) -> Optional[Channel]:
         stmt = select(Channel).where(Channel.identifier == identifier)
         result = await self._session.execute(stmt)

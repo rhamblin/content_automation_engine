@@ -17,6 +17,24 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Publication)
 
+    async def add(
+        self,
+        tenant_id: UUID,
+        channel_id: UUID,
+        content_id: UUID,
+        render_id: Optional[UUID] = None
+    ) -> Publication:
+        publication = Publication(
+            tenant_id=tenant_id,
+            channel_id=channel_id,
+            content_id=content_id,
+            render_id=render_id
+        )
+        self._session.add(publication)
+        await self._session.flush()
+        await self._session.refresh(publication)
+        return publication
+
     async def get_by_id_with_promotions(self, id: UUID) -> Optional[Publication]:
         stmt = (
             select(Publication)

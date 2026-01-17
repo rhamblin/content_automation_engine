@@ -15,6 +15,22 @@ class ReportRepository(BaseTenantScopedRepository[Report]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Report)
 
+    async def add(
+        self,
+        tenant_id: UUID,
+        recipients: List[str],
+        content: Optional[dict] = None
+    ) -> Report:
+        report = Report(
+            tenant_id=tenant_id,
+            recipients=recipients,
+            content=content
+        )
+        self._session.add(report)
+        await self._session.flush()
+        await self._session.refresh(report)
+        return report
+
     async def get_recent(self, tenant_id: UUID, limit: int = 10) -> List[Report]:
         stmt = (
             select(Report)

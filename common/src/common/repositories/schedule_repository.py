@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Schedule, ScheduleExecution
-from common.contracts.database_models.enums import ScheduleExecutionStatus
+from common.contracts.database_models.enums import ScheduleExecutionStatus, ScheduleMessageType
 from common.repositories.base import BaseTenantScopedRepository
 
 
@@ -16,6 +16,28 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
 
     def __init__(self, session: AsyncSession):
         super().__init__(session, Schedule)
+
+    async def add(
+        self,
+        tenant_id: UUID,
+        niche_id: UUID,
+        title: str,
+        cron_expression: str,
+        message_type: ScheduleMessageType = ScheduleMessageType.CONTENT_GENERATION,
+        message_payload: Optional[str] = None
+    ) -> Schedule:
+        schedule = Schedule(
+            tenant_id=tenant_id,
+            niche_id=niche_id,
+            title=title,
+            cron_expression=cron_expression,
+            message_type=message_type.value,
+            message_payload=message_payload
+        )
+        self._session.add(schedule)
+        await self._session.flush()
+        await self._session.refresh(schedule)
+        return schedule
 
     async def get_by_id_with_executions(self, id: UUID) -> Optional[Schedule]:
         stmt = (

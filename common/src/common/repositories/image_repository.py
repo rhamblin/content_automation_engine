@@ -15,6 +15,24 @@ class ImageRepository(BaseTenantScopedRepository[Image]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Image)
 
+    async def add(
+        self,
+        tenant_id: UUID,
+        niche_id: UUID,
+        keyword_id: UUID,
+        kind: ImageKind = ImageKind.ORIGINAL
+    ) -> Image:
+        image = Image(
+            tenant_id=tenant_id,
+            niche_id=niche_id,
+            keyword_id=keyword_id,
+            kind=kind.value
+        )
+        self._session.add(image)
+        await self._session.flush()
+        await self._session.refresh(image)
+        return image
+
     async def get_by_keyword(self, keyword_id: UUID) -> List[Image]:
         stmt = select(Image).where(Image.keyword_id == keyword_id)
         result = await self._session.execute(stmt)

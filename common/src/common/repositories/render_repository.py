@@ -16,6 +16,28 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Render)
 
+    async def add(
+        self,
+        tenant_id: UUID,
+        content_id: UUID,
+        niche_id: UUID,
+        keyword_id: UUID,
+        input_image_id: Optional[UUID] = None,
+        style_name: Optional[str] = None
+    ) -> Render:
+        render = Render(
+            tenant_id=tenant_id,
+            content_id=content_id,
+            niche_id=niche_id,
+            keyword_id=keyword_id,
+            input_image_id=input_image_id,
+            style_name=style_name
+        )
+        self._session.add(render)
+        await self._session.flush()
+        await self._session.refresh(render)
+        return render
+
     async def get_by_id_with_images(self, id: UUID) -> Optional[Render]:
         stmt = (
             select(Render)
