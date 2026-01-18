@@ -1,6 +1,6 @@
 from typing import Optional, List
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -119,7 +119,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         if promotion:
             promotion.status = status
             if status == PromotionStatus.EXECUTED:
-                promotion.executed_at = datetime.utcnow()
+                promotion.executed_at = datetime.now(timezone.utc)
             await self._session.flush()
             return True
         return False

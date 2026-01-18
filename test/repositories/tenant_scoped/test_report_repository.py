@@ -1,6 +1,6 @@
 """Tests for ReportRepository custom methods."""
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class TestReportRepository:
@@ -22,8 +22,8 @@ class TestReportRepository:
         r1 = await report_repo.add(tenant_id=tenant.id, recipients=["a@test.com"])
         r2 = await report_repo.add(tenant_id=tenant.id, recipients=["b@test.com"])
 
-        start_date = datetime.utcnow() - timedelta(hours=1)
-        end_date = datetime.utcnow() + timedelta(hours=1)
+        start_date = datetime.now(timezone.utc) - timedelta(hours=1)
+        end_date = datetime.now(timezone.utc) + timedelta(hours=1)
         results = await report_repo.get_by_date_range(tenant.id, start_date, end_date)
 
         assert len(results) >= 2

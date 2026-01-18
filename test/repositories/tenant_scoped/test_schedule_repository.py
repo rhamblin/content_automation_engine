@@ -1,6 +1,6 @@
 """Tests for ScheduleRepository custom methods."""
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from common.contracts.database_models import ScheduleExecution
 from common.contracts.database_models.enums import ScheduleExecutionStatus
 
@@ -14,7 +14,7 @@ class TestScheduleRepository:
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
             niche_id=schedule.niche_id,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         )
         await schedule_repo.add_execution(execution)
 
@@ -47,10 +47,10 @@ class TestScheduleRepository:
             title="Due Schedule",
             cron_expression="0 9 * * *"
         )
-        schedule.next_run_at = datetime.utcnow() - timedelta(hours=1)
+        schedule.next_run_at = datetime.now(timezone.utc) - timedelta(hours=1)
         await async_db_session.flush()
 
-        results = await schedule_repo.get_due_schedules(datetime.utcnow())
+        results = await schedule_repo.get_due_schedules(datetime.now(timezone.utc))
 
         assert len(results) >= 1
 
@@ -68,8 +68,8 @@ class TestScheduleRepository:
     @pytest.mark.asyncio
     async def test_update_last_run(self, schedule_repo, sample_schedule):
         schedule = sample_schedule
-        last_run = datetime.utcnow()
-        next_run = datetime.utcnow() + timedelta(days=1)
+        last_run = datetime.now(timezone.utc)
+        next_run = datetime.now(timezone.utc) + timedelta(days=1)
 
         result = await schedule_repo.update_last_run(schedule.external_id, last_run, next_run)
 
@@ -95,7 +95,7 @@ class TestScheduleRepository:
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
             niche_id=schedule.niche_id,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         )
 
         result = await schedule_repo.add_execution(execution)
@@ -109,13 +109,13 @@ class TestScheduleRepository:
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
             niche_id=schedule.niche_id,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         ))
         await schedule_repo.add_execution(ScheduleExecution(
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
             niche_id=schedule.niche_id,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         ))
 
         results = await schedule_repo.get_executions(schedule.id)
@@ -129,7 +129,7 @@ class TestScheduleRepository:
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
             niche_id=schedule.niche_id,
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(timezone.utc),
             status=ScheduleExecutionStatus.RUNNING.value
         )
         await schedule_repo.add_execution(execution)
@@ -145,7 +145,7 @@ class TestScheduleRepository:
             tenant_id=schedule.tenant_id,
             schedule_id=schedule.id,
             niche_id=schedule.niche_id,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         )
         exec_result = await schedule_repo.add_execution(execution)
 

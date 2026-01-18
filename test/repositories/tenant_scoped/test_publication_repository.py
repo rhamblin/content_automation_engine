@@ -1,6 +1,6 @@
 """Tests for PublicationRepository custom methods."""
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from common.contracts.database_models import Promotion, PublicationMetric
 from common.contracts.database_models.enums import PublicationStatus, PromotionStatus
 
@@ -27,7 +27,7 @@ class TestPublicationRepository:
         publication = sample_publication
         metric = PublicationMetric(
             publication_id=publication.id,
-            snapshot_date=datetime.utcnow(),
+            snapshot_date=datetime.now(timezone.utc),
             views=100
         )
         await publication_repo.add_metric(metric)

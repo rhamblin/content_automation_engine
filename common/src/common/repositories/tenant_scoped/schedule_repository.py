@@ -1,6 +1,6 @@
 from typing import Optional, List
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -124,11 +124,11 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         if execution:
             execution.status = status
             if status == ScheduleExecutionStatus.RUNNING and not execution.started_at:
-                execution.started_at = datetime.utcnow()
+                execution.started_at = datetime.now(timezone.utc)
             if completed_at:
                 execution.completed_at = completed_at
             elif status in (ScheduleExecutionStatus.COMPLETED, ScheduleExecutionStatus.FAILED):
-                execution.completed_at = datetime.utcnow()
+                execution.completed_at = datetime.now(timezone.utc)
             await self._session.flush()
             return True
         return False
