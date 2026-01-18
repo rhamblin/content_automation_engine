@@ -13,6 +13,8 @@ from common.contracts.messages.promotion_orchestrator_requested import (
 )
 from common.providers import registry
 
+from common.repositories import
+
 
 class SchedulerWorker:
     """Scheduler Worker"""
@@ -20,6 +22,7 @@ class SchedulerWorker:
     def __init__(self, registry: registry.ProviderRegistry):
         self.logger = self.__get_logger()
         self.registry = registry
+        self.scheduler_repository =
 
     async def work(self) -> None:
         """Main worker loop"""
@@ -60,4 +63,5 @@ class SchedulerWorker:
 
     def __getTenantsToSchedule(self) -> list:
         # placeholder - implement logic to get tenants to schedule from DB
+
         return ["test-tenant"]

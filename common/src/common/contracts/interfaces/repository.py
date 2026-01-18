@@ -18,9 +18,9 @@ IRepository[T]                        (Interface - abstract CRUD operations)
             |       +-- ProjectRepository
             |       +-- ReportRepository
             |
-            +-- TenantRepository      (global - tenants don't belong to tenants)
-            +-- UserRepository        (global - users can belong to multiple tenants)
-            +-- ChannelRepository     (global - channels are shared across tenants)
+            +-- TenantRepository      (cross-tenant - tenants don't belong to tenants)
+            +-- UserRepository        (cross-tenant - users can belong to multiple tenants)
+            +-- ChannelRepository     (cross-tenant - channels are shared across tenants)
 """
 
 from abc import ABC, abstractmethod

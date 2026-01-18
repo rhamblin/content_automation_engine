@@ -1,10 +1,10 @@
 from .base_repository import BaseRepository
 from .base_tenant_scoped_repository import BaseTenantScopedRepository
 
-# Global repositories (not tenant-scoped)
-from .global.tenant_repository import TenantRepository
-from .global.user_repository import UserRepository
-from .global.channel_repository import ChannelRepository
+# Cross-tenant repositories (not tenant-scoped)
+from .cross_tenant.tenant_repository import TenantRepository
+from .cross_tenant.user_repository import UserRepository
+from .cross_tenant.channel_repository import ChannelRepository
 
 # Tenant-scoped repositories
 from .tenant_scoped.project_repository import ProjectRepository
