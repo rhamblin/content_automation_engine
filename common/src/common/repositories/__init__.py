@@ -1,4 +1,5 @@
-from .base import BaseRepository, BaseTenantScopedRepository
+from .base import BaseRepository
+from .tenant_scoped import BaseTenantScopedRepository
 from .tenant_repository import TenantRepository
 from .user_repository import UserRepository
 from .channel_repository import ChannelRepository

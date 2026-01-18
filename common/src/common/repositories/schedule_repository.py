@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Schedule, ScheduleExecution
 from common.contracts.database_models.enums import ScheduleExecutionStatus, ScheduleMessageType
-from common.repositories.base import BaseTenantScopedRepository
+from common.repositories.tenant_scoped import BaseTenantScopedRepository
 
 
 class ScheduleRepository(BaseTenantScopedRepository[Schedule]):

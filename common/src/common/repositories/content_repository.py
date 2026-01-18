@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Content
-from common.repositories.base import BaseTenantScopedRepository
+from common.repositories.tenant_scoped import BaseTenantScopedRepository
 
 
 class ContentRepository(BaseTenantScopedRepository[Content]):

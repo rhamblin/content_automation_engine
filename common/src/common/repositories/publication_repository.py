@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Publication, Promotion, PublicationMetric
 from common.contracts.database_models.enums import PublicationStatus, PromotionStatus
-from common.repositories.base import BaseTenantScopedRepository
+from common.repositories.tenant_scoped import BaseTenantScopedRepository
 
 
 class PublicationRepository(BaseTenantScopedRepository[Publication]):

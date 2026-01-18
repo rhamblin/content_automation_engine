@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from common.contracts.interfaces.repository import IRepository, ITenantScopedRepository
+from common.contracts.interfaces.repository import IRepository
 
 T = TypeVar("T")
 
@@ -35,12 +35,3 @@ class BaseRepository(IRepository[T], Generic[T]):
         stmt = delete(self._model).where(self._model.external_id == id)
         result = await self._session.execute(stmt)
         return result.rowcount > 0
-
-
-class BaseTenantScopedRepository(ITenantScopedRepository[T], BaseRepository[T], Generic[T]):
-    """Base repository for tenant-scoped entities."""
-
-    async def get_all_by_tenant(self, tenant_id: UUID, limit: int = 100, offset: int = 0) -> List[T]:
-        stmt = select(self._model).where(self._model.tenant_id == tenant_id).limit(limit).offset(offset)
-        result = await self._session.execute(stmt)
-        return list(result.scalars().all())

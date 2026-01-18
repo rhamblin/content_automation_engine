@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Render
 from common.contracts.database_models.enums import RenderStatus
-from common.repositories.base import BaseTenantScopedRepository
+from common.repositories.tenant_scoped import BaseTenantScopedRepository
 
 
 class RenderRepository(BaseTenantScopedRepository[Render]):
