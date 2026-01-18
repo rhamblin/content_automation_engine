@@ -64,7 +64,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     async def get_by_status(self, tenant_id: UUID, status: PublicationStatus, limit: int = 100) -> List[Publication]:
         stmt = (
             select(Publication)
-            .where(Publication.tenant_id == tenant_id, Publication.status == status.value)
+            .where(Publication.tenant_id == tenant_id, Publication.status == status)
             .limit(limit)
         )
         result = await self._session.execute(stmt)
@@ -86,7 +86,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     async def update_status(self, id: UUID, status: PublicationStatus, post_id: Optional[str] = None) -> bool:
         publication = await self.get_by_id(id)
         if publication:
-            publication.status = status.value
+            publication.status = status
             if post_id:
                 publication.post_id = post_id
             await self._session.flush()
@@ -108,7 +108,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     async def get_pending_promotions(self, tenant_id: UUID, limit: int = 100) -> List[Promotion]:
         stmt = (
             select(Promotion)
-            .where(Promotion.tenant_id == tenant_id, Promotion.status == PromotionStatus.PENDING.value)
+            .where(Promotion.tenant_id == tenant_id, Promotion.status == PromotionStatus.PENDING)
             .limit(limit)
         )
         result = await self._session.execute(stmt)
@@ -117,7 +117,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     async def update_promotion_status(self, promotion_id: UUID, status: PromotionStatus) -> bool:
         promotion = await self._session.get(Promotion, promotion_id)
         if promotion:
-            promotion.status = status.value
+            promotion.status = status
             if status == PromotionStatus.EXECUTED:
                 promotion.executed_at = datetime.utcnow()
             await self._session.flush()

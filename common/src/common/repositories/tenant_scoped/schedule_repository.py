@@ -31,7 +31,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
             niche_id=niche_id,
             title=title,
             cron_expression=cron_expression,
-            message_type=message_type.value,
+            message_type=message_type,
             message_payload=message_payload
         )
         self._session.add(schedule)
@@ -108,7 +108,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
             select(ScheduleExecution)
             .where(
                 ScheduleExecution.tenant_id == tenant_id,
-                ScheduleExecution.status == ScheduleExecutionStatus.RUNNING.value
+                ScheduleExecution.status == ScheduleExecutionStatus.RUNNING
             )
         )
         result = await self._session.execute(stmt)
@@ -122,7 +122,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
     ) -> bool:
         execution = await self.get_execution_by_id(execution_id)
         if execution:
-            execution.status = status.value
+            execution.status = status
             if status == ScheduleExecutionStatus.RUNNING and not execution.started_at:
                 execution.started_at = datetime.utcnow()
             if completed_at:

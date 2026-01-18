@@ -26,7 +26,7 @@ class ImageRepository(BaseTenantScopedRepository[Image]):
             tenant_id=tenant_id,
             niche_id=niche_id,
             keyword_id=keyword_id,
-            kind=kind.value
+            kind=kind
         )
         self._session.add(image)
         await self._session.flush()
@@ -39,7 +39,7 @@ class ImageRepository(BaseTenantScopedRepository[Image]):
         return list(result.scalars().all())
 
     async def get_by_keyword_and_kind(self, keyword_id: UUID, kind: ImageKind) -> List[Image]:
-        stmt = select(Image).where(Image.keyword_id == keyword_id, Image.kind == kind.value)
+        stmt = select(Image).where(Image.keyword_id == keyword_id, Image.kind == kind)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -49,6 +49,6 @@ class ImageRepository(BaseTenantScopedRepository[Image]):
         return list(result.scalars().all())
 
     async def get_by_kind(self, tenant_id: UUID, kind: ImageKind, limit: int = 100) -> List[Image]:
-        stmt = select(Image).where(Image.tenant_id == tenant_id, Image.kind == kind.value).limit(limit)
+        stmt = select(Image).where(Image.tenant_id == tenant_id, Image.kind == kind).limit(limit)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

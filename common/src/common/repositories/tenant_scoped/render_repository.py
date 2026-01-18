@@ -55,7 +55,7 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
     async def get_by_status(self, tenant_id: UUID, status: RenderStatus, limit: int = 100) -> List[Render]:
         stmt = (
             select(Render)
-            .where(Render.tenant_id == tenant_id, Render.status == status.value)
+            .where(Render.tenant_id == tenant_id, Render.status == status)
             .limit(limit)
         )
         result = await self._session.execute(stmt)
@@ -72,7 +72,7 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
     async def update_status(self, id: UUID, status: RenderStatus) -> bool:
         render = await self.get_by_id(id)
         if render:
-            render.status = status.value
+            render.status = status
             await self._session.flush()
             return True
         return False
