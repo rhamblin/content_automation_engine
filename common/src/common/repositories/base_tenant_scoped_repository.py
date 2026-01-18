@@ -2,6 +2,7 @@ from typing import TypeVar, List, Protocol
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.orm import Mapped
 
 from common.contracts.interfaces.tenant_scoped_repository import ITenantScopedRepository
 from common.repositories.base_repository import BaseRepository
@@ -9,7 +10,7 @@ from common.repositories.base_repository import BaseRepository
 
 class TenantScoped(Protocol):
     """Protocol for entities that belong to a tenant."""
-    tenant_id: UUID
+    tenant_id: Mapped[UUID]
 
 
 T = TypeVar("T", bound=TenantScoped)
