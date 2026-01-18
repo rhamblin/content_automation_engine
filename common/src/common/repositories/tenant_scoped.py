@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, List
+from typing import TypeVar, List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -9,7 +9,7 @@ from common.repositories.base import BaseRepository
 T = TypeVar("T")
 
 
-class BaseTenantScopedRepository(ITenantScopedRepository[T], BaseRepository[T], Generic[T]):
+class BaseTenantScopedRepository(ITenantScopedRepository[T], BaseRepository[T]):
     """Base repository for tenant-scoped entities."""
 
     async def get_all_by_tenant(self, tenant_id: UUID, limit: int = 100, offset: int = 0) -> List[T]:

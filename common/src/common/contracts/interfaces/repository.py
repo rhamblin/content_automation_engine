@@ -1,3 +1,28 @@
+"""
+Repository pattern class hierarchy:
+
+IRepository[T]                        (Interface - abstract CRUD operations)
+    |
+    +-- ITenantScopedRepository[T]    (Interface - adds tenant filtering)
+    |
+    +-- BaseRepository[T]             (Implementation - concrete CRUD with SQLAlchemy)
+            |
+            +-- BaseTenantScopedRepository[T]   ((Implementation - concrete CRUD with SQLAlchemy and adds tenant filtering)
+            |       |
+            |       +-- NicheRepository
+            |       +-- ContentRepository
+            |       +-- ImageRepository
+            |       +-- RenderRepository
+            |       +-- PublicationRepository
+            |       +-- ScheduleRepository
+            |       +-- ProjectRepository
+            |       +-- ReportRepository
+            |
+            +-- TenantRepository      (global - tenants don't belong to tenants)
+            +-- UserRepository        (global - users can belong to multiple tenants)
+            +-- ChannelRepository     (global - channels are shared across tenants)
+"""
+
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional, List
 from uuid import UUID

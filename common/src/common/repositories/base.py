@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Optional, List, Type
+from typing import TypeVar, Optional, List, Type
 from uuid import UUID
 
 from sqlalchemy import select, delete
@@ -9,7 +9,7 @@ from common.contracts.interfaces.repository import IRepository
 T = TypeVar("T")
 
 
-class BaseRepository(IRepository[T], Generic[T]):
+class BaseRepository(IRepository[T]):
     """Base repository with common CRUD operations."""
 
     def __init__(self, session: AsyncSession, model: Type[T]):
