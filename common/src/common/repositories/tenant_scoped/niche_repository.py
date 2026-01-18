@@ -37,7 +37,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         return result.scalar_one_or_none()
 
     async def get_active_niches(self, tenant_id: UUID) -> List[Niche]:
-        stmt = select(Niche).where(Niche.tenant_id == tenant_id, Niche.is_active == True)
+        stmt = select(Niche).where(Niche.tenant_id == tenant_id, Niche.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -53,7 +53,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         return list(result.scalars().all())
 
     async def get_active_keywords(self, niche_id: UUID) -> List[Keyword]:
-        stmt = select(Keyword).where(Keyword.niche_id == niche_id, Keyword.is_active == True)
+        stmt = select(Keyword).where(Keyword.niche_id == niche_id, Keyword.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

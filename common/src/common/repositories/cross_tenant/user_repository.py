@@ -49,7 +49,7 @@ class UserRepository(BaseRepository[User]):
         return result.scalar_one_or_none()
 
     async def get_active_users(self, limit: int = 100, offset: int = 0) -> List[User]:
-        stmt = select(User).where(User.is_active == True).limit(limit).offset(offset)
+        stmt = select(User).where(User.is_active).limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

@@ -37,7 +37,7 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         return result.scalar_one_or_none()
 
     async def get_active_projects(self, tenant_id: UUID) -> List[Project]:
-        stmt = select(Project).where(Project.tenant_id == tenant_id, Project.is_active == True)
+        stmt = select(Project).where(Project.tenant_id == tenant_id, Project.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

@@ -49,14 +49,14 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         return result.scalar_one_or_none()
 
     async def get_active_schedules(self, tenant_id: UUID) -> List[Schedule]:
-        stmt = select(Schedule).where(Schedule.tenant_id == tenant_id, Schedule.is_active == True)
+        stmt = select(Schedule).where(Schedule.tenant_id == tenant_id, Schedule.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_due_schedules(self, before: datetime) -> List[Schedule]:
         stmt = (
             select(Schedule)
-            .where(Schedule.is_active == True, Schedule.next_run_at <= before)
+            .where(Schedule.is_active, Schedule.next_run_at <= before)
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
