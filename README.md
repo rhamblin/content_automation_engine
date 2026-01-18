@@ -237,7 +237,7 @@ erDiagram
     uuid id pk
     uuid external_id
     uuid tenant_id fk
-    uuid niche_id fk %% Used to denormalize data and aid in faster queries without joins
+    uuid niche_id fk
     uuid project_id fk
     uuid channel_id fk
     boolean is_active
@@ -246,6 +246,8 @@ erDiagram
     timestamp updated_at
     uuid  updated_by
     %% Unique constraints: (external_id), (project_id, niche_id, channel_id)
+    %% niche_id used to denormalize data and aid in faster queries without joins
+
   }
 
   niches {
@@ -279,23 +281,26 @@ erDiagram
     uuid id pk
     uuid external_id
     uuid tenant_id fk
-    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
-    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
-    text  kind %% This is an ENUM
+    uuid  niche_id  fk
+    uuid  keyword_id  fk
+    text  kind
     timestamp created_at
     %% Unique constraint: (external_id)
+    %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
+    %% kind is an ENUM
   }
 
   contents {
     uuid id pk
     uuid external_id
     uuid tenant_id fk
-    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
-    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  niche_id  fk
+    uuid  keyword_id  fk
     text  title
     text  description
     timestamp created_at
     %% Unique constraint: (external_id)
+    %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
   }
 
   renders {
@@ -303,14 +308,16 @@ erDiagram
     uuid external_id
     uuid tenant_id fk
     uuid  content_id fk
-    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
-    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
+    uuid  niche_id  fk
+    uuid  keyword_id  fk
     uuid  input_image_id  fk
     uuid  output_image_id fk
     text  style_name
-    text  status %% This is an ENUM
+    text  status
     timestamp created_at
     %% Unique constraint: (external_id)
+    %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
+    %% Status is an ENUM
   }
 
   publications {
@@ -320,10 +327,12 @@ erDiagram
     uuid  render_id fk
     uuid  channel_id  fk
     uuid  content_id  fk
-    text  post_id %% The ID from channel after posting
-    text  status %% This is an ENUM
+    text  post_id
+    text  status
     timestamp created_at
     %% Unique constraint: (external_id)
+    %% post_id is the ID from channel after posting
+    %% Status is an ENUM
   }
 
   promotions {
@@ -332,12 +341,14 @@ erDiagram
     uuid tenant_id fk
     uuid  publication_id  fk
     uuid  channel_id  fk
-    jsonb payload %% Channel specific API parameters
-    text  action_taken %% This is an ENUM
-    text  status %% This is an ENUM
+    jsonb payload
+    text  action_taken
+    text  status
     timestamp created_at
     timestamp executed_at
     %% Unique constraint: (external_id)
+    %% Status and action_taken are ENUMs
+    %% payload is channel specific API parameters
   }
 
   publication_metrics {
@@ -360,7 +371,7 @@ erDiagram
     boolean is_active
     text  title
     text  cron_expression
-    text  message_type %% This is an ENUM
+    text  message_type
     text  message_payload
     timestamp last_run_at
     timestamp next_run_at
@@ -369,6 +380,7 @@ erDiagram
     timestamp updated_at
     uuid  updated_by
     %% Unique constraint: (external_id)
+    %% Message Type is an ENUM
   }
 
   schedule_executions {
@@ -376,12 +388,14 @@ erDiagram
     uuid external_id
     uuid tenant_id fk
     uuid schedule_id  fk
-    uuid  niche_id  fk %% Used to denormalize data and aid in faster queries without joins
-    uuid  keyword_id  fk %% Used to denormalize data and aid in faster queries without joins
-    text  status %% This is an ENUM
+    uuid  niche_id  fk
+    uuid  keyword_id  fk
+    text  status
     timestamp started_at
     timestamp completed_at
     %% Unique constraint: (external_id)
+    %% Status is an ENUM
+    %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
   }
 
 ```
