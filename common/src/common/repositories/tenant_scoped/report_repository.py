@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from common.contracts.database_models import Report
-from common.repositories.tenant_scoped import BaseTenantScopedRepository
+from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRepository
 
 
 class ReportRepository(BaseTenantScopedRepository[Report]):

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from common.contracts.database_models import Image
 from common.contracts.database_models.enums import ImageKind
-from common.repositories.tenant_scoped import BaseTenantScopedRepository
+from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRepository
 
 
 class ImageRepository(BaseTenantScopedRepository[Image]):

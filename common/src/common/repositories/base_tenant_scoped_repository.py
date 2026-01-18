@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import select
 
 from common.contracts.interfaces.tenant_scoped_repository import ITenantScopedRepository
-from common.repositories.base import BaseRepository
+from common.repositories.base_repository import BaseRepository
 
 T = TypeVar("T")
 
