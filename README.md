@@ -1,6 +1,6 @@
 # Content Automation Engine
 
-A modular, multi-tenant platform for AI-driven posts. Phase 1 focuses on Content generation; Phases 2 & 3 add Posting/Ads and Analytics/Pruning.
+A modular, multi-tenant platform for AI-driven publications to distribution channel
 
 See system diagram for full context of system design. [Doc](./doc_assets/system-diagram.png)
 
@@ -11,6 +11,8 @@ The following applications are requirements
 - (Docker Desktop)[https://docs.docker.com/desktop/#next-steps]
 - (Microsoft Azure Storage Explorer)[https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4]
 - Git e.g. (GitHub Desktop)[https://github.com/apps/desktop]
+
+Install Recommended Extensions when VS Code opens
 
 ## Onboarding a Niche and Keywords
 The Niche API can be used to add a net new Niche or to add a keyword to a niche

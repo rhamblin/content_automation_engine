@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from common.contracts.database_models import Channel, TenantsChannels
-from common.repositories.base import BaseRepository
+from common.repositories.base_repository import BaseRepository
 
 
 class ChannelRepository(BaseRepository[Channel]):

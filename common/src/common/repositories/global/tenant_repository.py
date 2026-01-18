@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Tenant, TenantsUsers, TenantsIdentityProviders, TenantsChannels
-from common.repositories.base import BaseRepository
+from common.repositories.base_repository import BaseRepository
 
 
 class TenantRepository(BaseRepository[Tenant]):

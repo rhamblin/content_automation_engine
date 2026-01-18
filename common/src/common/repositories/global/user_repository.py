@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import User, UsersIdentityProviders, TenantsUsers
-from common.repositories.base import BaseRepository
+from common.repositories.base_repository import BaseRepository
 
 
 class UserRepository(BaseRepository[User]):
