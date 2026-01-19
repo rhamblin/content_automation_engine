@@ -1,12 +1,20 @@
-from typing import TypeVar, Optional, List, Type
+from typing import TypeVar, Optional, List, Type, Protocol
 from uuid import UUID
 
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped
 
 from common.contracts.interfaces.repository import IRepository
 
-T = TypeVar("T")
+
+class HasExternalId(Protocol):
+    """Protocol for entities with an external ID."""
+
+    external_id: Mapped[UUID]
+
+
+T = TypeVar("T", bound=HasExternalId)
 
 
 class BaseRepository(IRepository[T]):
@@ -31,7 +39,6 @@ class BaseRepository(IRepository[T]):
         await self._session.refresh(entity)
         return entity
 
-    async def delete(self, id: UUID) -> bool:
+    async def delete(self, id: UUID) -> None:
         stmt = delete(self._model).where(self._model.external_id == id)
-        result = await self._session.execute(stmt)
-        return result.rowcount > 0
+        await self._session.execute(stmt)

@@ -49,6 +49,6 @@ class IRepository(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def delete(self, id: UUID) -> bool:
-        """Delete entity by ID. Returns True if deleted."""
+    async def delete(self, id: UUID) -> None:
+        """Delete entity by ID. Idempotent - no error if not found."""
         pass

@@ -66,15 +66,12 @@ class TestBaseRepositoryCRUD:
     async def test_delete_removes_entity(self, tenant_repo):
         tenant = await tenant_repo.add(title="To Delete")
 
-        result = await tenant_repo.delete(tenant.external_id)
+        await tenant_repo.delete(tenant.external_id)
 
-        assert result is True
         fetched = await tenant_repo.get_by_id(tenant.external_id)
         assert fetched is None
 
     @pytest.mark.asyncio
-    async def test_delete_returns_false_for_nonexistent(self, tenant_repo):
+    async def test_delete_is_idempotent(self, tenant_repo):
         from uuid import uuid4
-        result = await tenant_repo.delete(uuid4())
-
-        assert result is False
+        await tenant_repo.delete(uuid4())  # No exception raised

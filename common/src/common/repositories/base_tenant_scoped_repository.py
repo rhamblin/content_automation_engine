@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped
 
 from common.contracts.interfaces.tenant_scoped_repository import ITenantScopedRepository
-from common.repositories.base_repository import BaseRepository
+from common.repositories.base_repository import BaseRepository, HasExternalId
 
 
-class TenantScoped(Protocol):
+class TenantScoped(HasExternalId, Protocol):
     """Protocol for entities that belong to a tenant."""
 
     tenant_id: Mapped[UUID]
@@ -51,10 +51,9 @@ class BaseTenantScopedRepository(ITenantScopedRepository[T], BaseRepository[T]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def delete(self, id: UUID) -> bool:
-        """Delete entity by ID, scoped to tenant. Returns True if deleted."""
+    async def delete(self, id: UUID) -> None:
+        """Delete entity by ID, scoped to tenant."""
         stmt = delete(self._model).where(
             self._model.tenant_id == self._tenant_id, self._model.external_id == id
         )
-        result = await self._session.execute(stmt)
-        return result.rowcount > 0
+        await self._session.execute(stmt)
