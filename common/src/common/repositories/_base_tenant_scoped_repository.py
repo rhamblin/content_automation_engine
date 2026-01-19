@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped
 
 from common.contracts.interfaces.tenant_scoped_repository import ITenantScopedRepository
-from common.repositories.base_repository import BaseRepository, HasExternalId
+from common.repositories._base_repository import BaseRepository, HasExternalId
 
 
 class TenantScoped(HasExternalId, Protocol):
