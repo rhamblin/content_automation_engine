@@ -14,18 +14,17 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class PublicationRepository(BaseTenantScopedRepository[Publication]):
     """Repository for Publication aggregate (includes promotions & metrics)."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Publication)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Publication, tenant_id)
 
     async def add(
         self,
-        tenant_id: UUID,
         channel_id: UUID,
         content_id: UUID,
         render_id: Optional[UUID] = None
     ) -> Publication:
         publication = Publication(
-            tenant_id=tenant_id,
+            tenant_id=self._tenant_id,
             channel_id=channel_id,
             content_id=content_id,
             render_id=render_id
@@ -39,7 +38,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         stmt = (
             select(Publication)
             .options(selectinload(Publication.promotions))
-            .where(Publication.external_id == id)
+            .where(Publication.tenant_id == self._tenant_id, Publication.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
@@ -48,38 +47,45 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         stmt = (
             select(Publication)
             .options(selectinload(Publication.publication_metrics))
-            .where(Publication.external_id == id)
+            .where(Publication.tenant_id == self._tenant_id, Publication.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def get_by_post_id(self, channel_id: UUID, post_id: str) -> Optional[Publication]:
         stmt = select(Publication).where(
+            Publication.tenant_id == self._tenant_id,
             Publication.channel_id == channel_id,
             Publication.post_id == post_id
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_status(self, tenant_id: UUID, status: PublicationStatus, limit: int = 100) -> List[Publication]:
+    async def get_by_status(self, status: PublicationStatus, limit: int = 100) -> List[Publication]:
         stmt = (
             select(Publication)
-            .where(Publication.tenant_id == tenant_id, Publication.status == status)
+            .where(Publication.tenant_id == self._tenant_id, Publication.status == status)
             .limit(limit)
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_pending(self, tenant_id: UUID, limit: int = 100) -> List[Publication]:
-        return await self.get_by_status(tenant_id, PublicationStatus.PENDING, limit)
+    async def get_pending(self, limit: int = 100) -> List[Publication]:
+        return await self.get_by_status(PublicationStatus.PENDING, limit)
 
     async def get_by_channel(self, channel_id: UUID, limit: int = 100, offset: int = 0) -> List[Publication]:
-        stmt = select(Publication).where(Publication.channel_id == channel_id).limit(limit).offset(offset)
+        stmt = select(Publication).where(
+            Publication.tenant_id == self._tenant_id,
+            Publication.channel_id == channel_id
+        ).limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_by_content(self, content_id: UUID) -> List[Publication]:
-        stmt = select(Publication).where(Publication.content_id == content_id)
+        stmt = select(Publication).where(
+            Publication.tenant_id == self._tenant_id,
+            Publication.content_id == content_id
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -101,14 +107,17 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         return promotion
 
     async def get_promotions(self, publication_id: UUID) -> List[Promotion]:
-        stmt = select(Promotion).where(Promotion.publication_id == publication_id)
+        stmt = select(Promotion).where(
+            Promotion.tenant_id == self._tenant_id,
+            Promotion.publication_id == publication_id
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_pending_promotions(self, tenant_id: UUID, limit: int = 100) -> List[Promotion]:
+    async def get_pending_promotions(self, limit: int = 100) -> List[Promotion]:
         stmt = (
             select(Promotion)
-            .where(Promotion.tenant_id == tenant_id, Promotion.status == PromotionStatus.PENDING)
+            .where(Promotion.tenant_id == self._tenant_id, Promotion.status == PromotionStatus.PENDING)
             .limit(limit)
         )
         result = await self._session.execute(stmt)
@@ -116,7 +125,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
 
     async def update_promotion_status(self, promotion_id: UUID, status: PromotionStatus) -> bool:
         promotion = await self._session.get(Promotion, promotion_id)
-        if promotion:
+        if promotion and promotion.tenant_id == self._tenant_id:
             promotion.status = status
             if status == PromotionStatus.EXECUTED:
                 promotion.executed_at = datetime.now(timezone.utc)
@@ -134,7 +143,10 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     async def get_metrics(self, publication_id: UUID) -> List[PublicationMetric]:
         stmt = (
             select(PublicationMetric)
-            .where(PublicationMetric.publication_id == publication_id)
+            .where(
+                PublicationMetric.tenant_id == self._tenant_id,
+                PublicationMetric.publication_id == publication_id
+            )
             .order_by(PublicationMetric.snapshot_date.desc())
         )
         result = await self._session.execute(stmt)
@@ -143,7 +155,10 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
     async def get_latest_metric(self, publication_id: UUID) -> Optional[PublicationMetric]:
         stmt = (
             select(PublicationMetric)
-            .where(PublicationMetric.publication_id == publication_id)
+            .where(
+                PublicationMetric.tenant_id == self._tenant_id,
+                PublicationMetric.publication_id == publication_id
+            )
             .order_by(PublicationMetric.snapshot_date.desc())
             .limit(1)
         )
@@ -152,6 +167,7 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
 
     async def get_metric_by_date(self, publication_id: UUID, snapshot_date: datetime) -> Optional[PublicationMetric]:
         stmt = select(PublicationMetric).where(
+            PublicationMetric.tenant_id == self._tenant_id,
             PublicationMetric.publication_id == publication_id,
             PublicationMetric.snapshot_date == snapshot_date
         )

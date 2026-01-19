@@ -13,9 +13,8 @@ from common.contracts.messages.promotion_orchestrator_requested import (
 )
 from common.providers import registry
 
-from common.repositories import
-
-
+from common.repositories.
+# how can we remove the bases from being imported outside of common....they are not interfaces
 class SchedulerWorker:
     """Scheduler Worker"""
 

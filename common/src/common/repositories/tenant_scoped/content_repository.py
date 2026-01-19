@@ -12,19 +12,18 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class ContentRepository(BaseTenantScopedRepository[Content]):
     """Repository for Content aggregate."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Content)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Content, tenant_id)
 
     async def add(
         self,
-        tenant_id: UUID,
         niche_id: UUID,
         keyword_id: UUID,
         title: str = "[Untitled]",
         description: str = "[No description]"
     ) -> Content:
         content = Content(
-            tenant_id=tenant_id,
+            tenant_id=self._tenant_id,
             niche_id=niche_id,
             keyword_id=keyword_id,
             title=title,
@@ -39,7 +38,7 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
         stmt = (
             select(Content)
             .options(selectinload(Content.renders))
-            .where(Content.external_id == id)
+            .where(Content.tenant_id == self._tenant_id, Content.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
@@ -48,25 +47,31 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
         stmt = (
             select(Content)
             .options(selectinload(Content.publications))
-            .where(Content.external_id == id)
+            .where(Content.tenant_id == self._tenant_id, Content.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def get_by_keyword(self, keyword_id: UUID, limit: int = 100, offset: int = 0) -> List[Content]:
-        stmt = select(Content).where(Content.keyword_id == keyword_id).limit(limit).offset(offset)
+        stmt = select(Content).where(
+            Content.tenant_id == self._tenant_id,
+            Content.keyword_id == keyword_id
+        ).limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_by_niche(self, niche_id: UUID, limit: int = 100, offset: int = 0) -> List[Content]:
-        stmt = select(Content).where(Content.niche_id == niche_id).limit(limit).offset(offset)
+        stmt = select(Content).where(
+            Content.tenant_id == self._tenant_id,
+            Content.niche_id == niche_id
+        ).limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def search_by_title(self, tenant_id: UUID, title_query: str, limit: int = 100) -> List[Content]:
+    async def search_by_title(self, title_query: str, limit: int = 100) -> List[Content]:
         stmt = (
             select(Content)
-            .where(Content.tenant_id == tenant_id, Content.title.ilike(f"%{title_query}%"))
+            .where(Content.tenant_id == self._tenant_id, Content.title.ilike(f"%{title_query}%"))
             .limit(limit)
         )
         result = await self._session.execute(stmt)

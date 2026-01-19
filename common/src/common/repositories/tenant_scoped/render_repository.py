@@ -13,12 +13,11 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class RenderRepository(BaseTenantScopedRepository[Render]):
     """Repository for Render aggregate."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Render)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Render, tenant_id)
 
     async def add(
         self,
-        tenant_id: UUID,
         content_id: UUID,
         niche_id: UUID,
         keyword_id: UUID,
@@ -26,7 +25,7 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         style_name: Optional[str] = None
     ) -> Render:
         render = Render(
-            tenant_id=tenant_id,
+            tenant_id=self._tenant_id,
             content_id=content_id,
             niche_id=niche_id,
             keyword_id=keyword_id,
@@ -42,30 +41,36 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         stmt = (
             select(Render)
             .options(selectinload(Render.input_image), selectinload(Render.output_image))
-            .where(Render.external_id == id)
+            .where(Render.tenant_id == self._tenant_id, Render.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def get_by_content(self, content_id: UUID) -> List[Render]:
-        stmt = select(Render).where(Render.content_id == content_id)
+        stmt = select(Render).where(
+            Render.tenant_id == self._tenant_id,
+            Render.content_id == content_id
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_by_status(self, tenant_id: UUID, status: RenderStatus, limit: int = 100) -> List[Render]:
+    async def get_by_status(self, status: RenderStatus, limit: int = 100) -> List[Render]:
         stmt = (
             select(Render)
-            .where(Render.tenant_id == tenant_id, Render.status == status)
+            .where(Render.tenant_id == self._tenant_id, Render.status == status)
             .limit(limit)
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_pending(self, tenant_id: UUID, limit: int = 100) -> List[Render]:
-        return await self.get_by_status(tenant_id, RenderStatus.PENDING, limit)
+    async def get_pending(self, limit: int = 100) -> List[Render]:
+        return await self.get_by_status(RenderStatus.PENDING, limit)
 
     async def get_by_keyword(self, keyword_id: UUID) -> List[Render]:
-        stmt = select(Render).where(Render.keyword_id == keyword_id)
+        stmt = select(Render).where(
+            Render.tenant_id == self._tenant_id,
+            Render.keyword_id == keyword_id
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

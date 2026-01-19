@@ -12,11 +12,11 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class NicheRepository(BaseTenantScopedRepository[Niche]):
     """Repository for Niche aggregate (includes keywords)."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Niche)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Niche, tenant_id)
 
-    async def add(self, tenant_id: UUID, title: str) -> Niche:
-        niche = Niche(tenant_id=tenant_id, title=title)
+    async def add(self, title: str) -> Niche:
+        niche = Niche(tenant_id=self._tenant_id, title=title)
         self._session.add(niche)
         await self._session.flush()
         await self._session.refresh(niche)
@@ -26,18 +26,18 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         stmt = (
             select(Niche)
             .options(selectinload(Niche.keywords))
-            .where(Niche.external_id == id)
+            .where(Niche.tenant_id == self._tenant_id, Niche.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_title(self, tenant_id: UUID, title: str) -> Optional[Niche]:
-        stmt = select(Niche).where(Niche.tenant_id == tenant_id, Niche.title == title)
+    async def get_by_title(self, title: str) -> Optional[Niche]:
+        stmt = select(Niche).where(Niche.tenant_id == self._tenant_id, Niche.title == title)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_niches(self, tenant_id: UUID) -> List[Niche]:
-        stmt = select(Niche).where(Niche.tenant_id == tenant_id, Niche.is_active)
+    async def get_active_niches(self) -> List[Niche]:
+        stmt = select(Niche).where(Niche.tenant_id == self._tenant_id, Niche.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -48,20 +48,22 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         return keyword
 
     async def get_keywords(self, niche_id: UUID) -> List[Keyword]:
-        stmt = select(Keyword).where(Keyword.niche_id == niche_id)
+        stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.niche_id == niche_id)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_active_keywords(self, niche_id: UUID) -> List[Keyword]:
-        stmt = select(Keyword).where(Keyword.niche_id == niche_id, Keyword.is_active)
+        stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.niche_id == niche_id, Keyword.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_keyword_by_id(self, keyword_id: UUID) -> Optional[Keyword]:
-        return await self._session.get(Keyword, keyword_id)
+        stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.id == keyword_id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_keyword_by_term(self, niche_id: UUID, term: str) -> Optional[Keyword]:
-        stmt = select(Keyword).where(Keyword.niche_id == niche_id, Keyword.term == term)
+        stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.niche_id == niche_id, Keyword.term == term)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 

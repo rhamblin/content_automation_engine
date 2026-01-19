@@ -12,11 +12,11 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class ProjectRepository(BaseTenantScopedRepository[Project]):
     """Repository for Project aggregate (includes integration profiles)."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Project)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Project, tenant_id)
 
-    async def add(self, tenant_id: UUID, name: str) -> Project:
-        project = Project(tenant_id=tenant_id, name=name)
+    async def add(self, name: str) -> Project:
+        project = Project(tenant_id=self._tenant_id, name=name)
         self._session.add(project)
         await self._session.flush()
         await self._session.refresh(project)
@@ -26,18 +26,18 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         stmt = (
             select(Project)
             .options(selectinload(Project.integration_profiles))
-            .where(Project.external_id == id)
+            .where(Project.tenant_id == self._tenant_id, Project.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_name(self, tenant_id: UUID, name: str) -> Optional[Project]:
-        stmt = select(Project).where(Project.tenant_id == tenant_id, Project.name == name)
+    async def get_by_name(self, name: str) -> Optional[Project]:
+        stmt = select(Project).where(Project.tenant_id == self._tenant_id, Project.name == name)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_projects(self, tenant_id: UUID) -> List[Project]:
-        stmt = select(Project).where(Project.tenant_id == tenant_id, Project.is_active)
+    async def get_active_projects(self) -> List[Project]:
+        stmt = select(Project).where(Project.tenant_id == self._tenant_id, Project.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -48,17 +48,26 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         return profile
 
     async def get_integration_profiles(self, project_id: UUID) -> List[IntegrationProfile]:
-        stmt = select(IntegrationProfile).where(IntegrationProfile.project_id == project_id)
+        stmt = select(IntegrationProfile).where(
+            IntegrationProfile.tenant_id == self._tenant_id,
+            IntegrationProfile.project_id == project_id
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_integration_profile_by_id(self, profile_id: UUID) -> Optional[IntegrationProfile]:
-        return await self._session.get(IntegrationProfile, profile_id)
+        stmt = select(IntegrationProfile).where(
+            IntegrationProfile.tenant_id == self._tenant_id,
+            IntegrationProfile.id == profile_id
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_integration_profile(
         self, project_id: UUID, niche_id: UUID, channel_id: UUID
     ) -> Optional[IntegrationProfile]:
         stmt = select(IntegrationProfile).where(
+            IntegrationProfile.tenant_id == self._tenant_id,
             IntegrationProfile.project_id == project_id,
             IntegrationProfile.niche_id == niche_id,
             IntegrationProfile.channel_id == channel_id

@@ -14,12 +14,11 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
     """Repository for Schedule aggregate (includes executions)."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Schedule)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Schedule, tenant_id)
 
     async def add(
         self,
-        tenant_id: UUID,
         niche_id: UUID,
         title: str,
         cron_expression: str,
@@ -27,7 +26,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         message_payload: Optional[str] = None
     ) -> Schedule:
         schedule = Schedule(
-            tenant_id=tenant_id,
+            tenant_id=self._tenant_id,
             niche_id=niche_id,
             title=title,
             cron_expression=cron_expression,
@@ -43,26 +42,33 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         stmt = (
             select(Schedule)
             .options(selectinload(Schedule.schedule_executions))
-            .where(Schedule.external_id == id)
+            .where(Schedule.tenant_id == self._tenant_id, Schedule.external_id == id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_schedules(self, tenant_id: UUID) -> List[Schedule]:
-        stmt = select(Schedule).where(Schedule.tenant_id == tenant_id, Schedule.is_active)
+    async def get_active_schedules(self) -> List[Schedule]:
+        stmt = select(Schedule).where(Schedule.tenant_id == self._tenant_id, Schedule.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_due_schedules(self, before: datetime) -> List[Schedule]:
         stmt = (
             select(Schedule)
-            .where(Schedule.is_active, Schedule.next_run_at <= before)
+            .where(
+                Schedule.tenant_id == self._tenant_id,
+                Schedule.is_active,
+                Schedule.next_run_at <= before
+            )
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
     async def get_by_niche(self, niche_id: UUID) -> List[Schedule]:
-        stmt = select(Schedule).where(Schedule.niche_id == niche_id)
+        stmt = select(Schedule).where(
+            Schedule.tenant_id == self._tenant_id,
+            Schedule.niche_id == niche_id
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -93,7 +99,10 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
     async def get_executions(self, schedule_id: UUID, limit: int = 100) -> List[ScheduleExecution]:
         stmt = (
             select(ScheduleExecution)
-            .where(ScheduleExecution.schedule_id == schedule_id)
+            .where(
+                ScheduleExecution.tenant_id == self._tenant_id,
+                ScheduleExecution.schedule_id == schedule_id
+            )
             .order_by(ScheduleExecution.started_at.desc())
             .limit(limit)
         )
@@ -101,13 +110,18 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         return list(result.scalars().all())
 
     async def get_execution_by_id(self, execution_id: UUID) -> Optional[ScheduleExecution]:
-        return await self._session.get(ScheduleExecution, execution_id)
+        stmt = select(ScheduleExecution).where(
+            ScheduleExecution.tenant_id == self._tenant_id,
+            ScheduleExecution.id == execution_id
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
-    async def get_running_executions(self, tenant_id: UUID) -> List[ScheduleExecution]:
+    async def get_running_executions(self) -> List[ScheduleExecution]:
         stmt = (
             select(ScheduleExecution)
             .where(
-                ScheduleExecution.tenant_id == tenant_id,
+                ScheduleExecution.tenant_id == self._tenant_id,
                 ScheduleExecution.status == ScheduleExecutionStatus.RUNNING
             )
         )

@@ -12,17 +12,16 @@ from common.repositories.base_tenant_scoped_repository import BaseTenantScopedRe
 class ReportRepository(BaseTenantScopedRepository[Report]):
     """Repository for Report aggregate."""
 
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, Report)
+    def __init__(self, session: AsyncSession, tenant_id: UUID):
+        super().__init__(session, Report, tenant_id)
 
     async def add(
         self,
-        tenant_id: UUID,
         recipients: List[str],
         content: Optional[dict] = None
     ) -> Report:
         report = Report(
-            tenant_id=tenant_id,
+            tenant_id=self._tenant_id,
             recipients=recipients,
             content=content
         )
@@ -31,10 +30,10 @@ class ReportRepository(BaseTenantScopedRepository[Report]):
         await self._session.refresh(report)
         return report
 
-    async def get_recent(self, tenant_id: UUID, limit: int = 10) -> List[Report]:
+    async def get_recent(self, limit: int = 10) -> List[Report]:
         stmt = (
             select(Report)
-            .where(Report.tenant_id == tenant_id)
+            .where(Report.tenant_id == self._tenant_id)
             .order_by(Report.created_at.desc())
             .limit(limit)
         )
@@ -43,14 +42,13 @@ class ReportRepository(BaseTenantScopedRepository[Report]):
 
     async def get_by_date_range(
         self,
-        tenant_id: UUID,
         start_date: datetime,
         end_date: datetime
     ) -> List[Report]:
         stmt = (
             select(Report)
             .where(
-                Report.tenant_id == tenant_id,
+                Report.tenant_id == self._tenant_id,
                 Report.created_at >= start_date,
                 Report.created_at <= end_date
             )
@@ -59,11 +57,11 @@ class ReportRepository(BaseTenantScopedRepository[Report]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_by_recipient(self, tenant_id: UUID, recipient_email: str) -> List[Report]:
+    async def get_by_recipient(self, recipient_email: str) -> List[Report]:
         stmt = (
             select(Report)
             .where(
-                Report.tenant_id == tenant_id,
+                Report.tenant_id == self._tenant_id,
                 Report.recipients.contains([recipient_email])
             )
             .order_by(Report.created_at.desc())
