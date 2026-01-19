@@ -15,7 +15,7 @@ from .worker import TemplateServiceWorker
 
 from redis.asyncio import Redis
 from sqlalchemy import text
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
 
 
 async def main(logger: AppLogger):
@@ -24,7 +24,6 @@ async def main(logger: AppLogger):
     logger.info(f"Starting Template Service in {settings.app_environment} environment.")
 
     # Initialize any needed providers in this block
-    provider_registry = None
     try:
         database = None
         message_broker = None
@@ -59,23 +58,22 @@ async def main(logger: AppLogger):
             database=database,
         )
 
+        worker = TemplateServiceWorker(provider_registry)
+        await worker.work()
+    except RetryError as e:
+        print(f"Underlying error: {e.last_attempt.exception()}")
     except Exception as e:
         logger.error(f"Failed to initialize Service: {e}")
         return
-
-    worker = TemplateServiceWorker(provider_registry)
-
-    try:
-        await worker.work()
     finally:
         logger.info("Shutting down worker...")
         await provider_registry.shutdown()
         logger.info("Shutdown complete")
 
 
-@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=2, max=10))
-async def test_db_connection(database, logger: AppLogger):
-    async with database.session() as session:
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+async def test_db_connection(database: SQLAlchemyDatabaseProvider, logger: AppLogger):
+    async with database.get_session() as session:
         await session.execute(text("SELECT 1"))
         logger.info("Database connection successful")
 

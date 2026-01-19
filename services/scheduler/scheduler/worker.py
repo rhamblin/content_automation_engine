@@ -1,6 +1,7 @@
 import asyncio
 
 from common.app_logger import AppLogger
+from common.contracts.database_models import Tenant
 from common.contracts.messages.activity_report_requested import ActivityReportRequested
 from common.contracts.messages.collect_analytics_requested import (
     CollectAnalyticsRequested,
@@ -12,8 +13,9 @@ from common.contracts.messages.promotion_orchestrator_requested import (
     PromotionOrchestratorRequested,
 )
 from common.providers import registry
+from common.repositories.cross_tenant import TenantRepository
 
-from common.repositories.
+
 # how can we remove the bases from being imported outside of common....they are not interfaces
 class SchedulerWorker:
     """Scheduler Worker"""
@@ -21,18 +23,17 @@ class SchedulerWorker:
     def __init__(self, registry: registry.ProviderRegistry):
         self.logger = self.__get_logger()
         self.registry = registry
-        self.scheduler_repository =
 
     async def work(self) -> None:
         """Main worker loop"""
         self.logger.info("SchedulerWorker started.")
-        await asyncio.sleep(10)  # Initial delay before starting scheduling loop
+        await asyncio.sleep(5)  # Initial delay before starting scheduling loop
         while True:
             try:
                 # get schedule information from DB
-                tenants: list = self.__getTenantsToSchedule()
-
-                for tenant in tenants:
+                tenants_uuids: list = await self.__getTenantsUUIDsToSchedule()
+                for tenant_uuid in tenants_uuids:
+                    tenant_id = str(tenant_uuid)
                     outgoing_msgs = []
                     outgoing_msgs.append(
                         ContentGenerationRequested(
@@ -42,25 +43,29 @@ class SchedulerWorker:
                     )
 
                     outgoing_msgs.append(
-                        PromotionOrchestratorRequested(tenant_id=tenant)
+                        PromotionOrchestratorRequested(tenant_id=tenant_id)
                     )
 
-                    outgoing_msgs.append(CollectAnalyticsRequested(tenant_id=tenant))
+                    outgoing_msgs.append(CollectAnalyticsRequested(tenant_id=tenant_id))
 
-                    outgoing_msgs.append(ActivityReportRequested(tenant_id=tenant))
+                    outgoing_msgs.append(ActivityReportRequested(tenant_id=tenant_id))
 
                     for msg in outgoing_msgs:
-                        self.logger.info("zzMessage Going!")
+                        self.logger.info(f"zzMessage Going for tenant - {tenant_id}!")
                         await self.registry.get_message_broker().publish(msg)
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)  # Brief pause before retrying
-            await asyncio.sleep(30)  # Wait before next scheduling cycle
+            await asyncio.sleep(15)  # Wait before next scheduling cycle
 
     def __get_logger(self):
         return AppLogger(__name__)
 
-    def __getTenantsToSchedule(self) -> list:
-        # placeholder - implement logic to get tenants to schedule from DB
+    async def __getTenantsUUIDsToSchedule(self) -> list:
+        self.logger.info("Get Tenants started")
+        async with self.registry.get_database().get_session() as session:
+            tenant_repository = TenantRepository(session)
 
-        return ["test-tenant"]
+            all_tenants_uuids: list[Tenant] = await tenant_repository.get_all() or []
+            self.logger.info("All Tenants fetched")
+        return [tenant.external_id for tenant in all_tenants_uuids]
