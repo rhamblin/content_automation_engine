@@ -1,11 +1,9 @@
-from asyncio import constants
-from common.app_logger import AppLogger
 from common.contracts import (
-    IDatabase,
     IBlobStorage,
-    ITextProvider,
+    IDatabase,
     IDistributionChannel,
     IMessageBroker,
+    ITextProvider,
 )
 
 
@@ -60,4 +58,4 @@ class ProviderRegistry:
         if self.message_broker:
             await self.message_broker.close()
         if self.database:
-            await self.database.close()
+            await self.database.close_connection()

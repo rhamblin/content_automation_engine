@@ -1,16 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
 
 class IDatabase(ABC):
     @abstractmethod
     @asynccontextmanager
-    async def session(self) -> AsyncIterator:
+    async def get_session(self) -> AsyncIterator:
         """Get a database session"""
         yield
 
     @abstractmethod
-    async def close(self) -> None:
+    async def close_connection(self) -> None:
         """Close the database connection"""
         pass

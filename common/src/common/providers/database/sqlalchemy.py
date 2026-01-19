@@ -1,12 +1,13 @@
 # common/providers/sqlalchemy/database.py
-from common.app_logger import AppLogger
 from contextlib import asynccontextmanager
-from sqlalchemy.ext.asyncio import (
-    create_async_engine,
-    async_sessionmaker,
-    AsyncSession,
-)
+
+from common.app_logger import AppLogger
 from common.contracts.interfaces.database import IDatabase
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 
 class SQLAlchemyDatabaseProvider(IDatabase):
@@ -30,9 +31,9 @@ class SQLAlchemyDatabaseProvider(IDatabase):
         self.logger.info("Database engine created")
 
     @asynccontextmanager
-    async def session(self):
+    async def get_session(self):
         async with self.session_factory() as session:
             yield session
 
-    async def close(self) -> None:
+    async def close_connection(self) -> None:
         await self.engine.dispose()
