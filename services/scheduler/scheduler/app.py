@@ -1,6 +1,8 @@
 import asyncio
 
 import common.providers as providers
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
 from common.contracts import IDistributionChannel, ITextProvider
@@ -12,6 +14,7 @@ from redis.asyncio import Redis
 from sqlalchemy import text
 from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
 
+from .update_listener import ScheduleUpdateListener
 from .worker import SchedulerWorker
 
 
@@ -24,11 +27,11 @@ async def main(logger: AppLogger):
 
     # Initialize any needed providers in this block
     try:
-        database = None
-        message_broker = None
-        blob_storage = None
-        text_providers = {}
-        distribution_channels = {}
+        # database = None
+        # message_broker = None
+        # blob_storage = None
+        # text_providers = {}
+        # distribution_channels = {}
         if settings.app_environment == ENVIRONMENT_LOCAL:
             redis_instance = Redis(host="redis", port=6379)
             message_broker = RedisMessageBroker(redis_instance)
@@ -57,8 +60,15 @@ async def main(logger: AppLogger):
             database=database,
         )
 
-        worker = SchedulerWorker(provider_registry)
-        await worker.work()
+        # Initialize APScheduler
+        jobstores = {"default": SQLAlchemyJobStore(url=settings.database_url)}
+        scheduler = AsyncIOScheduler(jobstores=jobstores)
+        scheduler.start()
+
+        worker = SchedulerWorker(provider_registry, scheduler)
+        update_listener = ScheduleUpdateListener(message_broker, scheduler)
+
+        await asyncio.gather(update_listener.work(), worker.work())
     except RetryError as e:
         print(f"Underlying error: {e.last_attempt.exception()}")
     except Exception as e:
@@ -67,6 +77,7 @@ async def main(logger: AppLogger):
     finally:
         logger.info("Shutting down worker...")
         await provider_registry.shutdown()
+        scheduler.shutdown()
         logger.info("Shutdown complete")
 
 

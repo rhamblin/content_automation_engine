@@ -4,9 +4,9 @@ from .interfaces.distribution_channel import IDistributionChannel
 from .interfaces.image_provider import IBlobStorage
 from .interfaces.message import IMessage
 from .interfaces.message_broker import IMessageBroker
-from .interfaces.text_provider import ITextProvider
 from .interfaces.repository import IRepository
 from .interfaces.tenant_scoped_repository import ITenantScopedRepository
+from .interfaces.text_provider import ITextProvider
 from .messages.activity_report_requested import ActivityReportRequested
 from .messages.collect_analytics_requested import CollectAnalyticsRequested
 
@@ -17,6 +17,7 @@ from .messages.content_ready_for_styling import ContentReadyForStyling
 from .messages.local_input_message import LocalInputMessage
 from .messages.local_output_message import LocalOutputMessage
 from .messages.promotion_orchestrator_requested import PromotionOrchestratorRequested
+from .messages.schedule_updated import ScheduleUpdated
 
 __all__ = [
     "IMessage",
@@ -35,4 +36,5 @@ __all__ = [
     "ContentReadyForPublication",
     "LocalInputMessage",
     "LocalOutputMessage",
+    "ScheduleUpdated",
 ]

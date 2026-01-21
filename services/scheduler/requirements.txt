@@ -1,2 +1,3 @@
-# Common is already included in platform-requirements.txt
+# Common is already included by default
 # Place your other dependencies
+apscheduler==3.11.2
