@@ -302,20 +302,3 @@ CREATE UNIQUE INDEX uq_schedules_integration_profile
   ON schedules(integration_profile_id)
   WHERE integration_profile_id IS NOT NULL;
 
--- 13. Schedule Executions
-
-CREATE TABLE schedule_executions (
-  id           UUID                      PRIMARY KEY DEFAULT gen_random_uuid(),
-  external_id  UUID                      NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id    UUID                      NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  schedule_id  UUID                      NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
-  niche_id     UUID                      NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
-  keyword_id   UUID                      REFERENCES keywords(id) ON DELETE SET NULL,
-  status       TEXT                      NOT NULL DEFAULT 'pending',
-  started_at   TIMESTAMPTZ,
-  completed_at TIMESTAMPTZ,
-  CONSTRAINT uq_schedule_executions_external_id UNIQUE (external_id)
-);
-
-CREATE INDEX idx_schedule_executions_tenant_id ON schedule_executions(tenant_id);
-CREATE INDEX idx_schedule_executions_schedule_id ON schedule_executions(schedule_id);

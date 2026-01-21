@@ -40,13 +40,6 @@ class ScheduleMessageType(str, Enum):
     PROMOTION = "promotion"
 
 
-class ScheduleExecutionStatus(str, Enum):
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-
-
 class TenantUserRole(str, Enum):
     ADMIN = "admin"
     EDITOR = "editor"

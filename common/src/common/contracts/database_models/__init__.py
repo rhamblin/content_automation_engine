@@ -6,7 +6,6 @@ from .enums import (
     PromotionActionTaken,
     PromotionStatus,
     ScheduleMessageType,
-    ScheduleExecutionStatus,
     TenantUserRole,
     IdentityProvider,
 )
@@ -29,7 +28,6 @@ from .publication import Publication
 from .promotion import Promotion
 from .publication_metric import PublicationMetric
 from .schedule import Schedule
-from .schedule_execution import ScheduleExecution
 
 __all__ = [
     "Base",
@@ -40,7 +38,6 @@ __all__ = [
     "PromotionActionTaken",
     "PromotionStatus",
     "ScheduleMessageType",
-    "ScheduleExecutionStatus",
     "TenantUserRole",
     "IdentityProvider",
     # Core entities
@@ -65,5 +62,4 @@ __all__ = [
     "Promotion",
     "PublicationMetric",
     "Schedule",
-    "ScheduleExecution",
 ]

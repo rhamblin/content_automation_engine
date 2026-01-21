@@ -137,7 +137,7 @@ erDiagram
   contents      ||--o{  publications: published_in
   publications  ||--o{  promotions: promoted_via
   publications  ||--o{  publication_metrics: performs
-  schedules     ||--o{  schedule_executions: triggers
+  integration_profiles ||--o{ schedules: triggers
 
   tenants {
     uuid id pk
@@ -369,35 +369,19 @@ erDiagram
     uuid id pk
     uuid external_id
     uuid tenant_id fk
-    uuid niche_id fk
+    uuid integration_profile_id fk
     boolean is_active
-    text  title
     text  cron_expression
     text  message_type
-    text  message_payload
-    timestamp last_run_at
-    timestamp next_run_at
     timestamp created_at
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
     %% Unique constraint: (external_id)
+    %% Partial unique: (tenant_id, message_type) WHERE integration_profile_id IS NULL
+    %% Partial unique: (integration_profile_id) WHERE integration_profile_id IS NOT NULL
     %% Message Type is an ENUM
-  }
-
-  schedule_executions {
-    uuid id pk
-    uuid external_id
-    uuid tenant_id fk
-    uuid schedule_id  fk
-    uuid  niche_id  fk
-    uuid  keyword_id  fk
-    text  status
-    timestamp started_at
-    timestamp completed_at
-    %% Unique constraint: (external_id)
-    %% Status is an ENUM
-    %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
+    %% integration_profile_id is nullable - set for content_generation, null for tenant-level schedules
   }
 
 ```

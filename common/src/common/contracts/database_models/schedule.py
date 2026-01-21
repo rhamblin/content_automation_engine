@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy import String, DateTime, ForeignKey, UniqueConstraint, Boolean, Index, text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
@@ -48,4 +48,3 @@ class Schedule(Base):
     # Relationships
     tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="schedules")
     integration_profile: Mapped[Optional["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="schedules")
-    schedule_executions: Mapped[List["ScheduleExecution"]] = relationship("ScheduleExecution", back_populates="schedule", cascade="all, delete", lazy="selectin")
