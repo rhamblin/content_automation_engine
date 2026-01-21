@@ -33,4 +33,3 @@ class Niche(Base):
     tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="niches")
     keywords: Mapped[List["Keyword"]] = relationship("Keyword", back_populates="niche", cascade="all, delete", lazy="selectin")
     integration_profiles: Mapped[List["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="niche", cascade="all, delete", lazy="selectin")
-    schedules: Mapped[List["Schedule"]] = relationship("Schedule", back_populates="niche", cascade="all, delete", lazy="selectin")

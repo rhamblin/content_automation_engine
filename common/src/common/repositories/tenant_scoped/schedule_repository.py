@@ -19,19 +19,15 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
 
     async def add(
         self,
-        niche_id: UUID,
-        title: str,
         cron_expression: str,
-        message_type: ScheduleMessageType = ScheduleMessageType.CONTENT_GENERATION,
-        message_payload: Optional[str] = None
+        message_type: ScheduleMessageType,
+        integration_profile_id: Optional[UUID] = None
     ) -> Schedule:
         schedule = Schedule(
             tenant_id=self._tenant_id,
-            niche_id=niche_id,
-            title=title,
+            integration_profile_id=integration_profile_id,
             cron_expression=cron_expression,
-            message_type=message_type,
-            message_payload=message_payload
+            message_type=message_type
         )
         self._session.add(schedule)
         await self._session.flush()
@@ -52,34 +48,23 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_due_schedules(self, before: datetime) -> List[Schedule]:
-        stmt = (
-            select(Schedule)
-            .where(
-                Schedule.tenant_id == self._tenant_id,
-                Schedule.is_active,
-                Schedule.next_run_at <= before
-            )
-        )
-        result = await self._session.execute(stmt)
-        return list(result.scalars().all())
-
-    async def get_by_niche(self, niche_id: UUID) -> List[Schedule]:
+    async def get_by_integration_profile(self, integration_profile_id: UUID) -> Optional[Schedule]:
         stmt = select(Schedule).where(
             Schedule.tenant_id == self._tenant_id,
-            Schedule.niche_id == niche_id
+            Schedule.integration_profile_id == integration_profile_id
         )
         result = await self._session.execute(stmt)
-        return list(result.scalars().all())
+        return result.scalar_one_or_none()
 
-    async def update_last_run(self, id: UUID, last_run_at: datetime, next_run_at: datetime) -> bool:
-        schedule = await self.get_by_id(id)
-        if schedule:
-            schedule.last_run_at = last_run_at
-            schedule.next_run_at = next_run_at
-            await self._session.flush()
-            return True
-        return False
+    async def get_by_message_type(self, message_type: ScheduleMessageType) -> Optional[Schedule]:
+        """Get tenant-level schedule by message type (where integration_profile_id is null)."""
+        stmt = select(Schedule).where(
+            Schedule.tenant_id == self._tenant_id,
+            Schedule.message_type == message_type,
+            Schedule.integration_profile_id.is_(None)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def deactivate(self, id: UUID) -> bool:
         schedule = await self.get_by_id(id)

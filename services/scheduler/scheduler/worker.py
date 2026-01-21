@@ -19,7 +19,6 @@ from common.repositories.cross_tenant import TenantRepository
 from common.repositories.tenant_scoped import ScheduleRepository
 
 
-# how can we remove the bases from being imported outside of common....they are not interfaces
 class SchedulerWorker:
     """Scheduler Worker"""
 

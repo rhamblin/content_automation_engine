@@ -275,26 +275,32 @@ CREATE INDEX idx_publication_metrics_publication_id ON publication_metrics(publi
 -- 12. Schedules
 
 CREATE TABLE schedules (
-  id              UUID                  PRIMARY KEY DEFAULT gen_random_uuid(),
-  external_id     UUID                  NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id       UUID                  NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  niche_id        UUID                  NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
-  is_active       BOOLEAN               NOT NULL DEFAULT true,
-  title           TEXT                  NOT NULL,
-  cron_expression TEXT                  NOT NULL,
-  message_type    TEXT                  NOT NULL DEFAULT 'content_generation',
-  message_payload TEXT,
-  last_run_at     TIMESTAMPTZ,
-  next_run_at     TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ           NOT NULL DEFAULT now(),
-  created_by      UUID,
-  updated_at      TIMESTAMPTZ,
-  updated_by      UUID,
+  id                     UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id            UUID        NOT NULL DEFAULT gen_random_uuid(),
+  tenant_id              UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  integration_profile_id UUID        REFERENCES integration_profiles(id) ON DELETE CASCADE,
+  is_active              BOOLEAN     NOT NULL DEFAULT true,
+  cron_expression        TEXT        NOT NULL,
+  message_type           TEXT        NOT NULL DEFAULT 'content_generation_requested',
+  created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by             UUID,
+  updated_at             TIMESTAMPTZ,
+  updated_by             UUID,
   CONSTRAINT uq_schedules_external_id UNIQUE (external_id)
 );
 
 CREATE INDEX idx_schedules_tenant_id ON schedules(tenant_id);
-CREATE INDEX idx_schedules_niche_id ON schedules(niche_id);
+CREATE INDEX idx_schedules_integration_profile_id ON schedules(integration_profile_id);
+
+-- Tenant-level schedules: one per tenant per message_type
+CREATE UNIQUE INDEX uq_schedules_tenant_message_type
+  ON schedules(tenant_id, message_type)
+  WHERE integration_profile_id IS NULL;
+
+-- Content generation: one per integration_profile
+CREATE UNIQUE INDEX uq_schedules_integration_profile
+  ON schedules(integration_profile_id)
+  WHERE integration_profile_id IS NOT NULL;
 
 -- 13. Schedule Executions
 
