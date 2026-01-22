@@ -74,10 +74,15 @@ BEGIN
     VALUES
       ('00000000-0000-0000-0000-000000000060', '00000000-0000-0000-0000-000000000160', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000010', NOW() - INTERVAL '1 day', '{"impressions": 150, "clicks": 12, "saves": 3}', NOW());
 
-    -- 11. Sample Schedule (content generation tied to integration profile)
+    -- 11. Schedules (one per message type)
     INSERT INTO schedules (id, external_id, tenant_id, integration_profile_id, is_active, cron_expression, message_type, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000008', true, '0 9 * * *', 'content_generation_requested', NOW());
+      -- Content generation (tied to integration profile)
+      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000008', true, '* * * * *', 'content_generation_requested', NOW()),
+      -- Tenant-level schedules (no integration profile)
+      ('00000000-0000-0000-0000-000000000071', '00000000-0000-0000-0000-000000000171', '00000000-0000-0000-0000-000000000001', NULL, true, '* * * * *', 'promotion_orchestrator_requested', NOW()),
+      ('00000000-0000-0000-0000-000000000072', '00000000-0000-0000-0000-000000000172', '00000000-0000-0000-0000-000000000001', NULL, true, '* * * * *', 'collect_analytics_requested', NOW()),
+      ('00000000-0000-0000-0000-000000000073', '00000000-0000-0000-0000-000000000173', '00000000-0000-0000-0000-000000000001', NULL, true, '* * * * *', 'activity_report_requested', NOW());
 
   END IF;
 END
