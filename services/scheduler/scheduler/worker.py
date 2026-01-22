@@ -1,19 +1,11 @@
 from uuid import UUID
 
+import common.contracts.messages as msgs
 from apscheduler.schedulers.base import BaseScheduler
 from apscheduler.triggers.cron import CronTrigger
 from common.app_logger import AppLogger
 from common.contracts.database_models import Schedule, Tenant
-from common.contracts.messages.activity_report_requested import ActivityReportRequested
-from common.contracts.messages.collect_analytics_requested import (
-    CollectAnalyticsRequested,
-)
-from common.contracts.messages.content_generation_requested import (
-    ContentGenerationRequested,
-)
-from common.contracts.messages.promotion_orchestrator_requested import (
-    PromotionOrchestratorRequested,
-)
+from common.contracts.interfaces import IMessage
 from common.providers import registry
 from common.repositories.cross_tenant import TenantRepository
 from common.repositories.tenant_scoped import ScheduleRepository
@@ -34,37 +26,14 @@ class SchedulerWorker:
             # get schedule information from DB
             tenants_uuids: list = await self.__getTenantsUUIDsToSchedule()
             for tenant_uuid in tenants_uuids:
-
                 schedules = await self.__getSchedules(tenant_uuid)
-                tenant_id = str(tenant_uuid)
 
                 for s in schedules:
                     self.scheduler.add_job(
-                        publish_message,
+                        self.__publish_message,
                         CronTrigger.from_crontab(s.cron_expression),
-                        args=[
-                            s
-                        ],  # what information is needed to ensure publish message works?
+                        args=[s],
                     )
-                outgoing_msgs = []
-                outgoing_msgs.append(
-                    ContentGenerationRequested(
-                        tenant_id="",
-                        project_id="",
-                    )
-                )
-
-                outgoing_msgs.append(
-                    PromotionOrchestratorRequested(tenant_id=tenant_id)
-                )
-
-                outgoing_msgs.append(CollectAnalyticsRequested(tenant_id=tenant_id))
-
-                outgoing_msgs.append(ActivityReportRequested(tenant_id=tenant_id))
-
-                for msg in outgoing_msgs:
-                    self.logger.info(f"zzMessage Going for tenant - {tenant_id}!")
-                    await self.registry.get_message_broker().publish(msg)
         except Exception as e:
             self.logger.error(f"Worker error: {e}")
 
@@ -92,10 +61,32 @@ class SchedulerWorker:
             self.logger.info("All Tenants fetched")
         return [tenant.external_id for tenant in all_tenants_uuids]
 
+    async def __publish_message(self, schedule: Schedule):
+        message_broker = self.registry.get_message_broker()
 
-def publish_message():
-    """
-    Docstring for publish_message
-    Trigger message based on information
-    """
-    pass
+        tenant_id = str(schedule.tenant_id)
+        message_type = str(schedule.message_type)
+
+        message: IMessage | None = None
+        if message_type == msgs.ContentGenerationRequested.topic():
+            profile_id = str(schedule.integration_profile_id)
+            message = msgs.ContentGenerationRequested(
+                tenant_id=tenant_id, project_id=profile_id
+            )
+        elif message_type == msgs.PromotionOrchestratorRequested.topic():
+            message = msgs.PromotionOrchestratorRequested(tenant_id=tenant_id)
+        elif message_type == msgs.ActivityReportRequested.topic():
+            message = msgs.ActivityReportRequested(tenant_id=tenant_id)
+        elif message_type == msgs.CollectAnalyticsRequested.topic():
+            message = msgs.CollectAnalyticsRequested(tenant_id=tenant_id)
+        else:
+            self.logger.error(
+                f"An invalid message type {message_type} was found for Schedule {schedule.external_id}"
+            )
+            return
+
+        if message:
+            self.logger.info(f"zzMessage Going for tenant - {tenant_id}!")
+            await message_broker.publish(message)
+        else:
+            self.logger.error("No message was found")

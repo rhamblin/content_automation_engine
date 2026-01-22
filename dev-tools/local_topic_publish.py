@@ -1,7 +1,7 @@
 from redis.asyncio import Redis
 import asyncio
 
-from common.contracts import LocalInputMessage
+from common.contracts.messages import LocalInputMessage
 from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.app_logger import AppLogger
 

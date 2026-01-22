@@ -1,7 +1,6 @@
 import asyncio
 from common.app_logger import AppLogger
-from common.contracts import LocalOutputMessage
-from common.contracts.messages.local_input_message import LocalInputMessage
+from common.contracts.messages import LocalOutputMessage, LocalInputMessage
 from common.providers import registry
 
 

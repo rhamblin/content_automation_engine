@@ -1,11 +1,10 @@
 import asyncio
 
 import common.providers as providers
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts import IDistributionChannel, ITextProvider
+from common.contracts.interfaces import IDistributionChannel, ITextProvider
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
@@ -61,8 +60,7 @@ async def main(logger: AppLogger):
         )
 
         # Initialize APScheduler
-        jobstores = {"default": SQLAlchemyJobStore(url=settings.database_url)}
-        scheduler = AsyncIOScheduler(jobstores=jobstores)
+        scheduler = AsyncIOScheduler()
         scheduler.start()
 
         worker = SchedulerWorker(provider_registry, scheduler)

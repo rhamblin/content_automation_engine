@@ -3,7 +3,7 @@ import asyncio
 import common.providers as providers
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts import IDistributionChannel, IBlobStorage, ITextProvider
+from common.contracts.interfaces import IDistributionChannel, IBlobStorage, ITextProvider
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker

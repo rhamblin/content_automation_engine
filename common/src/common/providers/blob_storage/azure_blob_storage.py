@@ -1,5 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts import IBlobStorage
+from common.contracts.interfaces import IBlobStorage
 from common.contracts.database_models import Keyword
 from azure.storage.blob import BlobServiceClient, ContainerClient
 import random

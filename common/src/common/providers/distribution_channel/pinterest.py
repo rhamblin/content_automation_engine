@@ -1,5 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts import IDistributionChannel
+from common.contracts.interfaces import IDistributionChannel
 
 class PinterestChannel(IDistributionChannel):
     PROVIDER_NAME = "pinterest"

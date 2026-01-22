@@ -1,7 +1,7 @@
 import asyncio
 
 from common.app_logger import AppLogger
-from common.contracts import ContentGenerationRequested, ContentReadyForStyling
+from common.contracts.messages import ContentGenerationRequested, ContentReadyForStyling
 from common.providers import registry
 
 

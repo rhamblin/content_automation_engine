@@ -1,6 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts import IDistributionChannel
-from common.contracts.messages.local_input_message import LocalInputMessage
+from common.contracts.interfaces import IDistributionChannel
 
 class LocalDistributionChannel(IDistributionChannel):
     PROVIDER_NAME = "LocalDistributionChannel"

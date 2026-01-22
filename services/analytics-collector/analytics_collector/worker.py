@@ -1,7 +1,7 @@
 import asyncio
 
 from common.app_logger import AppLogger
-from common.contracts import CollectAnalyticsRequested
+from common.contracts.messages import CollectAnalyticsRequested
 from common.providers import registry
 
 

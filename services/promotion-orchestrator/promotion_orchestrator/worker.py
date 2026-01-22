@@ -1,7 +1,7 @@
 import asyncio
 
 from common.app_logger import AppLogger
-from common.contracts import PromotionOrchestratorRequested
+from common.contracts.messages import PromotionOrchestratorRequested
 from common.providers import registry
 
 

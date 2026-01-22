@@ -1,4 +1,4 @@
-from common.contracts import (
+from common.contracts.interfaces import (
     IBlobStorage,
     IDatabase,
     IDistributionChannel,

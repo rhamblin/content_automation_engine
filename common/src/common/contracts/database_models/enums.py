@@ -1,5 +1,12 @@
 from enum import Enum
 
+from ..messages import (
+    ActivityReportRequested,
+    CollectAnalyticsRequested,
+    ContentGenerationRequested,
+    PromotionOrchestratorRequested,
+)
+
 
 class ImageKind(str, Enum):
     ORIGINAL = "original"
@@ -34,10 +41,10 @@ class PromotionStatus(str, Enum):
 
 
 class ScheduleMessageType(str, Enum):
-    CONTENT_GENERATION = "content_generation"
-    PUBLICATION = "publication"
-    ANALYTICS_COLLECTION = "analytics_collection"
-    PROMOTION = "promotion"
+    CONTENT_GENERATION = ContentGenerationRequested.topic()
+    PROMOTION_ORCHESTRATION = PromotionOrchestratorRequested.topic()
+    ANALYTICS_COLLECTION = CollectAnalyticsRequested.topic()
+    ACTIVITY_REPORT = ActivityReportRequested.topic()
 
 
 class TenantUserRole(str, Enum):

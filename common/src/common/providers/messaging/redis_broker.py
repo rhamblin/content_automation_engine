@@ -1,6 +1,6 @@
 from typing import Optional
 from common.app_logger import AppLogger
-from common.contracts import IMessageBroker, IMessage
+from common.contracts.interfaces import IMessageBroker, IMessage
 
 class RedisMessageBroker(IMessageBroker):
     """Redis implementation of IMessageBroker using async redis client"""

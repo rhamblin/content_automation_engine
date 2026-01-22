@@ -1,5 +1,5 @@
 from common.app_logger import AppLogger
-from common.contracts import ITextProvider
+from common.contracts.interfaces import ITextProvider
 from openai import AzureOpenAI
 import json
 

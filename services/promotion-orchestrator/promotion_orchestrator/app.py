@@ -7,7 +7,7 @@ from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.settings import load_settings
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts import IBlobStorage, ITextProvider, IDistributionChannel
+from common.contracts.interfaces import IBlobStorage, ITextProvider, IDistributionChannel
 
 from .worker import PromotionOrchestratorWorker
 

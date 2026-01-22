@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar
-from common.contracts import IMessage
+from .message import IMessage
 
 T = TypeVar('T', bound=IMessage)
 
