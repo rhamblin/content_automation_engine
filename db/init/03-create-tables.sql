@@ -34,8 +34,8 @@ CREATE TABLE channels (
 -- 2. Junction tables
 
 CREATE TABLE tenants_users (
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  user_id     UUID        NOT NULL REFERENCES users(external_id) ON DELETE CASCADE,
   role        TEXT        NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by  UUID,
@@ -46,7 +46,7 @@ CREATE TABLE tenants_users (
 );
 
 CREATE TABLE users_identity_providers (
-  user_id                   UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id                   UUID        NOT NULL REFERENCES users(external_id) ON DELETE CASCADE,
   identity_provider_user_id UUID        NOT NULL,
   identity_provider         TEXT        NOT NULL,
   created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -55,7 +55,7 @@ CREATE TABLE users_identity_providers (
 );
 
 CREATE TABLE tenants_identity_providers (
-  tenant_id                   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id                   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   identity_provider_tenant_id UUID        NOT NULL,
   identity_provider           TEXT        NOT NULL,
   created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -64,8 +64,8 @@ CREATE TABLE tenants_identity_providers (
 );
 
 CREATE TABLE tenants_channels (
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  channel_id  UUID        NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  channel_id  UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by  UUID,
   updated_at  TIMESTAMPTZ,
@@ -79,7 +79,7 @@ CREATE TABLE tenants_channels (
 CREATE TABLE projects (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   name        TEXT        NOT NULL,
   is_active   BOOLEAN     NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -95,7 +95,7 @@ CREATE INDEX idx_projects_tenant_id ON projects(tenant_id);
 CREATE TABLE reports (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   content     JSONB,
   recipients  TEXT[]      NOT NULL DEFAULT '{}',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -109,7 +109,7 @@ CREATE INDEX idx_reports_tenant_id ON reports(tenant_id);
 CREATE TABLE niches (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   title       TEXT        NOT NULL,
   is_active   BOOLEAN     NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -125,8 +125,8 @@ CREATE INDEX idx_niches_tenant_id ON niches(tenant_id);
 CREATE TABLE keywords (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  niche_id    UUID        NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
   term        TEXT        NOT NULL,
   is_active   BOOLEAN     NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -145,10 +145,10 @@ CREATE INDEX idx_keywords_niche_id ON keywords(niche_id);
 CREATE TABLE integration_profiles (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  niche_id    UUID        NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
-  project_id  UUID        NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-  channel_id  UUID        NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
+  project_id  UUID        NOT NULL REFERENCES projects(external_id) ON DELETE CASCADE,
+  channel_id  UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
   is_active   BOOLEAN     NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by  UUID,
@@ -168,9 +168,9 @@ CREATE INDEX idx_integration_profiles_channel_id ON integration_profiles(channel
 CREATE TABLE images (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  niche_id    UUID        NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
-  keyword_id  UUID        NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
+  keyword_id  UUID        NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
   kind        TEXT        NOT NULL DEFAULT 'original',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT uq_images_external_id UNIQUE (external_id)
@@ -184,9 +184,9 @@ CREATE INDEX idx_images_keyword_id ON images(keyword_id);
 CREATE TABLE contents (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  niche_id    UUID        NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
-  keyword_id  UUID        NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
+  keyword_id  UUID        NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
   title       TEXT        NOT NULL DEFAULT '[Untitled]',
   description TEXT        NOT NULL DEFAULT '[No description]',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -201,12 +201,12 @@ CREATE INDEX idx_contents_keyword_id ON contents(keyword_id);
 CREATE TABLE renders (
   id              UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id     UUID          NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id       UUID          NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  content_id      UUID          NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
-  niche_id        UUID          NOT NULL REFERENCES niches(id) ON DELETE CASCADE,
-  keyword_id      UUID          NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
-  input_image_id  UUID          REFERENCES images(id) ON DELETE SET NULL,
-  output_image_id UUID          REFERENCES images(id) ON DELETE SET NULL,
+  tenant_id       UUID          NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  content_id      UUID          NOT NULL REFERENCES contents(external_id) ON DELETE CASCADE,
+  niche_id        UUID          NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
+  keyword_id      UUID          NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
+  input_image_id  UUID          REFERENCES images(external_id) ON DELETE SET NULL,
+  output_image_id UUID          REFERENCES images(external_id) ON DELETE SET NULL,
   style_name      TEXT,
   status          TEXT          NOT NULL DEFAULT 'pending',
   created_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
@@ -221,10 +221,10 @@ CREATE INDEX idx_renders_content_id ON renders(content_id);
 CREATE TABLE publications (
   id          UUID               PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID               NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID               NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  render_id   UUID               REFERENCES renders(id) ON DELETE SET NULL,
-  channel_id  UUID               NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
-  content_id  UUID               NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+  tenant_id   UUID               NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  render_id   UUID               REFERENCES renders(external_id) ON DELETE SET NULL,
+  channel_id  UUID               NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
+  content_id  UUID               NOT NULL REFERENCES contents(external_id) ON DELETE CASCADE,
   post_id     TEXT,
   status      TEXT               NOT NULL DEFAULT 'pending',
   created_at  TIMESTAMPTZ        NOT NULL DEFAULT now(),
@@ -240,9 +240,9 @@ CREATE INDEX idx_publications_content_id ON publications(content_id);
 CREATE TABLE promotions (
   id             UUID                   PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id    UUID                   NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id      UUID                   NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  publication_id UUID                   NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
-  channel_id     UUID                   NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
+  tenant_id      UUID                   NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  publication_id UUID                   NOT NULL REFERENCES publications(external_id) ON DELETE CASCADE,
+  channel_id     UUID                   NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
   payload        JSONB,
   action_taken   TEXT                   NOT NULL DEFAULT 'boost',
   status         TEXT                   NOT NULL DEFAULT 'pending',
@@ -259,9 +259,9 @@ CREATE INDEX idx_promotions_publication_id ON promotions(publication_id);
 CREATE TABLE publication_metrics (
   id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id    UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id      UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  publication_id UUID        NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
-  channel_id     UUID        NOT NULL REFERENCES channels(id) ON DELETE CASCADE,
+  tenant_id      UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  publication_id UUID        NOT NULL REFERENCES publications(external_id) ON DELETE CASCADE,
+  channel_id     UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
   snapshot_date  TIMESTAMPTZ NOT NULL,
   metrics        JSONB,
   fetched_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -277,8 +277,8 @@ CREATE INDEX idx_publication_metrics_publication_id ON publication_metrics(publi
 CREATE TABLE schedules (
   id                     UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id            UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id              UUID        NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  integration_profile_id UUID        REFERENCES integration_profiles(id) ON DELETE CASCADE,
+  tenant_id              UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  integration_profile_id UUID        REFERENCES integration_profiles(external_id) ON DELETE CASCADE,
   is_active              BOOLEAN     NOT NULL DEFAULT true,
   cron_expression        TEXT        NOT NULL,
   message_type           TEXT        NOT NULL DEFAULT 'content_generation_requested',
@@ -301,4 +301,3 @@ CREATE UNIQUE INDEX uq_schedules_tenant_message_type
 CREATE UNIQUE INDEX uq_schedules_integration_profile
   ON schedules(integration_profile_id)
   WHERE integration_profile_id IS NOT NULL;
-

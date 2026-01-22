@@ -25,15 +25,32 @@ class SchedulerWorker:
         try:
             # get schedule information from DB
             tenants_uuids: list = await self.__getTenantsUUIDsToSchedule()
+            self.logger.info(f"Processing {len(tenants_uuids)} tenants for scheduling")
+            total_jobs = 0
             for tenant_uuid in tenants_uuids:
                 schedules = await self.__getSchedules(tenant_uuid)
 
+                self.logger.info(
+                    f"Found {len(schedules)} schedules for tenant {tenant_uuid}"
+                )
                 for s in schedules:
+                    self.logger.info(
+                        f"Adding job: schedule_id={s.external_id}, "
+                        f"tenant={tenant_uuid}, cron='{s.cron_expression}', "
+                        f"message_type={s.message_type}"
+                    )
                     self.scheduler.add_job(
                         self.__publish_message,
                         CronTrigger.from_crontab(s.cron_expression),
                         args=[s],
                     )
+                    total_jobs += 1
+                    self.logger.debug(
+                        f"Job added successfully for schedule {s.external_id}"
+                    )
+            self.logger.info(
+                f"SchedulerWorker completed: {total_jobs} jobs added across {len(tenants_uuids)} tenants"
+            )
         except Exception as e:
             self.logger.error(f"Worker error: {e}")
 
@@ -62,6 +79,10 @@ class SchedulerWorker:
         return [tenant.external_id for tenant in all_tenants_uuids]
 
     async def __publish_message(self, schedule: Schedule):
+        self.logger.info(
+            f"Executing job: schedule_id={schedule.external_id}, "
+            f"tenant={schedule.tenant_id}, message_type={schedule.message_type}"
+        )
         message_broker = self.registry.get_message_broker()
 
         tenant_id = str(schedule.tenant_id)
@@ -86,7 +107,13 @@ class SchedulerWorker:
             return
 
         if message:
-            self.logger.info(f"zzMessage Going for tenant - {tenant_id}!")
+            self.logger.info(
+                f"Publishing message: topic={message.topic()}, tenant={tenant_id}, "
+                f"schedule_id={schedule.external_id}"
+            )
             await message_broker.publish(message)
+            self.logger.info(
+                f"Message published successfully for schedule {schedule.external_id}"
+            )
         else:
-            self.logger.error("No message was found")
+            self.logger.error(f"No message created for schedule {schedule.external_id}")
