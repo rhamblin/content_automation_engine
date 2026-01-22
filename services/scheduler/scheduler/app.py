@@ -26,11 +26,11 @@ async def main(logger: AppLogger):
 
     # Initialize any needed providers in this block
     try:
-        # database = None
-        # message_broker = None
-        # blob_storage = None
-        # text_providers = {}
-        # distribution_channels = {}
+        database = None
+        message_broker = None
+        blob_storage = None
+        text_providers = {}
+        distribution_channels = {}
         if settings.app_environment == ENVIRONMENT_LOCAL:
             redis_instance = Redis(host="redis", port=6379)
             message_broker = RedisMessageBroker(redis_instance)
@@ -64,7 +64,9 @@ async def main(logger: AppLogger):
         scheduler.start()
 
         worker = SchedulerWorker(provider_registry, scheduler)
-        update_listener = ScheduleUpdateListener(message_broker, scheduler)
+
+        if message_broker:
+            update_listener = ScheduleUpdateListener(message_broker, scheduler)
 
         await asyncio.gather(update_listener.work(), worker.work())
     except RetryError as e:
