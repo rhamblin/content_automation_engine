@@ -50,12 +50,12 @@ class Schedule(Base):
     )
     tenant_id: Mapped[uuid.UUID] = mapped_column(
         PG_UUID(as_uuid=True),
-        ForeignKey("tenants.id", ondelete="CASCADE"),
+        ForeignKey("tenants.external_id", ondelete="CASCADE"),
         nullable=False,
     )
     integration_profile_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         PG_UUID(as_uuid=True),
-        ForeignKey("integration_profiles.id", ondelete="CASCADE"),
+        ForeignKey("integration_profiles.external_id", ondelete="CASCADE"),
         nullable=True,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
