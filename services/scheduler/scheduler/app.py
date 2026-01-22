@@ -1,10 +1,8 @@
 import asyncio
 
-import common.providers as providers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts.interfaces import IDistributionChannel, ITextProvider
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
@@ -28,33 +26,18 @@ async def main(logger: AppLogger):
     try:
         database = None
         message_broker = None
-        blob_storage = None
-        text_providers = {}
-        distribution_channels = {}
+
         if settings.app_environment == ENVIRONMENT_LOCAL:
             redis_instance = Redis(host="redis", port=6379)
             message_broker = RedisMessageBroker(redis_instance)
 
             database = SQLAlchemyDatabaseProvider(settings.database_url)
 
-            blob_storage = providers.LocalImageProvider()
-
-            text_providers: dict[str, ITextProvider] = {
-                providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
-            }
-
-            distribution_channels: dict[str, IDistributionChannel] = {
-                providers.LocalDistributionChannel.PROVIDER_NAME: providers.LocalDistributionChannel()
-            }
-
         if database:
             await test_db_connection(database, logger)
 
         # Add additional providers as needed
         provider_registry = registry.ProviderRegistry(
-            blob_storage=blob_storage,
-            text_providers=text_providers,
-            distribution_channels=distribution_channels,
             message_broker=message_broker,
             database=database,
         )
