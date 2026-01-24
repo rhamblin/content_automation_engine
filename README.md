@@ -120,10 +120,9 @@ erDiagram
   users         ||--|{  tenants_users : belongs_to
   users         ||--o{  users_identity_providers: integrates_with
   tenants       ||--o{  tenants_identity_providers : integrates_with
-  tenants       ||--o{  projects : manages
   tenants       ||--o{  reports  : receives
   tenants       ||--o{  schedules: works_based_on
-  projects      ||--o{  integration_profiles : configures
+  tenants       ||--o{  integration_profiles : configures
   niches        ||--o{  integration_profiles : targeted_by
   niches        ||--|{  keywords : defines
   keywords      ||--|{  images : generates
@@ -212,19 +211,6 @@ erDiagram
   }
   %% This is the end of the junction tables sections
 
-  projects {
-    uuid id pk
-    uuid external_id
-    uuid tenant_id fk
-    text name
-    boolean is_active
-    timestamp created_at
-    uuid  created_by
-    timestamp updated_at
-    uuid  updated_by
-    %% Unique constraints: (external_id), (tenant_id, name)
-  }
-
   reports {
     uuid id  pk
     uuid external_id
@@ -240,16 +226,13 @@ erDiagram
     uuid external_id
     uuid tenant_id fk
     uuid niche_id fk
-    uuid project_id fk
     uuid channel_id fk
     boolean is_active
     timestamp created_at
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
-    %% Unique constraints: (external_id), (project_id, niche_id, channel_id)
-    %% niche_id used to denormalize data and aid in faster queries without joins
-
+    %% Unique constraints: (external_id), (tenant_id, niche_id, channel_id)
   }
 
   niches {

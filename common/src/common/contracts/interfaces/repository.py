@@ -15,7 +15,7 @@ IRepository[T]                        (Interface - abstract CRUD operations)
             |       +-- RenderRepository
             |       +-- PublicationRepository
             |       +-- ScheduleRepository
-            |       +-- ProjectRepository
+            |       +-- IntegrationProfileRepository
             |       +-- ReportRepository
             |
             +-- TenantRepository      (cross-tenant - tenants don't belong to tenants)

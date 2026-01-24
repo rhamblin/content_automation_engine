@@ -1,7 +1,6 @@
 # Database Models Constants (public schema - no schema prefix needed)
 NICHE_ID_FULL_QUALIFIER = "niches.id"
-PROJECT_ID = "project_id"
-INTEGRATION_ID = "integration_id"
+INTEGRATION_PROFILE_ID = "integration_profile_id"
 
 # Environments
 ENVIRONMENT_LOCAL = "local"  # computer

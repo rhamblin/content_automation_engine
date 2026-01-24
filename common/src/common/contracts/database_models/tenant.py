@@ -27,7 +27,7 @@ class Tenant(Base):
     tenants_users: Mapped[List["TenantsUsers"]] = relationship("TenantsUsers", back_populates="tenant", cascade="all, delete", lazy="selectin")
     tenants_identity_providers: Mapped[List["TenantsIdentityProviders"]] = relationship("TenantsIdentityProviders", back_populates="tenant", cascade="all, delete", lazy="selectin")
     tenants_channels: Mapped[List["TenantsChannels"]] = relationship("TenantsChannels", back_populates="tenant", cascade="all, delete", lazy="selectin")
-    projects: Mapped[List["Project"]] = relationship("Project", back_populates="tenant", cascade="all, delete", lazy="selectin")
+    integration_profiles: Mapped[List["IntegrationProfile"]] = relationship("IntegrationProfile", back_populates="tenant", cascade="all, delete", lazy="selectin")
     reports: Mapped[List["Report"]] = relationship("Report", back_populates="tenant", cascade="all, delete", lazy="selectin")
     schedules: Mapped[List["Schedule"]] = relationship("Schedule", back_populates="tenant", cascade="all, delete", lazy="selectin")
     niches: Mapped[List["Niche"]] = relationship("Niche", back_populates="tenant", cascade="all, delete", lazy="selectin")

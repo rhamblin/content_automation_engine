@@ -7,8 +7,8 @@ from common.providers import registry
 from common.repositories.tenant_scoped import (
     ContentRepository,
     ImageRepository,
+    IntegrationProfileRepository,
     NicheRepository,
-    ProjectRepository,
 )
 
 
@@ -67,14 +67,12 @@ class ContentProducerWorker:
         """Process content generation for an integration profile"""
 
         async with self.registry.get_database().get_session() as session:
-            project_repo = ProjectRepository(session, tenant_id)
+            profile_repo = IntegrationProfileRepository(session, tenant_id)
             niche_repo = NicheRepository(session, tenant_id)
             content_repo = ContentRepository(session, tenant_id)
             image_repo = ImageRepository(session, tenant_id)
 
-            profile = await project_repo.get_integration_profile_by_id(
-                integration_profile_id
-            )
+            profile = await profile_repo.get_by_id(integration_profile_id)
             if not profile:
                 self.logger.error(
                     f"IntegrationProfile {integration_profile_id} not found"

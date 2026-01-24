@@ -4,7 +4,7 @@ import pytest_asyncio
 from common.repositories.tenant_repository import TenantRepository
 from common.repositories.user_repository import UserRepository
 from common.repositories.channel_repository import ChannelRepository
-from common.repositories.project_repository import ProjectRepository
+from common.repositories.integration_profile_repository import IntegrationProfileRepository
 from common.repositories.niche_repository import NicheRepository
 from common.repositories.content_repository import ContentRepository
 from common.repositories.image_repository import ImageRepository
@@ -31,8 +31,8 @@ def channel_repo(async_db_session):
 
 
 @pytest.fixture
-def project_repo(async_db_session):
-    return ProjectRepository(async_db_session)
+def integration_profile_repo(async_db_session):
+    return IntegrationProfileRepository(async_db_session)
 
 
 @pytest.fixture
@@ -84,12 +84,6 @@ async def sample_user(user_repo):
 @pytest_asyncio.fixture
 async def sample_channel(channel_repo):
     return await channel_repo.add(identifier="youtube")
-
-
-@pytest_asyncio.fixture
-async def sample_project(project_repo, sample_tenant):
-    # sample_tenant is already awaited by pytest-asyncio
-    return await project_repo.add(tenant_id=sample_tenant.id, name="Test Project")
 
 
 @pytest_asyncio.fixture

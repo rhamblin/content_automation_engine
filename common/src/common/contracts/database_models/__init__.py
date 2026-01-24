@@ -16,7 +16,6 @@ from .tenant_user import TenantsUsers
 from .users_identity_providers import UsersIdentityProviders
 from .tenants_identity_providers import TenantsIdentityProviders
 from .tenants_channels import TenantsChannels
-from .project import Project
 from .report import Report
 from .niche import Niche
 from .keyword import Keyword
@@ -50,7 +49,6 @@ __all__ = [
     "TenantsIdentityProviders",
     "TenantsChannels",
     # Main entities
-    "Project",
     "Report",
     "Niche",
     "Keyword",

@@ -4,7 +4,7 @@ from .image_repository import ImageRepository
 from .render_repository import RenderRepository
 from .publication_repository import PublicationRepository
 from .schedule_repository import ScheduleRepository
-from .project_repository import ProjectRepository
+from .integration_profile_repository import IntegrationProfileRepository
 from .report_repository import ReportRepository
 
 __all__ = [
@@ -14,6 +14,6 @@ __all__ = [
     "RenderRepository",
     "PublicationRepository",
     "ScheduleRepository",
-    "ProjectRepository",
+    "IntegrationProfileRepository",
     "ReportRepository",
 ]

@@ -74,23 +74,7 @@ CREATE TABLE tenants_channels (
   CONSTRAINT uq_tenants_channels UNIQUE (tenant_id, channel_id)
 );
 
--- 3. Projects and Reports (tenant-scoped)
-
-CREATE TABLE projects (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
-  name        TEXT        NOT NULL,
-  is_active   BOOLEAN     NOT NULL DEFAULT true,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_by  UUID,
-  updated_at  TIMESTAMPTZ,
-  updated_by  UUID,
-  CONSTRAINT uq_projects_external_id UNIQUE (external_id),
-  CONSTRAINT uq_projects_tenant_name UNIQUE (tenant_id, name)
-);
-
-CREATE INDEX idx_projects_tenant_id ON projects(tenant_id);
+-- 3. Reports (tenant-scoped)
 
 CREATE TABLE reports (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -147,7 +131,6 @@ CREATE TABLE integration_profiles (
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
   tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
-  project_id  UUID        NOT NULL REFERENCES projects(external_id) ON DELETE CASCADE,
   channel_id  UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
   is_active   BOOLEAN     NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -155,11 +138,10 @@ CREATE TABLE integration_profiles (
   updated_at  TIMESTAMPTZ,
   updated_by  UUID,
   CONSTRAINT uq_integration_profiles_external_id UNIQUE (external_id),
-  CONSTRAINT uq_integration_profiles_project_niche_channel UNIQUE (project_id, niche_id, channel_id)
+  CONSTRAINT uq_integration_profiles_tenant_niche_channel UNIQUE (tenant_id, niche_id, channel_id)
 );
 
 CREATE INDEX idx_integration_profiles_tenant_id ON integration_profiles(tenant_id);
-CREATE INDEX idx_integration_profiles_project_id ON integration_profiles(project_id);
 CREATE INDEX idx_integration_profiles_niche_id ON integration_profiles(niche_id);
 CREATE INDEX idx_integration_profiles_channel_id ON integration_profiles(channel_id);
 
