@@ -42,13 +42,22 @@ class ContentProducerWorker:
                         f"Received ContentGenerationRequested: tenant={tenant_id}, "
                         f"project={project_id}"
                     )
-                    await self.__process_content_generation(tenant_id, project_id)
+
+                    outgoing_msgs: list[ContentReadyForStyling] = (
+                        await self.__process_content_generation(tenant_id, project_id)
+                    )
+
+                    for msg in outgoing_msgs:
+                        msg.chain_from(incoming_msg)
+                        await self.registry.get_message_broker().publish(msg)
 
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)
 
-    async def __process_content_generation(self, tenant_id, project_id) -> None:
+    async def __process_content_generation(
+        self, tenant_id, project_id
+    ) -> list[ContentReadyForStyling]:
         """Process content generation for a project's integration profiles"""
 
         async with self.registry.get_database().get_session() as session:
@@ -60,23 +69,17 @@ class ContentProducerWorker:
             project = await project_repo.get_by_id_with_profiles(project_id)
             if not project:
                 self.logger.error(f"Project {project_id} not found")
-                return
+                return []
 
             for profile in project.integration_profiles:
-                if not profile.is_active:
-                    continue
-
                 niche = await niche_repo.get_by_id_with_keywords(profile.niche_id)
                 if not niche:
                     self.logger.error(f"Niche {profile.niche_id} not found")
                     continue
 
                 text_provider = self.registry.get_text_provider()
-
+                outgoing_msgs = []
                 for keyword in niche.keywords:
-                    if not keyword.is_active:
-                        continue
-
                     try:
                         generated = text_provider.generate_text(
                             niche.title, keyword.term, str(profile.channel_id)
@@ -97,18 +100,17 @@ class ContentProducerWorker:
                             kind=ImageKind.ORIGINAL,
                         )
 
-                        outgoing_msg = ContentReadyForStyling(
-                            tenant_id=msg.tenant_id,
-                            keyword_id=str(keyword.external_id),
-                            niche_id=str(niche.external_id),
-                            channel_id=str(profile.channel_id),
-                            content_id=str(content.external_id),
-                            base_image_id=str(image.external_id),
-                        ).chain_from(msg)
+                        await session.commit()
 
-                        await self.registry.get_message_broker().publish(outgoing_msg)
-                        self.logger.info(
-                            f"Published ContentReadyForStyling for content {content.external_id}"
+                        outgoing_msgs.append(
+                            ContentReadyForStyling(
+                                tenant_id=tenant_id,
+                                keyword_id=str(keyword.external_id),
+                                niche_id=str(niche.external_id),
+                                channel_id=str(profile.channel_id),
+                                content_id=str(content.external_id),
+                                base_image_id=str(image.external_id),
+                            )
                         )
 
                     except Exception as e:
@@ -116,7 +118,7 @@ class ContentProducerWorker:
                             f"Error generating content for keyword '{keyword.term}': {e}"
                         )
 
-            await session.commit()
+            return outgoing_msgs
 
     def __get_logger(self):
         return AppLogger(__name__)

@@ -22,10 +22,15 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         await self._session.refresh(project)
         return project
 
-    async def get_by_id_with_profiles(self, id: UUID) -> Optional[Project]:
+    async def get_by_id_with_profiles(self, id: UUID, include_only_active: bool = True) -> Optional[Project]:
+        if include_only_active:
+            load_opt = selectinload(Project.integration_profiles.and_(IntegrationProfile.is_active == True))
+        else:
+            load_opt = selectinload(Project.integration_profiles)
+
         stmt = (
             select(Project)
-            .options(selectinload(Project.integration_profiles))
+            .options(load_opt)
             .where(Project.tenant_id == self._tenant_id, Project.external_id == id)
         )
         result = await self._session.execute(stmt)
@@ -36,8 +41,10 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_projects(self) -> List[Project]:
-        stmt = select(Project).where(Project.tenant_id == self._tenant_id, Project.is_active)
+    async def get_all(self, include_only_active: bool = True) -> List[Project]:
+        stmt = select(Project).where(Project.tenant_id == self._tenant_id)
+        if include_only_active:
+            stmt = stmt.where(Project.is_active == True)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -47,11 +54,13 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
         await self._session.refresh(profile)
         return profile
 
-    async def get_integration_profiles(self, project_id: UUID) -> List[IntegrationProfile]:
+    async def get_integration_profiles(self, project_id: UUID, include_only_active: bool = True) -> List[IntegrationProfile]:
         stmt = select(IntegrationProfile).where(
             IntegrationProfile.tenant_id == self._tenant_id,
             IntegrationProfile.project_id == project_id
         )
+        if include_only_active:
+            stmt = stmt.where(IntegrationProfile.is_active == True)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

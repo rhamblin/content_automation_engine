@@ -48,8 +48,11 @@ class UserRepository(BaseRepository[User]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_users(self, limit: int = 100, offset: int = 0) -> List[User]:
-        stmt = select(User).where(User.is_active).limit(limit).offset(offset)
+    async def get_all(self, limit: int = 100, offset: int = 0, include_only_active: bool = True) -> List[User]:
+        stmt = select(User)
+        if include_only_active:
+            stmt = stmt.where(User.is_active == True)
+        stmt = stmt.limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

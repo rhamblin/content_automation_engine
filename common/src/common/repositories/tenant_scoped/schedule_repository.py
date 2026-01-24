@@ -32,8 +32,10 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         await self._session.refresh(schedule)
         return schedule
 
-    async def get_active_schedules(self) -> List[Schedule]:
-        stmt = select(Schedule).where(Schedule.tenant_id == self._tenant_id, Schedule.is_active)
+    async def get_all(self, include_only_active: bool = True) -> List[Schedule]:
+        stmt = select(Schedule).where(Schedule.tenant_id == self._tenant_id)
+        if include_only_active:
+            stmt = stmt.where(Schedule.is_active == True)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

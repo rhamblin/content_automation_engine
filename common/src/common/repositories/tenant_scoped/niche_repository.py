@@ -22,10 +22,15 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         await self._session.refresh(niche)
         return niche
 
-    async def get_by_id_with_keywords(self, id: UUID) -> Optional[Niche]:
+    async def get_by_id_with_keywords(self, id: UUID, include_only_active: bool = True) -> Optional[Niche]:
+        if include_only_active:
+            load_opt = selectinload(Niche.keywords.and_(Keyword.is_active == True))
+        else:
+            load_opt = selectinload(Niche.keywords)
+
         stmt = (
             select(Niche)
-            .options(selectinload(Niche.keywords))
+            .options(load_opt)
             .where(Niche.tenant_id == self._tenant_id, Niche.external_id == id)
         )
         result = await self._session.execute(stmt)
@@ -36,8 +41,10 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_niches(self) -> List[Niche]:
-        stmt = select(Niche).where(Niche.tenant_id == self._tenant_id, Niche.is_active)
+    async def get_all(self, include_only_active: bool = True) -> List[Niche]:
+        stmt = select(Niche).where(Niche.tenant_id == self._tenant_id)
+        if include_only_active:
+            stmt = stmt.where(Niche.is_active == True)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -47,13 +54,10 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         await self._session.refresh(keyword)
         return keyword
 
-    async def get_keywords(self, niche_id: UUID) -> List[Keyword]:
+    async def get_keywords(self, niche_id: UUID, include_only_active: bool = True) -> List[Keyword]:
         stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.niche_id == niche_id)
-        result = await self._session.execute(stmt)
-        return list(result.scalars().all())
-
-    async def get_active_keywords(self, niche_id: UUID) -> List[Keyword]:
-        stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.niche_id == niche_id, Keyword.is_active)
+        if include_only_active:
+            stmt = stmt.where(Keyword.is_active == True)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
