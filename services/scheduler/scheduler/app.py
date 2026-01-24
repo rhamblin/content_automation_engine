@@ -2,7 +2,6 @@ import asyncio
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from common.app_logger import AppLogger
-from common.constants import ENVIRONMENT_LOCAL
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
@@ -27,11 +26,10 @@ async def main(logger: AppLogger):
         database = None
         message_broker = None
 
-        if settings.app_environment == ENVIRONMENT_LOCAL:
-            redis_instance = Redis(host="redis", port=6379)
-            message_broker = RedisMessageBroker(redis_instance)
+        redis_instance = Redis(host="redis", port=6379)
+        message_broker = RedisMessageBroker(redis_instance)
 
-            database = SQLAlchemyDatabaseProvider(settings.database_url)
+        database = SQLAlchemyDatabaseProvider(settings.database_url)
 
         if database:
             await test_db_connection(database, logger)

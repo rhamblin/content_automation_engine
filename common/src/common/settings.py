@@ -1,9 +1,11 @@
 import os
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Settings:
     """Application settings loaded once at startup from environment variables."""
+
     app_environment: str
     database_url: str
 
@@ -11,6 +13,7 @@ class Settings:
     azure_foundry_endpoint: str
     azure_foundry_proj_default_api_key: str
     azure_blob_storage_connection_string: str
+    azure_foundry_api_version: str = "2024-12-01-preview"
 
     # Optional settings
     log_level: str = "INFO"

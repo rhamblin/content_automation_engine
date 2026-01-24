@@ -40,12 +40,17 @@ class ProviderRegistry:
             raise RuntimeError("Message broker not available in this worker's registry")
         return self.message_broker
 
-    def get_text_provider(self, key: str) -> ITextProvider:
-        if key not in self.text_providers:
+    def get_text_provider(self, key: str = "") -> ITextProvider:
+        if not key and len(self.text_providers) >= 1:
+            # Default if no key is provided is get the first one
+            first_item = list(self.text_providers.values())[0]
+            return first_item
+        elif key not in self.text_providers:
             raise RuntimeError(
                 f"Text provider '{key}' not available in this worker's registry"
             )
-        return self.text_providers[key]
+        else:
+            return self.text_providers[key]
 
     def get_channel(self, key: str) -> IDistributionChannel:
         if key not in self.channels:

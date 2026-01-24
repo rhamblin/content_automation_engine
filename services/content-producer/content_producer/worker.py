@@ -1,15 +1,14 @@
 import asyncio
-from uuid import UUID
 
 from common.app_logger import AppLogger
 from common.contracts.database_models.enums import ImageKind
 from common.contracts.messages import ContentGenerationRequested, ContentReadyForStyling
 from common.providers import registry
 from common.repositories.tenant_scoped import (
-    ProjectRepository,
-    NicheRepository,
     ContentRepository,
     ImageRepository,
+    NicheRepository,
+    ProjectRepository,
 )
 
 
@@ -26,29 +25,31 @@ class ContentProducerWorker:
 
         while True:
             try:
-                incoming_msg: ContentGenerationRequested = (
-                    await self.registry.get_message_broker().consume(
-                        ContentGenerationRequested
-                    )
+                incoming_msg: (
+                    ContentGenerationRequested
+                ) = await self.registry.get_message_broker().consume(
+                    ContentGenerationRequested
                 )
 
                 if incoming_msg:
-                    self.logger.info(
-                        f"Received ContentGenerationRequested: tenant={incoming_msg.tenant_id}, "
-                        f"project={incoming_msg.project_id}"
+
+                    tenant_id, project_id = (
+                        incoming_msg.tenant_id,
+                        incoming_msg.project_id,
                     )
-                    await self._process_content_generation(incoming_msg)
+
+                    self.logger.info(
+                        f"Received ContentGenerationRequested: tenant={tenant_id}, "
+                        f"project={project_id}"
+                    )
+                    await self.__process_content_generation(tenant_id, project_id)
 
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
                 await asyncio.sleep(1)
 
-    async def _process_content_generation(
-        self, msg: ContentGenerationRequested
-    ) -> None:
+    async def __process_content_generation(self, tenant_id, project_id) -> None:
         """Process content generation for a project's integration profiles"""
-        tenant_id = UUID(msg.tenant_id)
-        project_id = UUID(msg.project_id)
 
         async with self.registry.get_database().get_session() as session:
             project_repo = ProjectRepository(session, tenant_id)
@@ -85,7 +86,9 @@ class ContentProducerWorker:
                             niche_id=niche.external_id,
                             keyword_id=keyword.external_id,
                             title=generated.get("title", "[Untitled]"),
-                            description=generated.get("description", "[No description]"),
+                            description=generated.get(
+                                "description", "[No description]"
+                            ),
                         )
 
                         image = await image_repo.add(
@@ -104,10 +107,14 @@ class ContentProducerWorker:
                         ).chain_from(msg)
 
                         await self.registry.get_message_broker().publish(outgoing_msg)
-                        self.logger.info(f"Published ContentReadyForStyling for content {content.external_id}")
+                        self.logger.info(
+                            f"Published ContentReadyForStyling for content {content.external_id}"
+                        )
 
                     except Exception as e:
-                        self.logger.error(f"Error generating content for keyword '{keyword.term}': {e}")
+                        self.logger.error(
+                            f"Error generating content for keyword '{keyword.term}': {e}"
+                        )
 
             await session.commit()
 
