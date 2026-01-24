@@ -90,9 +90,9 @@ class SchedulerWorker:
 
         message: IMessage | None = None
         if message_type == msgs.ContentGenerationRequested.topic():
-            profile_id = str(schedule.integration_profile_id)
+            integration_profile_id = str(schedule.integration_profile_id)
             message = msgs.ContentGenerationRequested(
-                tenant_id=tenant_id, project_id=profile_id
+                tenant_id=tenant_id, integration_profile_id=integration_profile_id
             )
         elif message_type == msgs.PromotionOrchestratorRequested.topic():
             message = msgs.PromotionOrchestratorRequested(tenant_id=tenant_id)

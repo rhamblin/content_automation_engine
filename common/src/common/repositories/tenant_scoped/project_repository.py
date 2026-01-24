@@ -67,7 +67,7 @@ class ProjectRepository(BaseTenantScopedRepository[Project]):
     async def get_integration_profile_by_id(self, profile_id: UUID) -> Optional[IntegrationProfile]:
         stmt = select(IntegrationProfile).where(
             IntegrationProfile.tenant_id == self._tenant_id,
-            IntegrationProfile.id == profile_id
+            IntegrationProfile.external_id == profile_id
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()

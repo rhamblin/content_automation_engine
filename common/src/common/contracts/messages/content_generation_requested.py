@@ -8,4 +8,4 @@ class ContentGenerationRequested(IMessage):
     """Message contract for content generation requests"""
 
     tenant_id: str
-    project_id: str
+    integration_profile_id: str
