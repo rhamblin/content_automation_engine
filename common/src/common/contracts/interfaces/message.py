@@ -30,8 +30,16 @@ class IMessage(ABC):
 
     @classmethod
     def deserialize(cls, json_str: str) -> Self:
-        """Deserialize from JSON string"""
-        return cls(**json.loads(json_str))
+        """Deserialize from JSON string.
+
+        Raises:
+            ValueError: When JSON is invalid or missing required fields.
+        """
+        try:
+            data = json.loads(json_str)
+            return cls(**data)
+        except (json.JSONDecodeError, TypeError) as e:
+            raise ValueError(f"Invalid message format for {cls.__name__}: {e}") from e
 
     def serialize(self) -> str:
         """Serialize to JSON string"""
