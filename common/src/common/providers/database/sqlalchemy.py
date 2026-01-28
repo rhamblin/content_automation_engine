@@ -1,16 +1,24 @@
 # common/providers/sqlalchemy/database.py
 from contextlib import asynccontextmanager
 
-from common.app_logger import AppLogger
-from common.contracts.interfaces.database import IDatabase
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
 
+from common.app_logger import AppLogger
+from common.contracts.interfaces.database import IDatabase
+
 
 class SQLAlchemyDatabaseProvider(IDatabase):
+    """SQLAlchemy database provider.
+
+    Raises:
+        ConnectionError: When database connection fails.
+    """
+
     def __init__(self, db_url: str):
         self.logger = AppLogger(__name__)
         self.logger.info("Creating database engine")
@@ -32,8 +40,17 @@ class SQLAlchemyDatabaseProvider(IDatabase):
 
     @asynccontextmanager
     async def get_session(self):
-        async with self.session_factory() as session:
-            yield session
+        """Get a database session.
+
+        Raises:
+            ConnectionError: When database connection fails.
+        """
+        try:
+            async with self.session_factory() as session:
+                yield session
+        except SQLAlchemyError as e:
+            raise ConnectionError(f"Database connection error: {e}") from e
 
     async def close_connection(self) -> None:
+        """Close database connection."""
         await self.engine.dispose()

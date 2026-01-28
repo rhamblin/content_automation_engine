@@ -34,23 +34,29 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
         await self._session.refresh(content)
         return content
 
-    async def get_by_id_with_renders(self, id: UUID) -> Optional[Content]:
+    async def get_by_id_with_renders(self, id: UUID) -> Content:
         stmt = (
             select(Content)
             .options(selectinload(Content.renders))
             .where(Content.tenant_id == self._tenant_id, Content.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Content with id '{id}' not found")
+        return entity
 
-    async def get_by_id_with_publications(self, id: UUID) -> Optional[Content]:
+    async def get_by_id_with_publications(self, id: UUID) -> Content:
         stmt = (
             select(Content)
             .options(selectinload(Content.publications))
             .where(Content.tenant_id == self._tenant_id, Content.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Content with id '{id}' not found")
+        return entity
 
     async def get_by_keyword(self, keyword_id: UUID, limit: int = 100, offset: int = 0) -> List[Content]:
         stmt = select(Content).where(

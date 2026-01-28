@@ -25,28 +25,25 @@ class ProviderRegistry:
 
     def get_database(self) -> IDatabase:
         if self.database is None:
-            raise RuntimeError("Database not available in this worker's registry")
+            raise LookupError("Database not available in this worker's registry")
         return self.database
 
     def get_blob_storage(self) -> IBlobStorage:
         if self.blob_storage is None:
-            raise RuntimeError(
-                "Blob Storate is not available in this worker's registry"
-            )
+            raise LookupError("Blob storage not available in this worker's registry")
         return self.blob_storage
 
     def get_message_broker(self) -> IMessageBroker:
         if self.message_broker is None:
-            raise RuntimeError("Message broker not available in this worker's registry")
+            raise LookupError("Message broker not available in this worker's registry")
         return self.message_broker
 
     def get_text_provider(self, key: str = "") -> ITextProvider:
         if not key and len(self.text_providers) >= 1:
-            # Default if no key is provided is get the first one
             first_item = list(self.text_providers.values())[0]
             return first_item
         elif key not in self.text_providers:
-            raise RuntimeError(
+            raise LookupError(
                 f"Text provider '{key}' not available in this worker's registry"
             )
         else:
@@ -54,7 +51,7 @@ class ProviderRegistry:
 
     def get_channel(self, key: str) -> IDistributionChannel:
         if key not in self.channels:
-            raise RuntimeError(
+            raise LookupError(
                 f"Channel '{key}' not available in this worker's registry"
             )
         return self.channels[key]

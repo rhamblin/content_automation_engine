@@ -37,14 +37,17 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         await self._session.refresh(render)
         return render
 
-    async def get_by_id_with_images(self, id: UUID) -> Optional[Render]:
+    async def get_by_id_with_images(self, id: UUID) -> Render:
         stmt = (
             select(Render)
             .options(selectinload(Render.input_image), selectinload(Render.output_image))
             .where(Render.tenant_id == self._tenant_id, Render.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Render with id '{id}' not found")
+        return entity
 
     async def get_by_content(self, content_id: UUID) -> List[Render]:
         stmt = select(Render).where(
@@ -74,10 +77,7 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def update_status(self, id: UUID, status: RenderStatus) -> bool:
+    async def update_status(self, id: UUID, status: RenderStatus) -> None:
         render = await self.get_by_id(id)
-        if render:
-            render.status = status
-            await self._session.flush()
-            return True
-        return False
+        render.status = status
+        await self._session.flush()

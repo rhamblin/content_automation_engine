@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -25,14 +25,6 @@ class IntegrationProfileRepository(BaseTenantScopedRepository[IntegrationProfile
         await self._session.refresh(profile)
         return profile
 
-    async def get_by_id(self, profile_id: UUID) -> Optional[IntegrationProfile]:
-        stmt = select(IntegrationProfile).where(
-            IntegrationProfile.tenant_id == self._tenant_id,
-            IntegrationProfile.external_id == profile_id
-        )
-        result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
-
     async def get_all(self, include_only_active: bool = True) -> List[IntegrationProfile]:
         stmt = select(IntegrationProfile).where(
             IntegrationProfile.tenant_id == self._tenant_id
@@ -53,10 +45,7 @@ class IntegrationProfileRepository(BaseTenantScopedRepository[IntegrationProfile
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def deactivate(self, id: UUID) -> bool:
+    async def deactivate(self, id: UUID) -> None:
         profile = await self.get_by_id(id)
-        if profile:
-            profile.is_active = False
-            await self._session.flush()
-            return True
-        return False
+        profile.is_active = False
+        await self._session.flush()

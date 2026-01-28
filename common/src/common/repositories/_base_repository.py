@@ -1,4 +1,4 @@
-from typing import TypeVar, Optional, List, Type, Protocol
+from typing import TypeVar, List, Type, Protocol
 from uuid import UUID
 
 from sqlalchemy import select, delete
@@ -24,10 +24,13 @@ class BaseRepository(IRepository[T]):
         self._session = session
         self._model = model
 
-    async def get_by_id(self, id: UUID) -> Optional[T]:
+    async def get_by_id(self, id: UUID) -> T:
         stmt = select(self._model).where(self._model.external_id == id)
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"{self._model.__name__} with id '{id}' not found")
+        return entity
 
     async def get_all(self, limit: int = 100, offset: int = 0) -> List[T]:
         stmt = select(self._model).limit(limit).offset(offset)

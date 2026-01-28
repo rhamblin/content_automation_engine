@@ -1,4 +1,4 @@
-from typing import List, Optional, Protocol, Type, TypeVar
+from typing import List, Protocol, Type, TypeVar
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -32,13 +32,16 @@ class BaseTenantScopedRepository(ITenantScopedRepository[T], BaseRepository[T]):
     def tenant_id(self) -> UUID:
         return self._tenant_id
 
-    async def get_by_id(self, id: UUID) -> Optional[T]:
+    async def get_by_id(self, id: UUID) -> T:
         """Get entity by external ID, scoped to tenant."""
         stmt = select(self._model).where(
             self._model.tenant_id == self._tenant_id, self._model.external_id == id
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"{self._model.__name__} with id '{id}' not found")
+        return entity
 
     async def get_all(self, limit: int = 100, offset: int = 0) -> List[T]:
         """Get all entities for this tenant with pagination."""

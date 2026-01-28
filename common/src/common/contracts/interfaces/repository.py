@@ -24,7 +24,7 @@ IRepository[T]                        (Interface - abstract CRUD operations)
 """
 
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Optional, List
+from typing import TypeVar, Generic, List
 from uuid import UUID
 
 T = TypeVar("T")
@@ -34,8 +34,8 @@ class IRepository(ABC, Generic[T]):
     """Base repository interface defining standard CRUD operations."""
 
     @abstractmethod
-    async def get_by_id(self, id: UUID) -> Optional[T]:
-        """Get entity by external ID."""
+    async def get_by_id(self, id: UUID) -> T:
+        """Get entity by external ID. Raises LookupError if not found."""
         pass
 
     @abstractmethod

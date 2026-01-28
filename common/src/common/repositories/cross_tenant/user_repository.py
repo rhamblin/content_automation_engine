@@ -27,14 +27,17 @@ class UserRepository(BaseRepository[User]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_id_with_identity_providers(self, id: UUID) -> Optional[User]:
+    async def get_by_id_with_identity_providers(self, id: UUID) -> User:
         stmt = (
             select(User)
             .options(selectinload(User.users_identity_providers))
             .where(User.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"User with id '{id}' not found")
+        return entity
 
     async def get_by_identity_provider(self, provider: str, provider_user_id: UUID) -> Optional[User]:
         stmt = (
@@ -71,10 +74,7 @@ class UserRepository(BaseRepository[User]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def deactivate(self, id: UUID) -> bool:
+    async def deactivate(self, id: UUID) -> None:
         user = await self.get_by_id(id)
-        if user:
-            user.is_active = False
-            await self._session.flush()
-            return True
-        return False
+        user.is_active = False
+        await self._session.flush()

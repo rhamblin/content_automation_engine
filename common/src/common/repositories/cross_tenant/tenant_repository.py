@@ -22,23 +22,29 @@ class TenantRepository(BaseRepository[Tenant]):
         await self._session.refresh(tenant)
         return tenant
 
-    async def get_by_id_with_users(self, id: UUID) -> Optional[Tenant]:
+    async def get_by_id_with_users(self, id: UUID) -> Tenant:
         stmt = (
             select(Tenant)
             .options(selectinload(Tenant.tenants_users))
             .where(Tenant.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Tenant with id '{id}' not found")
+        return entity
 
-    async def get_by_id_with_channels(self, id: UUID) -> Optional[Tenant]:
+    async def get_by_id_with_channels(self, id: UUID) -> Tenant:
         stmt = (
             select(Tenant)
             .options(selectinload(Tenant.tenants_channels))
             .where(Tenant.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Tenant with id '{id}' not found")
+        return entity
 
     async def get_by_title(self, title: str) -> Optional[Tenant]:
         stmt = select(Tenant).where(Tenant.title == title)

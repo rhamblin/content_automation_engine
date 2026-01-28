@@ -34,23 +34,29 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         await self._session.refresh(publication)
         return publication
 
-    async def get_by_id_with_promotions(self, id: UUID) -> Optional[Publication]:
+    async def get_by_id_with_promotions(self, id: UUID) -> Publication:
         stmt = (
             select(Publication)
             .options(selectinload(Publication.promotions))
             .where(Publication.tenant_id == self._tenant_id, Publication.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Publication with id '{id}' not found")
+        return entity
 
-    async def get_by_id_with_metrics(self, id: UUID) -> Optional[Publication]:
+    async def get_by_id_with_metrics(self, id: UUID) -> Publication:
         stmt = (
             select(Publication)
             .options(selectinload(Publication.publication_metrics))
             .where(Publication.tenant_id == self._tenant_id, Publication.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Publication with id '{id}' not found")
+        return entity
 
     async def get_by_post_id(self, channel_id: UUID, post_id: str) -> Optional[Publication]:
         stmt = select(Publication).where(
@@ -89,15 +95,12 @@ class PublicationRepository(BaseTenantScopedRepository[Publication]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def update_status(self, id: UUID, status: PublicationStatus, post_id: Optional[str] = None) -> bool:
+    async def update_status(self, id: UUID, status: PublicationStatus, post_id: Optional[str] = None) -> None:
         publication = await self.get_by_id(id)
-        if publication:
-            publication.status = status
-            if post_id:
-                publication.post_id = post_id
-            await self._session.flush()
-            return True
-        return False
+        publication.status = status
+        if post_id:
+            publication.post_id = post_id
+        await self._session.flush()
 
     # Promotion methods
     async def add_promotion(self, promotion: Promotion) -> Promotion:

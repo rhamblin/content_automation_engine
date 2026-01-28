@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -22,7 +22,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         await self._session.refresh(niche)
         return niche
 
-    async def get_by_id_with_keywords(self, id: UUID, include_only_active: bool = True) -> Optional[Niche]:
+    async def get_by_id_with_keywords(self, id: UUID, include_only_active: bool = True) -> Niche:
         if include_only_active:
             load_opt = selectinload(Niche.keywords.and_(Keyword.is_active == True))
         else:
@@ -34,7 +34,10 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
             .where(Niche.tenant_id == self._tenant_id, Niche.external_id == id)
         )
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Niche with id '{id}' not found")
+        return entity
 
     async def get_by_title(self, title: str) -> Optional[Niche]:
         stmt = select(Niche).where(Niche.tenant_id == self._tenant_id, Niche.title == title)
@@ -61,28 +64,25 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_keyword_by_id(self, keyword_id: UUID) -> Optional[Keyword]:
+    async def get_keyword_by_id(self, keyword_id: UUID) -> Keyword:
         stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.id == keyword_id)
         result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is None:
+            raise LookupError(f"Keyword with id '{keyword_id}' not found")
+        return entity
 
     async def get_keyword_by_term(self, niche_id: UUID, term: str) -> Optional[Keyword]:
         stmt = select(Keyword).where(Keyword.tenant_id == self._tenant_id, Keyword.niche_id == niche_id, Keyword.term == term)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def deactivate(self, id: UUID) -> bool:
+    async def deactivate(self, id: UUID) -> None:
         niche = await self.get_by_id(id)
-        if niche:
-            niche.is_active = False
-            await self._session.flush()
-            return True
-        return False
+        niche.is_active = False
+        await self._session.flush()
 
-    async def deactivate_keyword(self, keyword_id: UUID) -> bool:
+    async def deactivate_keyword(self, keyword_id: UUID) -> None:
         keyword = await self.get_keyword_by_id(keyword_id)
-        if keyword:
-            keyword.is_active = False
-            await self._session.flush()
-            return True
-        return False
+        keyword.is_active = False
+        await self._session.flush()
