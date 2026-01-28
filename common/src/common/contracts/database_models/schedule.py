@@ -42,11 +42,8 @@ class Schedule(Base):
         ),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
     external_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), nullable=False, default=uuid.uuid4
+        PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     tenant_id: Mapped[uuid.UUID] = mapped_column(
         PG_UUID(as_uuid=True),

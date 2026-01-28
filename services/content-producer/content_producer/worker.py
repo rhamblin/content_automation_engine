@@ -98,7 +98,6 @@ class ContentProducerWorker:
                         description=generated.get("description", "[No description]"),
                     )
 
-                    # get image uri and persist it in the data model
                     image_uri = self.registry.get_blob_storage().fetch_image_uri(
                         keyword
                     )
