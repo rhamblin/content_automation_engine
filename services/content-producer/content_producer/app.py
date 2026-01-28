@@ -36,8 +36,12 @@ async def main(logger: AppLogger):
 
         database = SQLAlchemyDatabaseProvider(settings.database_url)
 
+        blob_client = BlobServiceClient.from_connection_string(
+            settings.azure_blob_storage_connection_string
+        )
+        blob_storage = providers.AzureBlobStorageProvider(blob_client)
+
         if settings.app_environment == ENVIRONMENT_LOCAL:
-            blob_storage = providers.LocalImageProvider()
 
             text_providers: dict[str, ITextProvider] = {
                 providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
@@ -52,7 +56,7 @@ async def main(logger: AppLogger):
                 api_key=settings.azure_foundry_proj_default_api_key,
             )
 
-            blob_storage = providers.AzureBlobStorageImageProvider(blob_client)
+            blob_storage = providers.AzureBlobStorageProvider(blob_client)
 
             text_providers: dict[str, ITextProvider] = {
                 providers.AzureFoundryTextProvider.PROVIDER_NAME: providers.AzureFoundryTextProvider(
