@@ -48,9 +48,9 @@ BEGIN
       ('00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000108', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000110', true, NOW());
 
     -- 5. Sample Image
-    INSERT INTO images (id, external_id, tenant_id, niche_id, keyword_id, kind, created_at)
+    INSERT INTO images (id, external_id, tenant_id, niche_id, keyword_id, kind, uri, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000120', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000105', 'original', NOW());
+      ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000120', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000105', 'original', 'blob://dev-tenant/images/sample-image.jpg', NOW());
 
     -- 6. Sample Content
     INSERT INTO contents (id, external_id, tenant_id, niche_id, keyword_id, title, description, created_at)

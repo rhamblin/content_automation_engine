@@ -53,9 +53,7 @@ class ContentProducerWorker:
                 for msg in outgoing_msgs:
                     msg.chain_from(incoming_msg)
                     await self.registry.get_message_broker().publish(msg)
-                    self.logger.info(
-                        f"Published ContentReadyForStyling for content {msg.content_id}"
-                    )
+                    self.logger.info(f"\n\nPublished message: {msg}")
 
             except Exception as e:
                 self.logger.error(f"Worker error: {e}")
