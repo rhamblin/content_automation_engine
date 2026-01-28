@@ -1,18 +1,14 @@
-import json
-import uuid
 import asyncio
-
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+import json
 
 from common.contracts.database_models import (
-    IntegrationProfile,
     Content,
     ContentGenerationStatus,
+    IntegrationProfile,
     Niche,
-    Keyword,
 )
-import common.constants as constants
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 
 class ContentGenerationWorker:
@@ -53,13 +49,13 @@ class ContentGenerationWorker:
                     selectinload(IntegrationProfile.niche).selectinload(Niche.keywords)
                 )
                 .where(
-                    IntegrationProfile.integration_profile_id == uuid.UUID(profile_id)
+                    # IntegrationProfile.integration_profile_id == uuid.UUID(profile_id)
                 )
             )
             profile = result.scalar_one()
 
             text_provider = self.provider_registry.get_text_provider()
-            image_provider = self.provider_registry.get_image_provider()
+            blob_storage = self.provider_registry.get_blob_storage()
 
             niche_name = profile.niche.name
             channel = profile.channel_key
@@ -75,7 +71,7 @@ class ContentGenerationWorker:
                     title = generated_text.get("title", "")
                     description = generated_text.get("description", "")
 
-                    image_url = image_provider.fetch_image(kw)
+                    image_url = blob_storage.fetch_image(kw)
                     status = ContentGenerationStatus.READY.value
                 except Exception as e:
                     self.logger.error(

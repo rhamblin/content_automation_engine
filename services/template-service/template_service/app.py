@@ -1,21 +1,19 @@
 import asyncio
 
-from common.contracts.interfaces.distribution_channel import IDistributionChannel
-from common.contracts.interfaces.image_provider import IBlobStorage
-from common.contracts.interfaces.text_provider import ITextProvider
 import common.providers as providers
+from common.app_logger import AppLogger
+from common.constants import ENVIRONMENT_LOCAL
+from common.contracts.interfaces.distribution_channel import IDistributionChannel
+from common.contracts.interfaces.text_provider import ITextProvider
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
 from common.settings import load_settings
-from common.app_logger import AppLogger
-from common.constants import ENVIRONMENT_LOCAL
-
-from .worker import TemplateServiceWorker
-
 from redis.asyncio import Redis
 from sqlalchemy import text
 from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
+
+from .worker import TemplateServiceWorker
 
 
 async def main(logger: AppLogger):
