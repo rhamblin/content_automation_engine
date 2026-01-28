@@ -25,6 +25,7 @@ class Image(Base):
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("niches.external_id", ondelete="CASCADE"), nullable=False)
     keyword_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("keywords.external_id", ondelete="CASCADE"), nullable=False)
     kind: Mapped[ImageKind] = mapped_column(String, nullable=False, default=ImageKind.ORIGINAL.value)
+    uri: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships

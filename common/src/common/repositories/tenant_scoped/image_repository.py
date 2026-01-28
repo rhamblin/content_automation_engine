@@ -19,12 +19,14 @@ class ImageRepository(BaseTenantScopedRepository[Image]):
         self,
         niche_id: UUID,
         keyword_id: UUID,
+        uri: str,
         kind: ImageKind = ImageKind.ORIGINAL
     ) -> Image:
         image = Image(
             tenant_id=self._tenant_id,
             niche_id=niche_id,
             keyword_id=keyword_id,
+            uri=uri,
             kind=kind
         )
         self._session.add(image)

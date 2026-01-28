@@ -154,6 +154,7 @@ CREATE TABLE images (
   niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
   keyword_id  UUID        NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
   kind        TEXT        NOT NULL DEFAULT 'original',
+  uri         TEXT        NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT uq_images_external_id UNIQUE (external_id)
 );
