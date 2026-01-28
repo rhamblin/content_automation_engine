@@ -74,15 +74,13 @@ class ContentProducerWorker:
 
             profile = await profile_repo.get_by_id(integration_profile_id)
             if not profile:
-                self.logger.error(
+                raise ValueError(
                     f"IntegrationProfile {integration_profile_id} not found"
                 )
-                return []
 
             niche = await niche_repo.get_by_id_with_keywords(profile.niche_id)
             if not niche:
-                self.logger.error(f"Niche {profile.niche_id} not found")
-                return []
+                raise ValueError(f"Niche {profile.niche_id} not found")
 
             outgoing_msgs = []
             text_provider = self.registry.get_text_provider()
