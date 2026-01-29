@@ -3,6 +3,7 @@ import asyncio
 from common.app_logger import AppLogger
 from common.contracts.messages import ContentGenerationRequested, ContentReadyForStyling
 from common.providers import registry
+from common.repositories.cross_tenant import ChannelRepository
 from common.repositories.tenant_scoped import (
     ContentRepository,
     IntegrationProfileRepository,
@@ -66,9 +67,12 @@ class ContentProducerWorker:
             profile_repo = IntegrationProfileRepository(session, tenant_id)
             niche_repo = NicheRepository(session, tenant_id)
             content_repo = ContentRepository(session, tenant_id)
+            channel_repo = ChannelRepository(session)
 
             profile = await profile_repo.get_by_id(integration_profile_id)
             niche = await niche_repo.get_by_id_with_keywords(profile.niche_id)
+            channel_entity = await channel_repo.get_by_id(profile.channel_id)
+            distribution_channel = self.registry.get_channel(channel_entity.identifier)
 
             outgoing_msgs = []
             text_provider = self.registry.get_text_provider()
@@ -76,7 +80,7 @@ class ContentProducerWorker:
             for keyword in niche.keywords:
                 try:
                     generated = text_provider.generate_text(
-                        niche.title, keyword.term, str(profile.channel_id)
+                        niche.title, keyword.term, distribution_channel
                     )
 
                     content = await content_repo.add(

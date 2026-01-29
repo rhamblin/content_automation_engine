@@ -43,21 +43,31 @@ async def main(logger: AppLogger):
 
         if settings.app_environment == ENVIRONMENT_LOCAL:
 
-            text_providers: dict[str, ITextProvider] = {
-                providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
-            }
-        else:
-            blob_client = BlobServiceClient.from_connection_string(
-                settings.azure_blob_storage_connection_string
-            )
+            # text_providers: dict[str, ITextProvider] = {
+            #     providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
+            # }
+
             azure_openai_client = AzureOpenAI(
                 api_version=settings.azure_foundry_api_version,
                 azure_endpoint=settings.azure_foundry_endpoint,
                 api_key=settings.azure_foundry_proj_default_api_key,
             )
-
+            text_providers: dict[str, ITextProvider] = {
+                providers.AzureFoundryTextProvider.PROVIDER_NAME: providers.AzureFoundryTextProvider(
+                    azure_openai_client
+                )
+            }
+        else:
+            blob_client = BlobServiceClient.from_connection_string(
+                settings.azure_blob_storage_connection_string
+            )
             blob_storage = providers.AzureBlobStorageProvider(blob_client)
 
+            azure_openai_client = AzureOpenAI(
+                api_version=settings.azure_foundry_api_version,
+                azure_endpoint=settings.azure_foundry_endpoint,
+                api_key=settings.azure_foundry_proj_default_api_key,
+            )
             text_providers: dict[str, ITextProvider] = {
                 providers.AzureFoundryTextProvider.PROVIDER_NAME: providers.AzureFoundryTextProvider(
                     azure_openai_client
