@@ -182,29 +182,6 @@ services:
       - db
     networks: [backend, database]
 
-  # content-generation-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: services/content-generation-worker/Dockerfile
-  #   restart: unless-stopped
-  #   secrets:
-  #     - openai-api-key
-  #     - azure-foundry-proj-default-api-key
-  #   environment:
-  #     # Secrets are read by entrypoint.sh and exported as env vars
-  #     AZURE_FOUNDRY_ENDPOINT: ${AZURE_FOUNDRY_ENDPOINT}
-  #     DB_URL: postgresql+asyncpg://${APP_DB_USER}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB_NAME}
-  #     REDIS_URL: redis://redis:6379
-  #     LOG_LEVEL: ${LOG_LEVEL:-INFO}
-  #     ENVIRONMENT: ${ENVIRONMENT:-development}
-  #   networks:
-  #     - backend
-  #     - database
-  #     - development
-  #   depends_on:
-  #     - redis
-  #     - db
-
   test-runner:
     build:
       context: .
@@ -212,14 +189,14 @@ services:
       args:
         SERVICE_NAME: test-runner
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # Required for testcontainers
-      - ./test:/app/test  # Mount test files
-      - ./pytest.ini:/app/pytest.ini  # Pytest config
+      - /var/run/docker.sock:/var/run/docker.sock # Required for testcontainers
+      - ./test:/app/test # Mount test files
+      - ./pytest.ini:/app/pytest.ini # Pytest config
     environment:
       - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal
     command: ["pytest", "test/", "-v"]
     profiles:
-      - test  # Only runs when explicitly requested
+      - test # Only runs when explicitly requested
     networks:
       - backend
       - database
