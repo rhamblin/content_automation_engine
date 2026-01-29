@@ -4,7 +4,7 @@ import common.providers as providers
 from azure.storage.blob import BlobServiceClient
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts.interfaces import ITextProvider
+from common.contracts.interfaces import IDistributionChannel, ITextProvider
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
@@ -30,6 +30,7 @@ async def main(logger: AppLogger):
         message_broker = None
         blob_storage = None
         text_providers = {}
+        distribution_channels = {}
 
         redis_instance = Redis(host="redis", port=6379)
         message_broker = RedisMessageBroker(redis_instance)
@@ -43,20 +44,14 @@ async def main(logger: AppLogger):
 
         if settings.app_environment == ENVIRONMENT_LOCAL:
 
-            # text_providers: dict[str, ITextProvider] = {
-            #     providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
-            # }
-
-            azure_openai_client = AzureOpenAI(
-                api_version=settings.azure_foundry_api_version,
-                azure_endpoint=settings.azure_foundry_endpoint,
-                api_key=settings.azure_foundry_proj_default_api_key,
-            )
             text_providers: dict[str, ITextProvider] = {
-                providers.AzureFoundryTextProvider.PROVIDER_NAME: providers.AzureFoundryTextProvider(
-                    azure_openai_client
-                )
+                providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
             }
+
+            distribution_channels: dict[str, IDistributionChannel] = {
+                providers.LocalDistributionChannel.PROVIDER_NAME: providers.LocalDistributionChannel()
+            }
+
         else:
             blob_client = BlobServiceClient.from_connection_string(
                 settings.azure_blob_storage_connection_string
@@ -74,6 +69,10 @@ async def main(logger: AppLogger):
                 )
             }
 
+            distribution_channels: dict[str, IDistributionChannel] = {
+                providers.PinterestChannel.PROVIDER_NAME: providers.PinterestChannel()
+            }
+
         if database:
             await test_db_connection(database, logger)
 
@@ -81,6 +80,7 @@ async def main(logger: AppLogger):
         provider_registry = registry.ProviderRegistry(
             blob_storage=blob_storage,
             text_providers=text_providers,
+            distribution_channels=distribution_channels,
             message_broker=message_broker,
             database=database,
         )

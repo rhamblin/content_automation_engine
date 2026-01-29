@@ -71,7 +71,7 @@ BEGIN
     INSERT INTO schedules (id, external_id, tenant_id, integration_profile_id, is_active, cron_expression, message_type, created_at)
     VALUES
       -- Content generation (tied to integration profile)
-      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000108', true, '* * * * *', 'content_generation_requested', NOW()),
+      ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000170', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000108', true, '2 * * * *', 'content_generation_requested', NOW()),
       -- Tenant-level schedules (no integration profile)
       ('00000000-0000-0000-0000-000000000071', '00000000-0000-0000-0000-000000000171', '00000000-0000-0000-0000-000000000101', NULL, true, '* * * * *', 'promotion_orchestrator_requested', NOW()),
       ('00000000-0000-0000-0000-000000000072', '00000000-0000-0000-0000-000000000172', '00000000-0000-0000-0000-000000000101', NULL, true, '* * * * *', 'collect_analytics_requested', NOW()),
