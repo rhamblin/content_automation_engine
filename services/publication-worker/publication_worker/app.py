@@ -1,9 +1,10 @@
 import asyncio
 
 import common.providers as providers
+from azure.storage.blob import BlobServiceClient
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts.interfaces import IDistributionChannel, IBlobStorage, ITextProvider
+from common.contracts.interfaces import IDistributionChannel
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
@@ -27,22 +28,26 @@ async def main(logger: AppLogger):
         database = None
         message_broker = None
         blob_storage = None
-        text_providers = {}
         distribution_channels = {}
+
+        redis_instance = Redis(host="redis", port=6379)
+        message_broker = RedisMessageBroker(redis_instance)
+
+        database = SQLAlchemyDatabaseProvider(settings.database_url)
+
+        blob_client = BlobServiceClient.from_connection_string(
+            settings.azure_blob_storage_connection_string
+        )
+        blob_storage = providers.AzureBlobStorageProvider(blob_client)
+
         if settings.app_environment == ENVIRONMENT_LOCAL:
-            redis_instance = Redis(host="redis", port=6379)
-            message_broker = RedisMessageBroker(redis_instance)
-
-            database = SQLAlchemyDatabaseProvider(settings.database_url)
-
-            blob_storage = providers.LocalImageProvider()
-
-            text_providers: dict[str, ITextProvider] = {
-                providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
-            }
-
             distribution_channels: dict[str, IDistributionChannel] = {
                 providers.LocalDistributionChannel.PROVIDER_NAME: providers.LocalDistributionChannel()
+            }
+
+        else:
+            distribution_channels: dict[str, IDistributionChannel] = {
+                providers.PinterestChannel.PROVIDER_NAME: providers.PinterestChannel()
             }
 
         if database:
@@ -51,7 +56,6 @@ async def main(logger: AppLogger):
         # Add additional providers as needed
         provider_registry = registry.ProviderRegistry(
             blob_storage=blob_storage,
-            text_providers=text_providers,
             distribution_channels=distribution_channels,
             message_broker=message_broker,
             database=database,
