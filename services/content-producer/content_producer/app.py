@@ -43,7 +43,6 @@ async def main(logger: AppLogger):
         blob_storage = providers.AzureBlobStorageProvider(blob_client)
 
         if settings.app_environment == ENVIRONMENT_LOCAL:
-
             text_providers: dict[str, ITextProvider] = {
                 providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
             }
