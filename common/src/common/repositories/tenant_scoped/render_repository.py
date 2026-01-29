@@ -1,9 +1,8 @@
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Render
 from common.contracts.database_models.enums import RenderStatus
@@ -21,33 +20,21 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         content_id: UUID,
         niche_id: UUID,
         keyword_id: UUID,
-        input_image_id: Optional[UUID] = None,
-        style_name: Optional[str] = None
+        input_image_uri: Optional[str] = None,
+        style_name: Optional[str] = None,
     ) -> Render:
         render = Render(
             tenant_id=self._tenant_id,
             content_id=content_id,
             niche_id=niche_id,
             keyword_id=keyword_id,
-            input_image_id=input_image_id,
-            style_name=style_name
+            input_image_uri=input_image_uri,
+            style_name=style_name,
         )
         self._session.add(render)
         await self._session.flush()
         await self._session.refresh(render)
         return render
-
-    async def get_by_id_with_images(self, id: UUID) -> Render:
-        stmt = (
-            select(Render)
-            .options(selectinload(Render.input_image), selectinload(Render.output_image))
-            .where(Render.tenant_id == self._tenant_id, Render.external_id == id)
-        )
-        result = await self._session.execute(stmt)
-        entity = result.scalar_one_or_none()
-        if entity is None:
-            raise LookupError(f"Render with id '{id}' not found")
-        return entity
 
     async def get_by_content(self, content_id: UUID) -> List[Render]:
         stmt = select(Render).where(

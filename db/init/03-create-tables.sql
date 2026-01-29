@@ -145,24 +145,7 @@ CREATE INDEX idx_integration_profiles_tenant_id ON integration_profiles(tenant_i
 CREATE INDEX idx_integration_profiles_niche_id ON integration_profiles(niche_id);
 CREATE INDEX idx_integration_profiles_channel_id ON integration_profiles(channel_id);
 
--- 6. Images
-
-CREATE TABLE images (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
-  niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
-  keyword_id  UUID        NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
-  kind        TEXT        NOT NULL DEFAULT 'original',
-  uri         TEXT        NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT uq_images_external_id UNIQUE (external_id)
-);
-
-CREATE INDEX idx_images_tenant_id ON images(tenant_id);
-CREATE INDEX idx_images_keyword_id ON images(keyword_id);
-
--- 7. Contents
+-- 6. Contents
 
 CREATE TABLE contents (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -179,27 +162,27 @@ CREATE TABLE contents (
 CREATE INDEX idx_contents_tenant_id ON contents(tenant_id);
 CREATE INDEX idx_contents_keyword_id ON contents(keyword_id);
 
--- 8. Renders
+-- 7. Renders
 
 CREATE TABLE renders (
-  id              UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
-  external_id     UUID          NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id       UUID          NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
-  content_id      UUID          NOT NULL REFERENCES contents(external_id) ON DELETE CASCADE,
-  niche_id        UUID          NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
-  keyword_id      UUID          NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
-  input_image_id  UUID          REFERENCES images(external_id) ON DELETE SET NULL,
-  output_image_id UUID          REFERENCES images(external_id) ON DELETE SET NULL,
-  style_name      TEXT,
-  status          TEXT          NOT NULL DEFAULT 'pending',
-  created_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
+  id               UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id      UUID          NOT NULL DEFAULT gen_random_uuid(),
+  tenant_id        UUID          NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  content_id       UUID          NOT NULL REFERENCES contents(external_id) ON DELETE CASCADE,
+  niche_id         UUID          NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
+  keyword_id       UUID          NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
+  input_image_uri  TEXT,
+  output_image_uri TEXT,
+  style_name       TEXT,
+  status           TEXT          NOT NULL DEFAULT 'pending',
+  created_at       TIMESTAMPTZ   NOT NULL DEFAULT now(),
   CONSTRAINT uq_renders_external_id UNIQUE (external_id)
 );
 
 CREATE INDEX idx_renders_tenant_id ON renders(tenant_id);
 CREATE INDEX idx_renders_content_id ON renders(content_id);
 
--- 9. Publications
+-- 8. Publications
 
 CREATE TABLE publications (
   id          UUID               PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -218,7 +201,7 @@ CREATE INDEX idx_publications_tenant_id ON publications(tenant_id);
 CREATE INDEX idx_publications_channel_id ON publications(channel_id);
 CREATE INDEX idx_publications_content_id ON publications(content_id);
 
--- 10. Promotions
+-- 9. Promotions
 
 CREATE TABLE promotions (
   id             UUID                   PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -237,7 +220,7 @@ CREATE TABLE promotions (
 CREATE INDEX idx_promotions_tenant_id ON promotions(tenant_id);
 CREATE INDEX idx_promotions_publication_id ON promotions(publication_id);
 
--- 11. Publication Metrics
+-- 10. Publication Metrics
 
 CREATE TABLE publication_metrics (
   id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -255,7 +238,7 @@ CREATE TABLE publication_metrics (
 CREATE INDEX idx_publication_metrics_tenant_id ON publication_metrics(tenant_id);
 CREATE INDEX idx_publication_metrics_publication_id ON publication_metrics(publication_id);
 
--- 12. Schedules
+-- 11. Schedules
 
 CREATE TABLE schedules (
   id                     UUID        PRIMARY KEY DEFAULT gen_random_uuid(),

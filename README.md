@@ -125,9 +125,7 @@ erDiagram
   tenants       ||--o{  integration_profiles : configures
   niches        ||--o{  integration_profiles : targeted_by
   niches        ||--|{  keywords : defines
-  keywords      ||--|{  images : generates
   keywords      ||--o{  contents : produces
-  images        ||--o{  renders: styles_into
   contents      ||--o{  renders: styles_into
   channels      ||--o{  tenants_channels: available_to
   channels      ||--o{  integration_profiles: configured_in
@@ -262,19 +260,6 @@ erDiagram
     %% Unique constraints: (external_id), (niche_id, term)
   }
 
-  images {
-    uuid id pk
-    uuid external_id
-    uuid tenant_id fk
-    uuid  niche_id  fk
-    uuid  keyword_id  fk
-    text  kind
-    timestamp created_at
-    %% Unique constraint: (external_id)
-    %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
-    %% kind is an ENUM
-  }
-
   contents {
     uuid id pk
     uuid external_id
@@ -295,13 +280,14 @@ erDiagram
     uuid  content_id fk
     uuid  niche_id  fk
     uuid  keyword_id  fk
-    uuid  input_image_id  fk
-    uuid  output_image_id fk
+    text  input_image_uri
+    text  output_image_uri
     text  style_name
     text  status
     timestamp created_at
     %% Unique constraint: (external_id)
     %% niche_id and keyword_id used to denormalize data and aid in faster queries without joins
+    %% input_image_uri and output_image_uri are blob storage URIs
     %% Status is an ENUM
   }
 

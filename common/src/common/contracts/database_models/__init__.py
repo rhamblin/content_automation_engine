@@ -1,6 +1,5 @@
 from .base import Base
 from .enums import (
-    ImageKind,
     RenderStatus,
     PublicationStatus,
     PromotionActionTaken,
@@ -20,7 +19,6 @@ from .report import Report
 from .niche import Niche
 from .keyword import Keyword
 from .integration_profile import IntegrationProfile
-from .image import Image
 from .content import Content
 from .render import Render
 from .publication import Publication
@@ -31,7 +29,6 @@ from .schedule import Schedule
 __all__ = [
     "Base",
     # Enums
-    "ImageKind",
     "RenderStatus",
     "PublicationStatus",
     "PromotionActionTaken",
@@ -53,7 +50,6 @@ __all__ = [
     "Niche",
     "Keyword",
     "IntegrationProfile",
-    "Image",
     "Content",
     "Render",
     "Publication",

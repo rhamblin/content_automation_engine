@@ -12,4 +12,4 @@ class ContentReadyForStyling(IMessage):
     niche_id: str
     channel_id: str
     content_id: str
-    base_image_id: str
+    input_image_uri: str

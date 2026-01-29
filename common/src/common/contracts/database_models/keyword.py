@@ -31,5 +31,4 @@ class Keyword(Base):
 
     # Relationships
     niche: Mapped["Niche"] = relationship("Niche", back_populates="keywords")
-    images: Mapped[List["Image"]] = relationship("Image", back_populates="keyword", cascade="all, delete", lazy="selectin")
     contents: Mapped[List["Content"]] = relationship("Content", back_populates="keyword", cascade="all, delete", lazy="selectin")

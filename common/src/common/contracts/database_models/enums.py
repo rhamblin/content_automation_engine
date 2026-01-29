@@ -8,12 +8,6 @@ from ..messages import (
 )
 
 
-class ImageKind(str, Enum):
-    ORIGINAL = "original"
-    STYLED = "styled"
-    THUMBNAIL = "thumbnail"
-
-
 class RenderStatus(str, Enum):
     PENDING = "pending"
     PROCESSING = "processing"

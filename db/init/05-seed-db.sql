@@ -47,32 +47,27 @@ BEGIN
     VALUES
       ('00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000108', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000110', true, NOW());
 
-    -- 5. Sample Image
-    INSERT INTO images (id, external_id, tenant_id, niche_id, keyword_id, kind, uri, created_at)
-    VALUES
-      ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000120', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000105', 'original', 'blob://dev-tenant/images/sample-image.jpg', NOW());
-
-    -- 6. Sample Content
+    -- 5. Sample Content
     INSERT INTO contents (id, external_id, tenant_id, niche_id, keyword_id, title, description, created_at)
     VALUES
       ('00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-000000000130', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000105', 'Top-Rated Running Shoes', 'Check out these top-rated running shoes for ultimate comfort and style.', NOW());
 
-    -- 7. Sample Render
-    INSERT INTO renders (id, external_id, tenant_id, content_id, niche_id, keyword_id, input_image_id, style_name, status, created_at)
+    -- 6. Sample Render
+    INSERT INTO renders (id, external_id, tenant_id, content_id, niche_id, keyword_id, input_image_uri, style_name, status, created_at)
     VALUES
-      ('00000000-0000-0000-0000-000000000040', '00000000-0000-0000-0000-000000000140', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000130', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000105', '00000000-0000-0000-0000-000000000120', 'modern', 'completed', NOW());
+      ('00000000-0000-0000-0000-000000000040', '00000000-0000-0000-0000-000000000140', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000130', '00000000-0000-0000-0000-000000000104', '00000000-0000-0000-0000-000000000105', 'blob://dev-tenant/images/sample-image.jpg', 'modern', 'completed', NOW());
 
-    -- 8. Sample Publication
+    -- 7. Sample Publication
     INSERT INTO publications (id, external_id, tenant_id, render_id, channel_id, content_id, post_id, status, created_at)
     VALUES
       ('00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000150', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000140', '00000000-0000-0000-0000-000000000110', '00000000-0000-0000-0000-000000000130', '1234567890', 'published', NOW());
 
-    -- 9. Sample Publication Metric
+    -- 8. Sample Publication Metric
     INSERT INTO publication_metrics (id, external_id, tenant_id, publication_id, channel_id, snapshot_date, metrics, fetched_at)
     VALUES
       ('00000000-0000-0000-0000-000000000060', '00000000-0000-0000-0000-000000000160', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000150', '00000000-0000-0000-0000-000000000110', NOW() - INTERVAL '1 day', '{"impressions": 150, "clicks": 12, "saves": 3}', NOW());
 
-    -- 10. Schedules (one per message type)
+    -- 9. Schedules (one per message type)
     INSERT INTO schedules (id, external_id, tenant_id, integration_profile_id, is_active, cron_expression, message_type, created_at)
     VALUES
       -- Content generation (tied to integration profile)

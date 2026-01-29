@@ -1,12 +1,10 @@
 import asyncio
 
 from common.app_logger import AppLogger
-from common.contracts.database_models.enums import ImageKind
 from common.contracts.messages import ContentGenerationRequested, ContentReadyForStyling
 from common.providers import registry
 from common.repositories.tenant_scoped import (
     ContentRepository,
-    ImageRepository,
     IntegrationProfileRepository,
     NicheRepository,
 )
@@ -68,7 +66,6 @@ class ContentProducerWorker:
             profile_repo = IntegrationProfileRepository(session, tenant_id)
             niche_repo = NicheRepository(session, tenant_id)
             content_repo = ContentRepository(session, tenant_id)
-            image_repo = ImageRepository(session, tenant_id)
 
             profile = await profile_repo.get_by_id(integration_profile_id)
             niche = await niche_repo.get_by_id_with_keywords(profile.niche_id)
@@ -89,14 +86,8 @@ class ContentProducerWorker:
                         description=generated.get("description", "[No description]"),
                     )
 
-                    image_uri = self.registry.get_blob_storage().fetch_image_uri(
+                    input_image_uri = self.registry.get_blob_storage().fetch_image_uri(
                         keyword
-                    )
-                    image = await image_repo.add(
-                        niche_id=niche.external_id,
-                        keyword_id=keyword.external_id,
-                        uri=image_uri,
-                        kind=ImageKind.ORIGINAL,
                     )
 
                     await session.commit()
@@ -108,7 +99,7 @@ class ContentProducerWorker:
                             niche_id=str(niche.external_id),
                             channel_id=str(profile.channel_id),
                             content_id=str(content.external_id),
-                            base_image_id=str(image.external_id),
+                            input_image_uri=input_image_uri,
                         )
                     )
 
