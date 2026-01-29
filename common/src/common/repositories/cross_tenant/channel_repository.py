@@ -39,5 +39,4 @@ class ChannelRepository(BaseRepository[Channel]):
         existing = await self.get_by_identifier(identifier)
         if existing:
             return existing
-        channel = Channel(identifier=identifier)
-        return await self.add(channel)
+        return await self.add(identifier)
