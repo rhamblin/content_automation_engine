@@ -48,7 +48,7 @@ class AzureBlobStorageProvider(IBlobStorage):
             )
 
             identifier_text_blob_client = self.container_client.get_blob_client(
-                "".join([image_path_prefix, keyword.term, ".txt"])
+                "".join([image_path_prefix, keyword.term.replace(" ", "_"), ".txt"])
             )
 
             if not identifier_text_blob_client:
