@@ -35,7 +35,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
     async def get_all(self, include_only_active: bool = True) -> List[Schedule]:
         stmt = select(Schedule).where(Schedule.tenant_id == self._tenant_id)
         if include_only_active:
-            stmt = stmt.where(Schedule.is_active == True)
+            stmt = stmt.where(Schedule.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -57,10 +57,7 @@ class ScheduleRepository(BaseTenantScopedRepository[Schedule]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def deactivate(self, id: UUID) -> bool:
+    async def deactivate(self, id: UUID) -> None:
         schedule = await self.get_by_id(id)
-        if schedule:
-            schedule.is_active = False
-            await self._session.flush()
-            return True
-        return False
+        schedule.is_active = False
+        await self._session.flush()

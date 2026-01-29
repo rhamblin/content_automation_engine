@@ -54,7 +54,7 @@ class UserRepository(BaseRepository[User]):
     async def get_all(self, limit: int = 100, offset: int = 0, include_only_active: bool = True) -> List[User]:
         stmt = select(User)
         if include_only_active:
-            stmt = stmt.where(User.is_active == True)
+            stmt = stmt.where(User.is_active)
         stmt = stmt.limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

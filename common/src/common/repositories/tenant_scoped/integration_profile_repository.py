@@ -30,7 +30,7 @@ class IntegrationProfileRepository(BaseTenantScopedRepository[IntegrationProfile
             IntegrationProfile.tenant_id == self._tenant_id
         )
         if include_only_active:
-            stmt = stmt.where(IntegrationProfile.is_active == True)
+            stmt = stmt.where(IntegrationProfile.is_active)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
