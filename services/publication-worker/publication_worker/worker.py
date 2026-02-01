@@ -2,6 +2,7 @@ import asyncio
 from uuid import UUID
 
 from common.app_logger import AppLogger
+from common.contracts.database_models import Render
 from common.contracts.database_models.enums import PublicationStatus
 from common.contracts.messages import ContentReadyForPublication
 from common.providers import registry
@@ -38,7 +39,7 @@ class PublicationWorker:
                 tenant_id = UUID(incoming_msg.tenant_id)
                 content_id = UUID(incoming_msg.content_id)
                 channel_id = UUID(incoming_msg.channel_id)
-                render_id = UUID(incoming_msg.rendered_image_id)
+                render_id = UUID(incoming_msg.render_id)
 
                 self.logger.info(
                     f"Received ContentReadyForPublication: tenant={tenant_id}, "
@@ -64,18 +65,15 @@ class PublicationWorker:
 
         async with self.registry.get_database().get_session() as session:
             content_repo = ContentRepository(session, tenant_id)
-            render_repo = RenderRepository(session, tenant_id)
             publication_repo = PublicationRepository(session, tenant_id)
+            render_repo = RenderRepository(session, tenant_id)
             channel_repo = ChannelRepository(session)
 
             # Step 3: Get content
             content = await content_repo.get_by_id(content_id)
-            self.logger.info(f"Fetched content: {content.title}")
-
-            # Step 4: Get rendered image
-            render = await render_repo.get_by_id(render_id)
-            image_url = render.output_image_uri
-            self.logger.info(f"Fetched render with image: {image_url}")
+            content_title = content.title
+            content_desc = content.description
+            self.logger.info(f"Fetched content: {content_title}")
 
             # Get channel to determine distribution channel provider
             channel_entity = await channel_repo.get_by_id(channel_id)
@@ -87,15 +85,22 @@ class PublicationWorker:
                 content_id=content_id,
                 render_id=render_id,
             )
+
             await session.commit()
 
             try:
                 # Step 5: POST to channel (pinterest)
                 self.logger.info(f"Publishing to channel: {channel_entity.identifier}")
+                render: Render = await render_repo.get_by_id(render_id)
+                render_uri = render.output_image_uri
+
+                if not render_uri:
+                    raise ValueError(f"Render URI empty for render Id: {render_id}")
+
                 result = distribution_channel.publish(
-                    title=content.title,
-                    description=content.description,
-                    image_url=image_url,
+                    title=content_title,
+                    description=content_desc,
+                    image_url=render_uri,
                 )
 
                 # Step 6: PinID returned

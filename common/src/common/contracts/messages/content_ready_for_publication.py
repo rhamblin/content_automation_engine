@@ -12,4 +12,4 @@ class ContentReadyForPublication(IMessage):
     niche_id: str
     channel_id: str
     content_id: str
-    rendered_image_id: str
+    render_id: str

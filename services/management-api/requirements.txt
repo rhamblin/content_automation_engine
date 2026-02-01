@@ -1,2 +1,4 @@
 # Common is already included in platform-requirements.txt
 # Place your other dependencies
+fastapi>=0.115.0
+uvicorn>=0.32.0
