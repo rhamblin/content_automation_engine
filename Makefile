@@ -60,7 +60,7 @@ services:
 	  management-api scheduler content-producer visual-composer \
 	  publication-worker analytics-collector activity-reporter promotion-orchestrator
 
-local: infra seed-images services
+local: infra seed-images services frontend
 
 cleanup:
 	docker compose \

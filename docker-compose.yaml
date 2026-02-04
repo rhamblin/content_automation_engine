@@ -105,7 +105,15 @@ services:
         SERVICE_NAME: management-api
     restart: unless-stopped
     command:
-      ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+      [
+        "uvicorn",
+        "management_api.app:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--reload",
+      ]
     ports:
       - "8000:8000"
     env_file:

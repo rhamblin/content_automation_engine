@@ -17,6 +17,7 @@ class Settings:
 
     # Optional settings
     log_level: str = "INFO"
+    cors_allowed_origins: str = ""
 
 
 def load_settings() -> Settings:
@@ -52,5 +53,6 @@ def load_settings() -> Settings:
 
     # Optional vars with defaults
     config["log_level"] = os.getenv("LOG_LEVEL", "INFO")
+    config["cors_allowed_origins"] = os.getenv("CORS_ALLOWED_ORIGINS", "")
 
     return Settings(**config)
