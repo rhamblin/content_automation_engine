@@ -1,4 +1,4 @@
-.PHONY: setup infra seed-images services local cleanup publish consume logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -20,7 +20,12 @@ setup:  ## Create venv and install dependencies
 # ==========================================
 # Docker Compose (Original)
 # ==========================================
-
+frontend:
+	docker compose \
+	--env-file ./config/local/variables.env \
+	-f docker-compose.yaml \
+	-f config/local/docker-compose.override.yaml \
+	up --build -d --no-deps frontend
 infra:
 	docker compose \
 	  --env-file ./config/local/variables.env \
