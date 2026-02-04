@@ -1,21 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { msalInstance } from '@/auth/msalInstance'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const account = computed(() => msalInstance.getAllAccounts()[0])
+const apiUrl = import.meta.env.VITE_MANAGEMENT_API_URL
+const displayName = ref('')
+const loading = ref(true)
 
-async function logout() {
-  await msalInstance.logoutPopup()
-  router.push({ name: 'login' })
-}
+onMounted(async () => {
+  try {
+    const response = await fetch(`${apiUrl}/me`, { credentials: 'include' })
+    if (!response.ok) {
+      router.push({ name: 'login' })
+      return
+    }
+    const user = await response.json()
+    displayName.value = user.displayName ?? 'User'
+  } catch {
+    router.push({ name: 'login' })
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
   <div class="welcome-page">
-    <h1>Welcome, {{ account?.name ?? 'User' }}</h1>
-    <button @click="logout">Logout</button>
+    <template v-if="!loading">
+      <h1>Welcome, {{ displayName }}</h1>
+    </template>
   </div>
 </template>
 
@@ -27,19 +40,5 @@ async function logout() {
   justify-content: center;
   min-height: 80vh;
   gap: 2rem;
-}
-
-button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  background-color: #d43b00;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #b03200;
 }
 </style>
