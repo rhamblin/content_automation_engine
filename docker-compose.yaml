@@ -104,7 +104,8 @@ services:
       args:
         SERVICE_NAME: management-api
     restart: unless-stopped
-    command: ["uvicorn", "management_api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    command:
+      ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     ports:
       - "8000:8000"
     env_file:
@@ -184,6 +185,18 @@ services:
       - redis
       - db
     networks: [backend, database]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - management-api
+    networks:
+      - development
 
   test-runner:
     build:
