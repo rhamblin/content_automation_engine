@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 .venv
 *.egg-info/
+
+## For frontend
+node_modules
