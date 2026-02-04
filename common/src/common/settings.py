@@ -15,6 +15,12 @@ class Settings:
     azure_blob_storage_connection_string: str
     azure_foundry_api_version: str = "2024-12-01-preview"
 
+    # Azure Entra (Microsoft Identity)
+    azure_entra_client_id: str = ""
+    azure_entra_client_secret: str = ""
+    azure_entra_tenant_id: str = ""
+    frontend_url: str = "http://localhost:5173"
+
     # Optional settings
     log_level: str = "INFO"
     cors_allowed_origins: str = ""
@@ -50,6 +56,12 @@ def load_settings() -> Settings:
         raise ValueError(
             f"Missing required environment variables: {', '.join(missing)}"
         )
+
+    # Azure Entra
+    config["azure_entra_client_id"] = os.getenv("AZURE_ENTRA_CLIENT_ID", "")
+    config["azure_entra_client_secret"] = os.getenv("AZURE_ENTRA_CLIENT_SECRET", "")
+    config["azure_entra_tenant_id"] = os.getenv("AZURE_ENTRA_TENANT_ID", "")
+    config["frontend_url"] = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
     # Optional vars with defaults
     config["log_level"] = os.getenv("LOG_LEVEL", "INFO")

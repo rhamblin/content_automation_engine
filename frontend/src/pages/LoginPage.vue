@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { msalInstance } from '@/auth/msalInstance'
-import { useRouter } from 'vue-router'
+const clientId = import.meta.env.VITE_AZURE_CLIENT_ID
+const tenantId = import.meta.env.VITE_AZURE_TENANT_ID
+const redirectUri = `${import.meta.env.VITE_MANAGEMENT_API_URL}/entra/callback`
 
-const router = useRouter()
-
-async function login() {
-  try {
-    await msalInstance.loginPopup({ scopes: ['User.Read'] })
-    router.push({ name: 'welcome' })
-  } catch (error) {
-    console.error('Login failed:', error)
-  }
+function login() {
+  const params = new URLSearchParams({
+    client_id: clientId,
+    response_type: 'code',
+    redirect_uri: redirectUri,
+    scope: 'openid profile email User.Read',
+    response_mode: 'query',
+  })
+  window.location.href = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?${params}`
 }
 </script>
 

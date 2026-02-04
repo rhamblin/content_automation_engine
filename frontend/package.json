@@ -17,7 +17,6 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "@azure/msal-browser": "^5.1.0",
     "vue": "^3.5.27",
     "vue-router": "^5.0.2"
   },
