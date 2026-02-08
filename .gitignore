@@ -1,5 +1,7 @@
 secrets/
 config.env
+dev-tools/.env
+dev-tools/wp-uploader/wp-app-password.txt
 __pycache__/
 *.pyc
 .idea

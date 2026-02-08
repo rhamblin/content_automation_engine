@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -75,6 +75,9 @@ publish:
 consume:
 	. dev-tools/dev-shell.sh && python dev-tools/local_topic_consume.py
 
+wp-upload:
+	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/wp_uploader.py
+
 logs:
 	docker compose logs -f
 
@@ -126,6 +129,7 @@ help:  ## Show this help message
 	@echo "  make local          - Run infra → seed-images → services"
 	@echo "  make cleanup        - Stop and remove all containers"
 	@echo "  make logs           - Tail docker-compose logs"
+	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"
