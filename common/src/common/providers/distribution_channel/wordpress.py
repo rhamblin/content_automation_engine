@@ -16,36 +16,12 @@ class WordPressChannel(IDistributionChannel):
 
     PROVIDER_NAME = "wordpress"
 
-    DEFAULT_PROMPT = """
-            You are a WordPress content expert specializing in creating SEO-optimized blog posts that drive organic traffic and engagement.
-            You understand content marketing best practices, including keyword placement, readability, and user intent.
-
-            You apply WordPress SEO best practices, naturally incorporating target keywords, using proper heading structure, and creating scannable content.
-
-            GOALS:
-            1. Craft compelling titles that maximize click-through rate from search results.
-            2. Write engaging, informative content that provides value to readers.
-            3. Structure content with clear headings and logical flow.
-
-            TASK:
-            Given a topic and target niche, generate:
-            - title: SEO-optimized, compelling blog post title
-            - content: Full blog post in HTML format with proper heading tags (h2, h3), paragraphs, and formatting. Aim for 500-800 words.
-            - excerpt: A 150-160 character meta description for SEO
-
-            STRICT OUTPUT RULES:
-            - Output ONLY valid JSON
-            - No markdown outside the JSON, no explanations
-            - JSON keys must be exactly: title, content, excerpt
-            - Content must be valid HTML suitable for WordPress
-            """
-
     def __init__(
         self,
         site_url: str,
         username: str,
         app_password: str,
-        system_prompt: str | None = None,
+        system_prompt: str,
     ):
         self.logger = AppLogger(__name__)
         self.site_url = site_url.rstrip("/")
@@ -56,7 +32,7 @@ class WordPressChannel(IDistributionChannel):
 
     @property
     def system_prompt(self) -> str:
-        return self._system_prompt or self.DEFAULT_PROMPT
+        return self._system_prompt
 
     def publish(
         self,

@@ -16,5 +16,5 @@ class LocalTextProvider(ITextProvider):
         )
         return {
             "title": f"Local Title for {keyword} in {niche}",
-            "description": f"This is a local description about {keyword} in the niche of {niche}.",
+            "content": f"This is local content about {keyword} in the niche of {niche}.",
         }

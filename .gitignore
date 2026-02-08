@@ -1,7 +1,7 @@
 secrets/
 config.env
 dev-tools/.env
-dev-tools/wp-uploader/content_topics.csv
+dev-tools/wp-uploader/input/
 dev-tools/wp-uploader/wp-app-password.txt
 dev-tools/wp-uploader/output/
 __pycache__/

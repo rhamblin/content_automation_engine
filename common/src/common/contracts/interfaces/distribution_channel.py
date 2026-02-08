@@ -1,4 +1,5 @@
 from abc import abstractmethod
+
 from .base_provider_with_name import IBaseProviderWithName
 
 
@@ -9,7 +10,7 @@ class IDistributionChannel(IBaseProviderWithName):
         pass
 
     @abstractmethod
-    def publish(self, title: str, description: str, image_url: str, **kwargs) -> dict:
+    def publish(self, title: str, content: str, image_url: str, **kwargs) -> dict:
         """Publish content to the distribution channel.
 
         Returns:

@@ -42,7 +42,7 @@ class PinterestChannel(IDistributionChannel):
             - Description must include 2-5 hashtags and be 200 characters or fewer
             """
 
-    def publish(self, title: str, description: str, image_url: str, **kwargs) -> dict:
+    def publish(self, title: str, content: str, image_url: str, **kwargs) -> dict:
         """Publish content to Pinterest.
 
         Raises:

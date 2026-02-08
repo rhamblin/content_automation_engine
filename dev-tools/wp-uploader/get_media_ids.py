@@ -1,6 +1,7 @@
 """Look up WordPress media IDs for .jpg files in a directory."""
 
 import csv
+import re
 import sys
 from pathlib import Path
 
@@ -10,12 +11,29 @@ from requests.auth import HTTPBasicAuth
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
-OUTPUT_FILE = Path(__file__).parent / "media_ids.csv"
+OUTPUT_FILE = Path(__file__).parent / "input/content_topics.csv"
+
+NICHE = "food"  # ← hardcoded niche
 
 
-def get_media_id(session: requests.Session, api_url: str, filename: str) -> tuple[int | None, str]:
-    """Search WordPress media library for image by filename (partial match)."""
-    response = session.get(f"{api_url}/wp-json/wp/v2/media", params={"search": filename, "per_page": 10})
+def filename_to_keyword(filename: str) -> str:
+    """
+    lava_cakes1.jpg -> lava cakes
+    coconut_pancakes1.jpg -> coconut pancakes
+    """
+    stem = Path(filename).stem
+    stem = re.sub(r"\d+$", "", stem)  # remove trailing numbers
+    return stem.replace("_", " ").strip()
+
+
+def get_media_id(
+    session: requests.Session, api_url: str, filename: str
+) -> tuple[int | None, str]:
+    response = session.get(
+        f"{api_url}/wp-json/wp/v2/media",
+        params={"search": filename, "per_page": 10},
+    )
+
     if not response.ok or not response.json():
         return None, ""
 
@@ -26,7 +44,6 @@ def get_media_id(session: requests.Session, api_url: str, filename: str) -> tupl
         if filename.lower() in source_url.lower() or filename.lower() in slug.lower():
             return media["id"], source_url
 
-    # Fallback to first result
     first = response.json()[0]
     return first["id"], first.get("source_url", "")
 
@@ -48,12 +65,14 @@ def main():
 
     with open(OUTPUT_FILE, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["filename", "media_id", "wp_url"])
+        writer.writerow(["niche", "keyword", "image_url", "media_id"])
 
         for jpg in image_dir.glob("*.jpg"):
             media_id, wp_url = get_media_id(session, settings.wp_site_url, jpg.stem)
-            writer.writerow([jpg.name, media_id or "", wp_url])
-            print(f"{jpg.name} -> {media_id or 'not found'} ({wp_url})")
+            keyword = filename_to_keyword(jpg.name)
+
+            writer.writerow([NICHE, keyword, wp_url, media_id or ""])
+            print(f"{keyword} -> {media_id or 'not found'}")
 
     print(f"\nResults written to {OUTPUT_FILE}")
 

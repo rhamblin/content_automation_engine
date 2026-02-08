@@ -19,7 +19,7 @@ class AzureFoundryTextProvider(ITextProvider):
         self.client = azure_open_ai_client
 
     def generate_text(
-        self, niche: str, keyword: str, channel: IDistributionChannel
+        self, niche: str, keyword: str, channel: IDistributionChannel, image_url: str
     ) -> dict:
         """Generate text content using Azure OpenAI.
 
@@ -37,7 +37,9 @@ class AzureFoundryTextProvider(ITextProvider):
                     {
                         "role": "user",
                         "content": (
-                            f"Niche: {niche}\n" f"Primary keyword: {keyword}\n"
+                            f"Niche: {niche}\n"
+                            f"Primary keyword: {keyword}\n"
+                            f"Image URL: {image_url}\n"
                         ),
                     },
                 ],

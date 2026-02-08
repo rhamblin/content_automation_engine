@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -6,7 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from common.contracts.database_models import Content
-from common.repositories._base_tenant_scoped_repository import BaseTenantScopedRepository
+from common.repositories._base_tenant_scoped_repository import (
+    BaseTenantScopedRepository,
+)
 
 
 class ContentRepository(BaseTenantScopedRepository[Content]):
@@ -20,14 +22,14 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
         niche_id: UUID,
         keyword_id: UUID,
         title: str = "[Untitled]",
-        description: str = "[No description]"
+        description: str = "[No description]",
     ) -> Content:
         content = Content(
             tenant_id=self._tenant_id,
             niche_id=niche_id,
             keyword_id=keyword_id,
             title=title,
-            description=description
+            description=description,
         )
         self._session.add(content)
         await self._session.flush()
@@ -58,26 +60,41 @@ class ContentRepository(BaseTenantScopedRepository[Content]):
             raise LookupError(f"Content with id '{id}' not found")
         return entity
 
-    async def get_by_keyword(self, keyword_id: UUID, limit: int = 100, offset: int = 0) -> List[Content]:
-        stmt = select(Content).where(
-            Content.tenant_id == self._tenant_id,
-            Content.keyword_id == keyword_id
-        ).limit(limit).offset(offset)
-        result = await self._session.execute(stmt)
-        return list(result.scalars().all())
-
-    async def get_by_niche(self, niche_id: UUID, limit: int = 100, offset: int = 0) -> List[Content]:
-        stmt = select(Content).where(
-            Content.tenant_id == self._tenant_id,
-            Content.niche_id == niche_id
-        ).limit(limit).offset(offset)
-        result = await self._session.execute(stmt)
-        return list(result.scalars().all())
-
-    async def search_by_title(self, title_query: str, limit: int = 100) -> List[Content]:
+    async def get_by_keyword(
+        self, keyword_id: UUID, limit: int = 100, offset: int = 0
+    ) -> List[Content]:
         stmt = (
             select(Content)
-            .where(Content.tenant_id == self._tenant_id, Content.title.ilike(f"%{title_query}%"))
+            .where(
+                Content.tenant_id == self._tenant_id, Content.keyword_id == keyword_id
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_by_niche(
+        self, niche_id: UUID, limit: int = 100, offset: int = 0
+    ) -> List[Content]:
+        stmt = (
+            select(Content)
+            .where(Content.tenant_id == self._tenant_id, Content.niche_id == niche_id)
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def search_by_title(
+        self, title_query: str, limit: int = 100
+    ) -> List[Content]:
+        stmt = (
+            select(Content)
+            .where(
+                Content.tenant_id == self._tenant_id,
+                Content.title.ilike(f"%{title_query}%"),
+            )
             .limit(limit)
         )
         result = await self._session.execute(stmt)
