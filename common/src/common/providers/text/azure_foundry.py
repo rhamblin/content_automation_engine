@@ -41,7 +41,7 @@ class AzureFoundryTextProvider(ITextProvider):
                         ),
                     },
                 ],
-                max_completion_tokens=16000,
+                max_completion_tokens=50000,
                 model="gpt-5-nano",
             )
         except APIError as e:

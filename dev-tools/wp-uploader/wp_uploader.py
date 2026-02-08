@@ -14,9 +14,38 @@ from settings import load_dev_settings
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 OUTPUT_DIR = Path(__file__).parent / "output"
-
-
 TOPICS_FILE = Path(__file__).parent / "content_topics.csv"
+
+PROMPT = """
+You are a recipe content creator for chefexotic.com, writing in a warm, friendly housewife tone.
+
+Create a recipe post for #KEYWORD with the following sections:
+- Friendly introduction (like a housewife cooking for her family)
+- Jump to Recipe button
+- 2 image placeholders [IMAGE PLACEHOLDER 1], [IMAGE PLACEHOLDER 2], [IMAGE PLACEHOLDER 3]
+- Ingredients list with icons
+- Equipment needed (include Amazon affiliate "Check price on Amazon" CTA buttons for best-selling items)
+- Step-by-step instructions with icons
+- Health benefits
+- Nutritional value table
+- Serving suggestions
+- ChefExotic tips
+- Perfect for (occasions/audiences)
+- Amazon product comparison table
+- Friendly conclusion
+
+Requirements:
+- Amazon disclosure text (FTC-compliant) near affiliate links
+- Google Adsense, Amazon Associates, and Clickbank compliant
+- SEO optimized with proper heading structure (h2, h3)
+- Use icons/emojis for visual appeal
+- Do not limit recipes to Caribbean cuisine
+- Format like https://chefexotic.com/main-dishes/baked-pork-tenderloin/
+
+Output ONLY valid JSON with keys:
+- title: SEO-optimized recipe title
+- content: Full HTML ready for WordPress visual editor or Elementor/Astra code editor
+"""
 
 
 def main():
@@ -30,7 +59,7 @@ def main():
     )
     text_provider = AzureFoundryTextProvider(azure_client)
     wp = WordPressChannel(
-        settings.wp_site_url, settings.wp_username, settings.wp_app_password
+        settings.wp_site_url, settings.wp_username, settings.wp_app_password, PROMPT
     )
 
     # Create output CSV for this run
