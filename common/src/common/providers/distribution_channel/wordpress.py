@@ -16,16 +16,7 @@ class WordPressChannel(IDistributionChannel):
 
     PROVIDER_NAME = "wordpress"
 
-    def __init__(self, site_url: str, username: str, app_password: str):
-        self.logger = AppLogger(__name__)
-        self.site_url = site_url.rstrip("/")
-        self.username = username
-        self.app_password = app_password
-        self.api_url = f"{self.site_url}/wp-json/wp/v2/posts"
-
-    @property
-    def system_prompt(self) -> str:
-        return """
+    DEFAULT_PROMPT = """
             You are a WordPress content expert specializing in creating SEO-optimized blog posts that drive organic traffic and engagement.
             You understand content marketing best practices, including keyword placement, readability, and user intent.
 
@@ -49,39 +40,40 @@ class WordPressChannel(IDistributionChannel):
             - Content must be valid HTML suitable for WordPress
             """
 
+    def __init__(
+        self,
+        site_url: str,
+        username: str,
+        app_password: str,
+        system_prompt: str | None = None,
+    ):
+        self.logger = AppLogger(__name__)
+        self.site_url = site_url.rstrip("/")
+        self.username = username
+        self.app_password = app_password
+        self.api_url = f"{self.site_url}/wp-json/wp/v2/posts"
+        self._system_prompt = system_prompt
+
+    @property
+    def system_prompt(self) -> str:
+        return self._system_prompt or self.DEFAULT_PROMPT
+
     def publish(
-        self, title: str, description: str, image_url: str = "", **kwargs
+        self,
+        title: str,
+        content: str,
+        media_id: int | None = None,
+        status: str = "draft",
     ) -> dict:
-        """Publish content to WordPress.
-
-        Args:
-            title: Post title
-            description: Post content (HTML)
-            image_url: Featured image URL (optional, not used directly)
-            **kwargs: Additional fields (excerpt, status, categories, tags)
-
-        Raises:
-            ConnectionError: When WordPress API is unreachable.
-            RuntimeError: When WordPress API returns an error response.
-            ValueError: When response is missing required fields.
-        """
-        post_data = {
+        """Publish content to WordPress."""
+        post_data: dict = {
             "title": title,
-            "content": description,
-            "status": kwargs.get("status", "draft"),
+            "content": content,
+            "status": status,
         }
 
-        if excerpt := kwargs.get("excerpt"):
-            post_data["excerpt"] = excerpt
-
-        if categories := kwargs.get("categories"):
-            post_data["categories"] = categories
-
-        if tags := kwargs.get("tags"):
-            post_data["tags"] = tags
-
-        if featured_media := kwargs.get("featured_media"):
-            post_data["featured_media"] = featured_media
+        if media_id:
+            post_data["featured_media"] = media_id
 
         self.logger.info(f"Publishing to WordPress: {title}")
 
