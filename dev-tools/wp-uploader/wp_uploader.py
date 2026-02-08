@@ -1,4 +1,19 @@
-"""Generate and publish content to WordPress using Azure Foundry."""
+"""Generate and publish content to WordPress using Azure Foundry.
+What it does
+--------------
+Makes content and put it in place with the image
+Set feature image
+Sets it as a draft post
+
+What it doesn't do i.e. what still needs to be done manually
+------------------
+Verifying content / recipe looks good
+Putting page as the right category
+Setting any tags needed
+Modifying any buttons/links so they are pointing to the right affiliate pages
+Adding any additional monetization vehicles
+Publishing page
+"""
 
 import csv
 import sys
