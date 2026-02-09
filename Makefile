@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -14,6 +14,7 @@ setup:  ## Create venv and install dependencies
 	.venv/bin/pip install --upgrade pip
 	.venv/bin/pip install -e common/
 	@for req in services/*/requirements.txt; do .venv/bin/pip install -r $$req; done
+	@for req in dev-tools/*/requirements.txt; do .venv/bin/pip install -r $$req; done
 	.venv/bin/pip install -r test/requirements.txt
 	@echo "Done! Activate with: source .venv/bin/activate"
 
@@ -60,7 +61,7 @@ services:
 	  management-api scheduler content-producer visual-composer \
 	  publication-worker analytics-collector activity-reporter promotion-orchestrator
 
-local: infra seed-images services frontend
+local: infra seed-images services frontendw
 
 cleanup:
 	docker compose \
@@ -80,6 +81,9 @@ wp-upload:
 
 wp-media-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/get_media_ids.py $(MEDIA_FOLDER)
+
+pin-maker:
+	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(FOLDER)
 
 logs:
 	docker compose logs -f
@@ -134,6 +138,7 @@ help:  ## Show this help message
 	@echo "  make logs           - Tail docker-compose logs"
 	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
+	@echo "  make pin-maker FOLDER=/path/to/images - Create Pinterest pins from images"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"
