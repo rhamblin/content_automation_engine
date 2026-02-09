@@ -22,6 +22,33 @@ from settings import load_dev_settings
 PIN_WIDTH = 1000
 PIN_HEIGHT = 1500
 
+# =============================================================================
+# FONT CONFIGURATION - Easy to swap fonts here
+# =============================================================================
+FONTS_DIR = Path(__file__).parent / "fonts"
+
+# Font files - just change the filename to use a different font
+TITLE_FONT_FILE = "nexa-rust.slab-black-shadow-01.otf"
+TAGLINE_FONT_FILE = "Fredoka-VariableFont.ttf"
+TIME_FONT_FILE = "Allura-Regular.ttf"
+
+# Font sizes
+TITLE_FONT_SIZE = 110
+TAGLINE_FONT_SIZE = 62
+TIME_FONT_SIZE = 72
+
+# Outline widths
+TITLE_OUTLINE_WIDTH = 6
+TAGLINE_OUTLINE_WIDTH = 7
+TIME_OUTLINE_WIDTH = 7
+
+# Colors
+TITLE_COLOR = "white"
+TAGLINE_COLOR = "#FFD700"  # Gold
+TIME_COLOR = "#FFD700"  # Gold
+OUTLINE_COLOR = "black"
+# =============================================================================
+
 PROMPT = """
 You are a Pinterest marketing expert creating eye-catching pin text for food/recipe images.
 
@@ -101,9 +128,9 @@ def smart_crop_resize(img: Image.Image, target_w: int, target_h: int) -> Image.I
     return img.resize((target_w, target_h), Image.Resampling.LANCZOS)
 
 
-def get_font(size: int) -> ImageFont.FreeTypeFont:
-    """Get Fredoka One font for Pinterest-style text."""
-    font_path = Path(__file__).parent / "fonts" / "Fredoka-VariableFont.ttf"
+def get_font(font_file: str, size: int) -> ImageFont.FreeTypeFont:
+    """Load a font from the fonts directory."""
+    font_path = FONTS_DIR / font_file
     return ImageFont.truetype(str(font_path), size)
 
 
@@ -165,10 +192,10 @@ def create_pin(
 
     draw = ImageDraw.Draw(img)
 
-    # Font sizes
-    title_font = get_font(72)
-    tagline_font = get_font(42)
-    time_font = get_font(48)
+    # Load fonts from config
+    title_font = get_font(TITLE_FONT_FILE, TITLE_FONT_SIZE)
+    tagline_font = get_font(TAGLINE_FONT_FILE, TAGLINE_FONT_SIZE)
+    time_font = get_font(TIME_FONT_FILE, TIME_FONT_SIZE)
 
     padding = 40
     max_text_width = PIN_WIDTH - (padding * 2)
@@ -181,7 +208,8 @@ def create_pin(
         bbox = title_font.getbbox(line)
         text_width = bbox[2] - bbox[0]
         x = (PIN_WIDTH - text_width) // 2
-        draw_text_with_outline(draw, (x, y_offset), line, title_font, outline_width=4)
+        draw_text_with_outline(draw, (x, y_offset), line, title_font,
+                               fill=TITLE_COLOR, outline=OUTLINE_COLOR, outline_width=TITLE_OUTLINE_WIDTH)
         y_offset += bbox[3] - bbox[1] + 10
 
     # Draw tagline near bottom
@@ -190,7 +218,7 @@ def create_pin(
     text_width = bbox[2] - bbox[0]
     x = (PIN_WIDTH - text_width) // 2
     draw_text_with_outline(draw, (x, tagline_y), tagline, tagline_font,
-                           fill="#FFD700", outline_width=3)  # Gold color
+                           fill=TAGLINE_COLOR, outline=OUTLINE_COLOR, outline_width=TAGLINE_OUTLINE_WIDTH)
 
     # Draw time text at bottom
     time_y = PIN_HEIGHT - 120
@@ -198,7 +226,7 @@ def create_pin(
     text_width = bbox[2] - bbox[0]
     x = (PIN_WIDTH - text_width) // 2
     draw_text_with_outline(draw, (x, time_y), time_text, time_font,
-                           fill="#FFD700", outline_width=3)  # Gold color
+                           fill=TIME_COLOR, outline=OUTLINE_COLOR, outline_width=TIME_OUTLINE_WIDTH)
 
     # Save with high quality
     img.save(output_path, "JPEG", quality=95)
