@@ -4,7 +4,7 @@ from image_overlay import ImageOverlay
 from pin_style import PinStyle
 from text_element import TextElement
 
-BRAND_TEXT = "yourbrand.com"
+BRAND_TEXT = "chefexotic.com"
 
 # =============================================================================
 # Predefined Styles
