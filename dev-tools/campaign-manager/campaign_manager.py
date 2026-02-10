@@ -43,11 +43,23 @@ class CampaignManager:
             return []
         return response.json().get("items", [])
 
-    def get_campaigns(self, ad_account_id: str) -> list[dict]:
-        """Fetch all campaigns for an ad account."""
+    def get_campaigns(
+        self, ad_account_id: str, status_filter: list[str] | None = None
+    ) -> list[dict]:
+        """Fetch campaigns for an ad account.
+
+        Args:
+            ad_account_id: The ad account ID
+            status_filter: Filter by status (ACTIVE, PAUSED, ARCHIVED). None = all.
+        """
+        params = {}
+        if status_filter:
+            params["entity_statuses"] = ",".join(status_filter)
+
         response = requests.get(
             f"{PINTEREST_API_URL}/ad_accounts/{ad_account_id}/campaigns",
             headers=self.headers,
+            params=params,
         )
         if not response.ok:
             print(
@@ -147,9 +159,11 @@ class CampaignManager:
     # High-Level Actions
     # =========================================================================
 
-    def list_campaigns(self, ad_account_id: str, days: int = 7) -> list[dict]:
+    def list_campaigns(
+        self, ad_account_id: str, days: int = 7, status_filter: list[str] | None = None
+    ) -> list[dict]:
         """List campaigns with their current metrics."""
-        campaigns = self.get_campaigns(ad_account_id)
+        campaigns = self.get_campaigns(ad_account_id, status_filter)
         if not campaigns:
             return []
 
@@ -354,6 +368,12 @@ Examples:
     list_parser.add_argument(
         "--days", type=int, default=7, help="Days of metrics (default: 7)"
     )
+    list_parser.add_argument(
+        "--status",
+        choices=["all", "active", "paused", "archived"],
+        default="all",
+        help="Filter by status (default: all)",
+    )
     list_parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     # Pause command
@@ -437,7 +457,10 @@ Examples:
 
     # Execute command
     if args.command == "list":
-        campaigns = manager.list_campaigns(ad_account_id, args.days)
+        status_filter = None
+        if args.status != "all":
+            status_filter = [args.status.upper()]
+        campaigns = manager.list_campaigns(ad_account_id, args.days, status_filter)
         if args.json:
             print(json.dumps(campaigns, indent=2))
         else:
