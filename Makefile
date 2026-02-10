@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker get-pin-ids get-pin-stats plot-pin-analytics account-analytics logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -97,6 +97,9 @@ plot-pin-analytics:
 account-analytics:
 	. dev-tools/dev-shell.sh && cd dev-tools && python account-analytics/account_analytics.py --open
 
+campaign-manager:
+	. dev-tools/dev-shell.sh && cd dev-tools && python campaign-manager/campaign_manager.py $(CMD)
+
 logs:
 	docker compose logs -f
 
@@ -155,6 +158,7 @@ help:  ## Show this help message
 	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"
 	@echo "  make plot-pin-analytics PIN_ID=123 - Generate 14-day analytics HTML report"
 	@echo "  make account-analytics - Generate account-wide analytics report"
+	@echo "  make campaign-manager CMD='list' - Manage Pinterest campaigns"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"

@@ -13,7 +13,7 @@ import requests
 PINTEREST_AUTH_URL = "https://www.pinterest.com/oauth/"
 PINTEREST_API_URL = "https://api.pinterest.com/v5"
 REDIRECT_URI = "https://localhost:8765/callback"
-SCOPES = "boards:read,pins:read,user_accounts:read,ads:read"
+SCOPES = "boards:read,pins:read,user_accounts:read,ads:read,ads:write"
 
 CERTS_DIR = Path(__file__).parent / "certs"
 TOKEN_FILE = Path(__file__).parent / ".access_token"
