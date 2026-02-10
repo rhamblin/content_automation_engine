@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from PIL import ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 FONTS_DIR = Path(__file__).parent.parent.parent / "resources" / "fonts"
 
@@ -22,6 +22,7 @@ class TextElement:
     alignment: str = "center"  # "center", "left", "right"
     banner_color: str | None = None
     banner_padding: int = 12
+    banner_full_width: bool = False  # True = banner spans entire image width
     max_width_pct: float = 0.85
 
     def _get_font(self) -> ImageFont.FreeTypeFont:
@@ -42,7 +43,15 @@ class TextElement:
             lines.append(" ".join(current))
         return lines
 
-    def draw(self, canvas: ImageDraw.ImageDraw, text: str, img_width: int, img_height: int) -> None:
+    def draw(
+        self,
+        canvas: ImageDraw.ImageDraw,
+        text: str,
+        img_width: int,
+        img_height: int,
+        base_img: Image.Image | None = None,
+    ) -> Image.Image | None:
+        """Draw text element. Returns modified image if banner with alpha was drawn."""
         font = self._get_font()
         margin = int(img_width * (1 - self.max_width_pct) / 2)
 
@@ -56,6 +65,8 @@ class TextElement:
 
         # Wrap text (skip for corner elements)
         lines = [text] if self.corner else self._wrap_text(text, font, int(img_width * self.max_width_pct))
+
+        result_img = None
 
         for line in lines:
             bbox = font.getbbox(line)
@@ -71,10 +82,18 @@ class TextElement:
                     "right": img_width - text_w - margin,
                 }[self.alignment]
 
-            # Banner
-            if self.banner_color:
+            # Banner - use alpha compositing for transparency
+            if self.banner_color and base_img is not None:
                 p = self.banner_padding
-                canvas.rectangle([x - p, y - p, x + text_w + p, y + text_h + p], fill=self.banner_color)
+                overlay = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 0))
+                overlay_draw = ImageDraw.Draw(overlay)
+                if self.banner_full_width:
+                    overlay_draw.rectangle([0, y - p, img_width, y + text_h + p], fill=self.banner_color)
+                else:
+                    overlay_draw.rectangle([x - p, y - p, x + text_w + p, y + text_h + p], fill=self.banner_color)
+                base_img = Image.alpha_composite(base_img, overlay)
+                result_img = base_img
+                canvas = ImageDraw.Draw(base_img)
 
             # Outline
             if self.outline_width > 0:
@@ -86,3 +105,5 @@ class TextElement:
             # Text
             canvas.text((x, y), line, font=font, fill=self.color)
             y += text_h + 10
+
+        return result_img

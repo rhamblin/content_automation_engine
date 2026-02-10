@@ -14,7 +14,7 @@ from common.providers.text.azure_foundry import AzureFoundryTextProvider
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
-from styles import BRAND_TEXT, STYLES, get_style_brief
+from styles import BRAND_TEXT, STYLES, get_style_brief, list_styles
 
 
 def extract_keyword(filename: str) -> str:
@@ -59,7 +59,12 @@ def main():
 
     print(f"Found {len(jpg_files)} images")
 
-    for img_path in jpg_files:
+    # Get all style names - each used exactly once
+    style_names = list_styles()
+    if len(jpg_files) > len(style_names):
+        print(f"Warning: {len(jpg_files)} images but only {len(style_names)} styles. Some styles will repeat.")
+
+    for idx, img_path in enumerate(jpg_files):
         keyword = extract_keyword(img_path.name)
         print(f"\n{img_path.name} -> '{keyword}'")
 
@@ -68,12 +73,13 @@ def main():
             text_data = text_provider.generate_text(
                 niche="food", keyword=keyword, channel=channel, image_url=""
             )
-            if args.style:
-                text_data["style"] = args.style
 
-            # Get style
-            style_name = text_data.get("style", "bold_rustic")
-            style = STYLES.get(style_name, STYLES["bold_rustic"])
+            # Assign style: use forced style or cycle through styles (each used once)
+            if args.style:
+                style_name = args.style
+            else:
+                style_name = style_names[idx % len(style_names)]
+            style = STYLES[style_name]
 
             print(f"  Style: {style_name} | Title: {text_data.get('title')}")
 
@@ -88,8 +94,8 @@ def main():
                 brand_text=BRAND_TEXT,
             )
 
-            # Save (caller decides how)
-            output_path = output_folder / f"pin_{img_path.stem}.jpg"
+            # Save with style name appended
+            output_path = output_folder / f"{img_path.stem}_{style_name}.jpg"
             pin_image.save(output_path, "JPEG", quality=95)
             print(f"  Saved: {output_path}")
 

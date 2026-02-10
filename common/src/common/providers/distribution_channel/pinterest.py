@@ -132,15 +132,20 @@ Return ONLY valid JSON.
         if style and style.overlay:
             img = style.overlay.apply(img)
 
+        # Convert to RGBA for alpha-blended banners
+        img = img.convert("RGBA")
         draw = ImageDraw.Draw(img)
 
         if style:
             for key, element in style.elements():
                 text = brand_text if key == "watermark" else text_data.get(key)
                 if text:
-                    element.draw(draw, text, img.width, img.height)
+                    result = element.draw(draw, text, img.width, img.height, base_img=img)
+                    if result is not None:
+                        img = result
+                        draw = ImageDraw.Draw(img)
 
-        return img
+        return img.convert("RGB")
 
     def publish(self, title: str, description: str, content: Any, **kwargs) -> dict:
         """Publish content to Pinterest.

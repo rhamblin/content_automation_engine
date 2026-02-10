@@ -100,7 +100,7 @@ STYLES: dict[str, VisualStyle] = {
             color="white",
             y_position=-140,
             outline_width=4,
-            banner_color="rgba(0,0,0,0.5)",
+            banner_color=(0, 0, 0, 128),
             banner_padding=12,
         ),
         watermark=TextElement(
@@ -432,7 +432,7 @@ STYLES: dict[str, VisualStyle] = {
             color="white",
             y_position=-140,
             outline_width=3,
-            banner_color="rgba(0,0,0,0.4)",
+            banner_color=(0, 0, 0, 102),
             banner_padding=10,
         ),
         watermark=TextElement(
@@ -445,39 +445,37 @@ STYLES: dict[str, VisualStyle] = {
         overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
     ),
 
-    # 15. FOOD SHOWCASE - Bottom text, food hero
-    "food_showcase": VisualStyle(
-        name="food_showcase",
-        description="Text at bottom, food is the star. Great for beautiful plated dishes.",
+    # 15. CENTER BANNER - Full-width bars behind text (like Classic & Savory example)
+    "center_banner": VisualStyle(
+        name="center_banner",
+        description="Full-width banner bars behind centered text. Clean, professional look.",
+        prefix=TextElement(
+            font_file="DancingScript.ttf",
+            font_size=58,
+            color="#C71585",
+            y_position=680,
+            outline_width=0,
+            banner_color=(255, 255, 255, 200),
+            banner_padding=6,
+            banner_full_width=True,
+        ),
         title=TextElement(
-            font_file="NexaRust.otf",
-            font_size=95,
-            color="white",
-            y_position=-270,
-            outline_width=5,
-        ),
-        tagline=TextElement(
-            font_file="Pacifico.ttf",
-            font_size=48,
-            color="#FFD700",
-            y_position=-170,
-            outline_width=4,
-        ),
-        time_text=TextElement(
-            font_file="Montserrat.ttf",
-            font_size=36,
-            color="white",
-            y_position=-110,
-            outline_width=3,
+            font_file="BebasNeue.ttf",
+            font_size=85,
+            color="#5D3A3A",
+            y_position=760,
+            outline_width=0,
+            banner_color=(255, 255, 255, 200),
+            banner_padding=6,
+            banner_full_width=True,
         ),
         watermark=TextElement(
             font_file="Montserrat.ttf",
-            font_size=22,
-            color="white",
-            corner="top_right",
-            outline_width=2,
+            font_size=20,
+            color="#666666",
+            corner="bottom_right",
+            outline_width=0,
         ),
-        overlay=ImageOverlay(position="bottom", opacity=0.5, height_pct=0.5),
     ),
 }
 
