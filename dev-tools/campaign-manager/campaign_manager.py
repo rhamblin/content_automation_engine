@@ -75,6 +75,7 @@ class CampaignManager:
         if not campaign_ids:
             return {}
 
+
         end_date = datetime.now() - timedelta(days=1)
         start_date = end_date - timedelta(days=days - 1)
 
@@ -85,7 +86,7 @@ class CampaignManager:
                 "start_date": start_date.strftime("%Y-%m-%d"),
                 "end_date": end_date.strftime("%Y-%m-%d"),
                 "campaign_ids": ",".join(campaign_ids),
-                "columns": "CAMPAIGN_NAME,IMPRESSION,CLICKTHROUGH,SPEND_IN_DOLLAR,CTR,ECPC_IN_DOLLAR",
+                "columns": "CAMPAIGN_NAME,TOTAL_IMPRESSION,TOTAL_CLICKTHROUGH,SPEND_IN_DOLLAR,CTR,ECPC_IN_DOLLAR",
                 "granularity": "TOTAL",
             },
         )
@@ -102,11 +103,11 @@ class CampaignManager:
             campaign_id = item.get("CAMPAIGN_ID")
             if campaign_id:
                 result[campaign_id] = {
-                    "impressions": item.get("IMPRESSION", 0),
-                    "clicks": item.get("CLICKTHROUGH", 0),
-                    "spend": item.get("SPEND_IN_DOLLAR", 0),
-                    "ctr": item.get("CTR", 0),
-                    "cpc": item.get("ECPC_IN_DOLLAR", 0),
+                    "impressions": item.get("TOTAL_IMPRESSION", 0) or 0,
+                    "clicks": item.get("TOTAL_CLICKTHROUGH", 0) or 0,
+                    "spend": item.get("SPEND_IN_DOLLAR", 0) or 0,
+                    "ctr": item.get("CTR", 0) or 0,
+                    "cpc": item.get("ECPC_IN_DOLLAR", 0) or 0,
                 }
         return result
 

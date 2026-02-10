@@ -33,9 +33,7 @@ def get_pin_analytics(access_token: str, pin_id: str) -> dict | None:
         print(f"Failed to fetch analytics: {response.status_code} - {response.text}")
         return None
 
-    data = response.json()
-    print(f"DEBUG analytics response: {json.dumps(data, indent=2)}")
-    return data
+    return response.json()
 
 
 def get_pin_details(access_token: str, pin_id: str) -> dict | None:

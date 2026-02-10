@@ -16,14 +16,16 @@ OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 ORGANIC_METRICS = ["IMPRESSION", "SAVE", "PIN_CLICK", "OUTBOUND_CLICK"]
-CAMPAIGN_METRICS = ["IMPRESSION", "CLICKTHROUGH", "SPEND_IN_DOLLAR", "CTR", "ECPC_IN_DOLLAR"]
+CAMPAIGN_METRICS = ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH", "SPEND_IN_DOLLAR", "CTR", "ECPC_IN_DOLLAR"]
 
 METRIC_LABELS = {
     "IMPRESSION": "Impressions",
+    "TOTAL_IMPRESSION": "Impressions",
     "SAVE": "Saves",
     "PIN_CLICK": "Pin Clicks",
     "OUTBOUND_CLICK": "Outbound Clicks",
     "CLICKTHROUGH": "Clicks",
+    "TOTAL_CLICKTHROUGH": "Clicks",
     "SPEND_IN_DOLLAR": "Spend ($)",
     "CTR": "CTR (%)",
     "ECPC_IN_DOLLAR": "CPC ($)",
@@ -31,10 +33,12 @@ METRIC_LABELS = {
 
 COLORS = {
     "IMPRESSION": "#1f77b4",
+    "TOTAL_IMPRESSION": "#1f77b4",
     "SAVE": "#2ca02c",
     "PIN_CLICK": "#ff7f0e",
     "OUTBOUND_CLICK": "#d62728",
     "CLICKTHROUGH": "#9467bd",
+    "TOTAL_CLICKTHROUGH": "#9467bd",
     "SPEND_IN_DOLLAR": "#8c564b",
     "CTR": "#e377c2",
     "ECPC_IN_DOLLAR": "#7f7f7f",
@@ -189,7 +193,7 @@ def fetch_campaign_analytics(
         "start_date": start_date.strftime("%Y-%m-%d"),
         "end_date": end_date.strftime("%Y-%m-%d"),
         "campaign_ids": ",".join(campaign_ids),
-        "columns": "CAMPAIGN_NAME,IMPRESSION,CLICKTHROUGH,SPEND_IN_DOLLAR,CTR,ECPC_IN_DOLLAR",
+        "columns": "CAMPAIGN_NAME,TOTAL_IMPRESSION,TOTAL_CLICKTHROUGH,SPEND_IN_DOLLAR,CTR,ECPC_IN_DOLLAR",
         "granularity": "DAY",
     }
 
@@ -248,16 +252,16 @@ def collect_campaign_data(access_token: str, days: int = 14) -> dict:
                 for m in CAMPAIGN_METRICS:
                     val = day.get(m, 0) or 0
                     daily_data[m].append(val)
-                    if m in ["IMPRESSION", "CLICKTHROUGH"]:
+                    if m in ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH"]:
                         totals[m] += val
                     elif m == "SPEND_IN_DOLLAR":
                         totals[m] += val
 
             # Calculate averages for rate metrics
-            if totals["IMPRESSION"] > 0:
-                totals["CTR"] = (totals["CLICKTHROUGH"] / totals["IMPRESSION"]) * 100
-            if totals["CLICKTHROUGH"] > 0:
-                totals["ECPC_IN_DOLLAR"] = totals["SPEND_IN_DOLLAR"] / totals["CLICKTHROUGH"]
+            if totals["TOTAL_IMPRESSION"] > 0:
+                totals["CTR"] = (totals["TOTAL_CLICKTHROUGH"] / totals["TOTAL_IMPRESSION"]) * 100
+            if totals["TOTAL_CLICKTHROUGH"] > 0:
+                totals["ECPC_IN_DOLLAR"] = totals["SPEND_IN_DOLLAR"] / totals["TOTAL_CLICKTHROUGH"]
 
             all_campaign_data.append({
                 "campaign_id": campaign_id,
@@ -295,7 +299,7 @@ def aggregate_campaign_metrics(campaigns: list[dict]) -> dict:
         aggregated[m] = [0] * len(dates)
 
     for c in campaigns:
-        for m in ["IMPRESSION", "CLICKTHROUGH", "SPEND_IN_DOLLAR"]:
+        for m in ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH", "SPEND_IN_DOLLAR"]:
             daily = c.get("daily", {}).get(m, [])
             for i, val in enumerate(daily):
                 if i < len(aggregated[m]):
@@ -303,10 +307,10 @@ def aggregate_campaign_metrics(campaigns: list[dict]) -> dict:
 
     # Calculate daily CTR and CPC
     for i in range(len(dates)):
-        if aggregated["IMPRESSION"][i] > 0:
-            aggregated["CTR"][i] = (aggregated["CLICKTHROUGH"][i] / aggregated["IMPRESSION"][i]) * 100
-        if aggregated["CLICKTHROUGH"][i] > 0:
-            aggregated["ECPC_IN_DOLLAR"][i] = aggregated["SPEND_IN_DOLLAR"][i] / aggregated["CLICKTHROUGH"][i]
+        if aggregated["TOTAL_IMPRESSION"][i] > 0:
+            aggregated["CTR"][i] = (aggregated["TOTAL_CLICKTHROUGH"][i] / aggregated["TOTAL_IMPRESSION"][i]) * 100
+        if aggregated["TOTAL_CLICKTHROUGH"][i] > 0:
+            aggregated["ECPC_IN_DOLLAR"][i] = aggregated["SPEND_IN_DOLLAR"][i] / aggregated["TOTAL_CLICKTHROUGH"][i]
 
     return aggregated
 
@@ -476,16 +480,16 @@ def generate_html_report(
     campaigns = campaign_data.get("campaigns", [])
     campaign_aggregated = campaign_data.get("aggregated", {})
     campaign_totals = {
-        "IMPRESSION": sum(c["totals"].get("IMPRESSION", 0) for c in campaigns),
-        "CLICKTHROUGH": sum(c["totals"].get("CLICKTHROUGH", 0) for c in campaigns),
+        "TOTAL_IMPRESSION": sum(c["totals"].get("TOTAL_IMPRESSION", 0) for c in campaigns),
+        "TOTAL_CLICKTHROUGH": sum(c["totals"].get("TOTAL_CLICKTHROUGH", 0) for c in campaigns),
         "SPEND_IN_DOLLAR": sum(c["totals"].get("SPEND_IN_DOLLAR", 0) for c in campaigns),
     }
-    if campaign_totals["IMPRESSION"] > 0:
-        campaign_totals["CTR"] = (campaign_totals["CLICKTHROUGH"] / campaign_totals["IMPRESSION"]) * 100
+    if campaign_totals["TOTAL_IMPRESSION"] > 0:
+        campaign_totals["CTR"] = (campaign_totals["TOTAL_CLICKTHROUGH"] / campaign_totals["TOTAL_IMPRESSION"]) * 100
     else:
         campaign_totals["CTR"] = 0
-    if campaign_totals["CLICKTHROUGH"] > 0:
-        campaign_totals["ECPC_IN_DOLLAR"] = campaign_totals["SPEND_IN_DOLLAR"] / campaign_totals["CLICKTHROUGH"]
+    if campaign_totals["TOTAL_CLICKTHROUGH"] > 0:
+        campaign_totals["ECPC_IN_DOLLAR"] = campaign_totals["SPEND_IN_DOLLAR"] / campaign_totals["TOTAL_CLICKTHROUGH"]
     else:
         campaign_totals["ECPC_IN_DOLLAR"] = 0
 
@@ -511,10 +515,10 @@ def generate_html_report(
     if campaign_aggregated:
         campaign_trend_chart = create_aggregate_chart(
             campaign_aggregated,
-            ["IMPRESSION", "CLICKTHROUGH", "SPEND_IN_DOLLAR"],
+            ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH", "SPEND_IN_DOLLAR"],
             "Campaign Performance - Last 14 Days"
         )
-        for m in ["IMPRESSION", "CLICKTHROUGH", "SPEND_IN_DOLLAR", "CTR"]:
+        for m in ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH", "SPEND_IN_DOLLAR", "CTR"]:
             campaign_metric_charts += f'<div class="metric-chart">{create_metric_chart(campaign_aggregated, m)}</div>'
 
     # Campaign table
@@ -689,11 +693,11 @@ def generate_html_report(
     <div id="campaigns" class="tab-content">
         <div class="summary">
             <div class="stat">
-                <div class="stat-value" style="color: {COLORS['IMPRESSION']}">{campaign_totals['IMPRESSION']:,.0f}</div>
+                <div class="stat-value" style="color: {COLORS['TOTAL_IMPRESSION']}">{campaign_totals['TOTAL_IMPRESSION']:,.0f}</div>
                 <div class="stat-label">Total Impressions</div>
             </div>
             <div class="stat">
-                <div class="stat-value" style="color: {COLORS['CLICKTHROUGH']}">{campaign_totals['CLICKTHROUGH']:,.0f}</div>
+                <div class="stat-value" style="color: {COLORS['TOTAL_CLICKTHROUGH']}">{campaign_totals['TOTAL_CLICKTHROUGH']:,.0f}</div>
                 <div class="stat-label">Total Clicks</div>
             </div>
             <div class="stat">
