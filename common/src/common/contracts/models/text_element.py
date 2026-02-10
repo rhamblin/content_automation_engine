@@ -23,6 +23,8 @@ class TextElement:
     banner_color: str | None = None
     banner_padding: int = 12
     banner_full_width: bool = False  # True = banner spans entire image width
+    banner_border_color: str | None = None  # Thin line on top/bottom edges
+    banner_border_width: int = 2
     max_width_pct: float = 0.85
 
     def _get_font(self) -> ImageFont.FreeTypeFont:
@@ -88,7 +90,14 @@ class TextElement:
                 overlay = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 0))
                 overlay_draw = ImageDraw.Draw(overlay)
                 if self.banner_full_width:
-                    overlay_draw.rectangle([0, y - p, img_width, y + text_h + p], fill=self.banner_color)
+                    top_y = y - p
+                    bot_y = y + text_h + p
+                    overlay_draw.rectangle([0, top_y, img_width, bot_y], fill=self.banner_color)
+                    # Border lines on edges
+                    if self.banner_border_color:
+                        bw = self.banner_border_width
+                        overlay_draw.rectangle([0, top_y, img_width, top_y + bw], fill=self.banner_border_color)
+                        overlay_draw.rectangle([0, bot_y - bw, img_width, bot_y], fill=self.banner_border_color)
                 else:
                     overlay_draw.rectangle([x - p, y - p, x + text_w + p, y + text_h + p], fill=self.banner_color)
                 base_img = Image.alpha_composite(base_img, overlay)
