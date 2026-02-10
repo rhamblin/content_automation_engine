@@ -1,11 +1,11 @@
-"""TextElement - Self-rendering text block for pin overlays."""
+"""TextElement - Self-rendering text block for visual content overlays."""
 
 from dataclasses import dataclass
 from pathlib import Path
 
 from PIL import ImageDraw, ImageFont
 
-FONTS_DIR = Path(__file__).parent / "fonts"
+FONTS_DIR = Path(__file__).parent.parent.parent / "resources" / "fonts"
 
 
 @dataclass

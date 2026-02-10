@@ -119,7 +119,7 @@ Return ONLY valid JSON.
         Args:
             source: Source PIL Image
             text_data: Text data (title, tagline, style, etc.)
-            style: PinStyle object with text elements and overlay
+            style: VisualStyle object with text elements and overlay
             brand_text: Brand watermark text
             width: Output width (default 1000)
             height: Output height (default 1500)

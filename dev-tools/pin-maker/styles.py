@@ -1,8 +1,10 @@
 """Style registry - Predefined pin styles and helpers."""
 
-from image_overlay import ImageOverlay
-from pin_style import PinStyle
-from text_element import TextElement
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from common.contracts.models import ImageOverlay, TextElement, VisualStyle
 
 BRAND_TEXT = "chefexotic.com"
 
@@ -10,8 +12,8 @@ BRAND_TEXT = "chefexotic.com"
 # Predefined Styles
 # =============================================================================
 
-STYLES: dict[str, PinStyle] = {
-    "bold_rustic": PinStyle(
+STYLES: dict[str, VisualStyle] = {
+    "bold_rustic": VisualStyle(
         name="bold_rustic",
         description="Bold slab serif with gold accents. Great for comfort food and hearty dishes.",
         mood=["comfort", "hearty", "homestyle", "rustic"],
@@ -45,7 +47,7 @@ STYLES: dict[str, PinStyle] = {
         ),
         overlay=ImageOverlay(position="top", opacity=0.25, height_pct=0.35),
     ),
-    "script_elegant": PinStyle(
+    "script_elegant": VisualStyle(
         name="script_elegant",
         description="Elegant script accents with clean title. Best for gourmet and date night dishes.",
         mood=["elegant", "gourmet", "romantic", "upscale"],
@@ -79,7 +81,7 @@ STYLES: dict[str, PinStyle] = {
         ),
         overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
     ),
-    "quick_easy": PinStyle(
+    "quick_easy": VisualStyle(
         name="quick_easy",
         description="Script prefix with bold title. Perfect for quick weeknight meals.",
         mood=["quick", "easy", "weeknight", "simple"],
@@ -115,7 +117,7 @@ STYLES: dict[str, PinStyle] = {
         ),
         overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.4),
     ),
-    "bottom_stack": PinStyle(
+    "bottom_stack": VisualStyle(
         name="bottom_stack",
         description="Text stacked at bottom. Good for beautiful plated dishes where food is the star.",
         mood=["beautiful", "plated", "restaurant", "showcase"],
@@ -149,7 +151,7 @@ STYLES: dict[str, PinStyle] = {
         ),
         overlay=ImageOverlay(position="bottom", opacity=0.45, height_pct=0.5),
     ),
-    "clean_minimal": PinStyle(
+    "clean_minimal": VisualStyle(
         name="clean_minimal",
         description="Clean, minimal look. Ideal for healthy, fresh, light recipes.",
         mood=["healthy", "fresh", "light", "clean", "minimal"],
@@ -179,7 +181,7 @@ STYLES: dict[str, PinStyle] = {
 }
 
 
-def get_style(name: str) -> PinStyle:
+def get_style(name: str) -> VisualStyle:
     """Get a style by name."""
     if name not in STYLES:
         raise KeyError(f"Style '{name}' not found. Available: {list(STYLES.keys())}")

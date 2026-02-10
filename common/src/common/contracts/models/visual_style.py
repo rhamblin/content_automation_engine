@@ -1,14 +1,14 @@
-"""PinStyle - Complete pin style definition combining text elements and overlay."""
+"""VisualStyle - Complete visual style definition for image-based content."""
 
 from dataclasses import dataclass
 
-from image_overlay import ImageOverlay
-from text_element import TextElement
+from .image_overlay import ImageOverlay
+from .text_element import TextElement
 
 
 @dataclass
-class PinStyle:
-    """Complete pin style definition."""
+class VisualStyle:
+    """Complete visual style definition for image-based content (pins, posts, thumbnails)."""
 
     name: str
     description: str
