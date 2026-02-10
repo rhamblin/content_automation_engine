@@ -1,111 +1,50 @@
-"""Pinterest Pin Maker - Generate Pinterest-worthy pins from images.
+"""Pinterest Pin Maker - Generate pins with LLM text and style selection."""
 
-Takes a folder of JPG images, extracts keywords from filenames,
-generates catchy text via Azure Foundry, and creates pin images
-with text overlays using PIL.
-"""
-
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
 
 from openai import AzureOpenAI
-from PIL import Image, ImageDraw, ImageFont
-
-from common.contracts.interfaces import IDistributionChannel
-from common.providers.text.azure_foundry import AzureFoundryTextProvider
+from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
+from styles import BRAND_TEXT, STYLES, get_style_brief
 
-# Pinterest optimal dimensions (2:3 ratio)
+# Pinterest dimensions (2:3)
 PIN_WIDTH = 1000
 PIN_HEIGHT = 1500
 
-# =============================================================================
-# FONT CONFIGURATION - Easy to swap fonts here
-# =============================================================================
-FONTS_DIR = Path(__file__).parent / "fonts"
-
-# Font files - just change the filename to use a different font
-TITLE_FONT_FILE = "nexa-rust.slab-black-shadow-01.otf"
-TAGLINE_FONT_FILE = "Fredoka-VariableFont.ttf"
-TIME_FONT_FILE = "Allura-Regular.ttf"
-
-# Font sizes
-TITLE_FONT_SIZE = 110
-TAGLINE_FONT_SIZE = 62
-TIME_FONT_SIZE = 72
-
-# Outline widths
-TITLE_OUTLINE_WIDTH = 6
-TAGLINE_OUTLINE_WIDTH = 7
-TIME_OUTLINE_WIDTH = 7
-
-# Colors
-TITLE_COLOR = "white"
-TAGLINE_COLOR = "#FFD700"  # Gold
-TIME_COLOR = "#FFD700"  # Gold
-OUTLINE_COLOR = "black"
-# =============================================================================
-
-PROMPT = """
+PROMPT = f"""
 You are a Pinterest marketing expert creating eye-catching pin text for food/recipe images.
 
-Given a keyword, generate compelling pin text that will drive clicks and saves.
+Given a keyword, generate compelling pin text AND select the best visual style.
 
-Output Schema (must always use this format):
-{
-  "title": "Catchy, bold title (2-4 words max, ALL CAPS, include an adjective)",
-  "tagline": "Short benefit tagline (2-4 words, ALL CAPS, use periods between words like EASY. WEEKNIGHT. DINNER.)",
-  "time_text": "Time indicator (e.g., 'In 30 MINUTES', 'Ready in 15 MIN', 'Under 1 HOUR')"
-}
+{get_style_brief()}
+
+Output Schema:
+{{
+  "style": "style_name from list above",
+  "title": "Catchy title (2-4 words, ALL CAPS)",
+  "tagline": "Benefit tagline (2-4 words, ALL CAPS, periods between words)",
+  "time_text": "Time indicator (e.g., 'In 30 MINUTES')",
+  "prefix": "Optional prefix like '30-Minute' or null",
+  "accent": "Optional elegant phrase like 'with Parmesan' or null"
+}}
 
 Guidelines:
-- Title should be punchy and appetizing (e.g., "JUICY BAKED PORK", "CRISPY FRIED CHICKEN")
+- Match style to the dish mood
+- Title should be punchy and appetizing
 - Include the main keyword naturally in the title
 - Tagline should highlight ease, occasion, or benefit
 - Time should be realistic for the dish type
-- Make it scroll-stopping and clickable
+- Use prefix for time-based or descriptor prefixes (e.g., "Quick & Easy", "30-Minute")
+- Use accent for elegant sub-phrases (e.g., "with Parmesan", "with Ricotta Cheese")
 
 Return ONLY valid JSON.
 """
-
-
-class PinterestChannel(IDistributionChannel):
-    """Minimal channel implementation for Pinterest pin text generation."""
-
-    PROVIDER_NAME = "pinterest"
-
-    def __init__(self, prompt: str):
-        self._prompt = prompt
-
-    @property
-    def system_prompt(self) -> str:
-        return self._prompt
-
-    def publish(self, title: str, content: str, image_url: str, **kwargs) -> dict:
-        raise NotImplementedError("Pinterest pins are saved locally, not published")
-
-
-def extract_keyword(filename: str) -> str:
-    """Extract keyword from filename like 'lava_cake1.jpg' -> 'lava cake'."""
-    stem = Path(filename).stem
-    # Remove trailing numbers
-    stem = re.sub(r"\d+$", "", stem)
-    # Replace underscores/hyphens with spaces
-    keyword = re.sub(r"[_-]", " ", stem)
-    return keyword.strip().lower()
-
-
-def generate_pin_text(text_provider: AzureFoundryTextProvider, channel: PinterestChannel, keyword: str) -> dict:
-    """Generate title, tagline, and time text for a pin."""
-    return text_provider.generate_text(
-        niche="food",
-        keyword=keyword,
-        channel=channel,
-        image_url="",
-    )
 
 
 def smart_crop_resize(img: Image.Image, target_w: int, target_h: int) -> Image.Image:
@@ -115,177 +54,119 @@ def smart_crop_resize(img: Image.Image, target_w: int, target_h: int) -> Image.I
     orig_ratio = orig_w / orig_h
 
     if orig_ratio > target_ratio:
-        # Image is wider - crop sides
         new_w = int(orig_h * target_ratio)
         left = (orig_w - new_w) // 2
         img = img.crop((left, 0, left + new_w, orig_h))
     else:
-        # Image is taller - crop top/bottom (favor keeping more top for food)
         new_h = int(orig_w / target_ratio)
-        top = (orig_h - new_h) // 3  # Bias towards top
+        top = (orig_h - new_h) // 3
         img = img.crop((0, top, orig_w, top + new_h))
 
     return img.resize((target_w, target_h), Image.Resampling.LANCZOS)
 
 
-def get_font(font_file: str, size: int) -> ImageFont.FreeTypeFont:
-    """Load a font from the fonts directory."""
-    font_path = FONTS_DIR / font_file
-    return ImageFont.truetype(str(font_path), size)
+def extract_keyword(filename: str) -> str:
+    """Extract keyword from filename like 'lava_cake1.jpg' -> 'lava cake'."""
+    stem = Path(filename).stem
+    stem = re.sub(r"\d+$", "", stem)
+    return re.sub(r"[_-]", " ", stem).strip().lower()
 
 
-def draw_text_with_outline(
-    draw: ImageDraw.ImageDraw,
-    position: tuple,
-    text: str,
-    font: ImageFont.FreeTypeFont,
-    fill: str = "white",
-    outline: str = "black",
-    outline_width: int = 3,
-) -> None:
-    """Draw text with an outline/stroke effect."""
-    x, y = position
-
-    # Draw outline by drawing text multiple times offset
-    for dx in range(-outline_width, outline_width + 1):
-        for dy in range(-outline_width, outline_width + 1):
-            if dx != 0 or dy != 0:
-                draw.text((x + dx, y + dy), text, font=font, fill=outline)
-
-    # Draw main text
-    draw.text(position, text, font=font, fill=fill)
+def generate_pin_data(client: AzureOpenAI, keyword: str, model: str) -> dict:
+    """Generate pin text and style selection via LLM."""
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": PROMPT},
+            {"role": "user", "content": f"Keyword: {keyword}"},
+        ],
+        response_format={"type": "json_object"},
+    )
+    content = response.choices[0].message.content or "{}"
+    return json.loads(content)
 
 
-def wrap_text(text: str, font: ImageFont.FreeTypeFont, max_width: int) -> list[str]:
-    """Wrap text to fit within max_width."""
-    words = text.split()
-    lines = []
-    current_line = []
+def create_pin(img_path: Path, pin_data: dict, style_name: str, output_path: Path) -> None:
+    """Create a Pinterest pin with text overlay using specified style."""
+    style = STYLES.get(style_name)
+    if not style:
+        print(f"  Warning: Style '{style_name}' not found, using 'bold_rustic'")
+        style = STYLES["bold_rustic"]
 
-    for word in words:
-        test_line = " ".join(current_line + [word])
-        bbox = font.getbbox(test_line)
-        if bbox[2] <= max_width:
-            current_line.append(word)
-        else:
-            if current_line:
-                lines.append(" ".join(current_line))
-            current_line = [word]
-
-    if current_line:
-        lines.append(" ".join(current_line))
-
-    return lines
-
-
-def create_pin(
-    img_path: Path,
-    title: str,
-    tagline: str,
-    time_text: str,
-    output_path: Path,
-) -> None:
-    """Create a Pinterest pin with text overlay."""
-    # Load and resize image
     img = Image.open(img_path).convert("RGB")
     img = smart_crop_resize(img, PIN_WIDTH, PIN_HEIGHT)
 
+    if style.overlay:
+        img = style.overlay.apply(img)
+
     draw = ImageDraw.Draw(img)
 
-    # Load fonts from config
-    title_font = get_font(TITLE_FONT_FILE, TITLE_FONT_SIZE)
-    tagline_font = get_font(TAGLINE_FONT_FILE, TAGLINE_FONT_SIZE)
-    time_font = get_font(TIME_FONT_FILE, TIME_FONT_SIZE)
+    for key, element in style.elements():
+        text = BRAND_TEXT if key == "watermark" else pin_data.get(key)
+        if text:
+            element.draw(draw, text, img.width, img.height)
 
-    padding = 40
-    max_text_width = PIN_WIDTH - (padding * 2)
-
-    # Draw title at top (wrapped if needed)
-    title_lines = wrap_text(title, title_font, max_text_width)
-    y_offset = 60
-
-    for line in title_lines:
-        bbox = title_font.getbbox(line)
-        text_width = bbox[2] - bbox[0]
-        x = (PIN_WIDTH - text_width) // 2
-        draw_text_with_outline(draw, (x, y_offset), line, title_font,
-                               fill=TITLE_COLOR, outline=OUTLINE_COLOR, outline_width=TITLE_OUTLINE_WIDTH)
-        y_offset += bbox[3] - bbox[1] + 10
-
-    # Draw tagline near bottom
-    tagline_y = PIN_HEIGHT - 200
-    bbox = tagline_font.getbbox(tagline)
-    text_width = bbox[2] - bbox[0]
-    x = (PIN_WIDTH - text_width) // 2
-    draw_text_with_outline(draw, (x, tagline_y), tagline, tagline_font,
-                           fill=TAGLINE_COLOR, outline=OUTLINE_COLOR, outline_width=TAGLINE_OUTLINE_WIDTH)
-
-    # Draw time text at bottom
-    time_y = PIN_HEIGHT - 120
-    bbox = time_font.getbbox(time_text)
-    text_width = bbox[2] - bbox[0]
-    x = (PIN_WIDTH - text_width) // 2
-    draw_text_with_outline(draw, (x, time_y), time_text, time_font,
-                           fill=TIME_COLOR, outline=OUTLINE_COLOR, outline_width=TIME_OUTLINE_WIDTH)
-
-    # Save with high quality
     img.save(output_path, "JPEG", quality=95)
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python pin_maker.py <folder_path>")
+    parser = argparse.ArgumentParser(description="Generate Pinterest pins")
+    parser.add_argument("folder", type=Path, help="Folder containing images")
+    parser.add_argument("--style", type=str, help="Force a specific style (skip LLM selection)")
+    parser.add_argument("--list-styles", action="store_true", help="List available styles")
+    args = parser.parse_args()
+
+    if args.list_styles:
+        print("Available styles:")
+        for name, style in STYLES.items():
+            print(f"  {name}: {style.description}")
+        sys.exit(0)
+
+    if not args.folder.is_dir():
+        print(f"Error: {args.folder} is not a directory")
         sys.exit(1)
 
-    input_folder = Path(sys.argv[1])
-    if not input_folder.is_dir():
-        print(f"Error: {input_folder} is not a directory")
-        sys.exit(1)
-
-    # Setup output folder
-    output_folder = input_folder / "output"
+    output_folder = args.folder / "output"
     output_folder.mkdir(exist_ok=True)
 
-    # Load settings and create providers
     settings = load_dev_settings()
-    azure_client = AzureOpenAI(
+    client = AzureOpenAI(
         azure_endpoint=settings.azure_foundry_endpoint,
         api_key=settings.azure_foundry_api_key,
         api_version=settings.azure_foundry_api_version,
     )
-    text_provider = AzureFoundryTextProvider(azure_client)
-    channel = PinterestChannel(PROMPT)
 
-    # Find all JPGs
-    jpg_files = list(input_folder.glob("*.jpg")) + list(input_folder.glob("*.JPG"))
-    jpg_files += list(input_folder.glob("*.jpeg")) + list(input_folder.glob("*.JPEG"))
+    jpg_files = list(args.folder.glob("*.jpg")) + list(args.folder.glob("*.JPG"))
+    jpg_files += list(args.folder.glob("*.jpeg")) + list(args.folder.glob("*.JPEG"))
 
     if not jpg_files:
-        print(f"No JPG files found in {input_folder}")
+        print(f"No JPG files found in {args.folder}")
         sys.exit(1)
 
     print(f"Found {len(jpg_files)} images to process")
 
     for img_path in jpg_files:
         keyword = extract_keyword(img_path.name)
-        print(f"Processing: {img_path.name} -> keyword: '{keyword}'")
+        print(f"\nProcessing: {img_path.name} -> '{keyword}'")
 
         try:
-            # Generate text
-            pin_text = generate_pin_text(text_provider, channel, keyword)
-            print(f"  Title: {pin_text['title']}")
-            print(f"  Tagline: {pin_text['tagline']}")
-            print(f"  Time: {pin_text['time_text']}")
+            pin_data = generate_pin_data(client, keyword, settings.azure_foundry_model)
 
-            # Create pin
+            style_name = args.style or pin_data.get("style", "bold_rustic")
+
+            print(f"  Style: {style_name}")
+            print(f"  Title: {pin_data.get('title', 'N/A')}")
+            if pin_data.get("prefix"):
+                print(f"  Prefix: {pin_data['prefix']}")
+            if pin_data.get("accent"):
+                print(f"  Accent: {pin_data['accent']}")
+            if pin_data.get("tagline"):
+                print(f"  Tagline: {pin_data['tagline']}")
+            if pin_data.get("time_text"):
+                print(f"  Time: {pin_data['time_text']}")
+
             output_path = output_folder / f"pin_{img_path.stem}.jpg"
-            create_pin(
-                img_path,
-                pin_text["title"],
-                pin_text["tagline"],
-                pin_text["time_text"],
-                output_path,
-            )
+            create_pin(img_path, pin_data, style_name, output_path)
             print(f"  Saved: {output_path}")
 
         except Exception as e:
