@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager unified-dashboard title-generator amazon-affiliate logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -100,6 +100,15 @@ account-analytics:
 campaign-manager:
 	. dev-tools/dev-shell.sh && cd dev-tools && python campaign-manager/campaign_manager.py $(CMD)
 
+unified-dashboard:
+	. dev-tools/dev-shell.sh && cd dev-tools && python unified-dashboard/dashboard.py --open
+
+title-generator:
+	. dev-tools/dev-shell.sh && cd dev-tools && python title-generator/title_generator.py -c $(CHANNEL) -n $(NICHE) -k $(KEYWORD)
+
+amazon-affiliate:
+	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py $(CMD)
+
 logs:
 	docker compose logs -f
 
@@ -159,6 +168,9 @@ help:  ## Show this help message
 	@echo "  make plot-pin-analytics PIN_ID=123 - Generate 14-day analytics HTML report"
 	@echo "  make account-analytics - Generate account-wide analytics report"
 	@echo "  make campaign-manager CMD='list' - Manage Pinterest campaigns"
+	@echo "  make unified-dashboard - Multi-platform analytics dashboard"
+	@echo "  make title-generator CHANNEL=pinterest NICHE=food KEYWORD='air fryer' - Generate titles"
+	@echo "  make amazon-affiliate CMD='get B0BSHF7WHW' - Amazon affiliate links"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"

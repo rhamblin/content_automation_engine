@@ -1,0 +1,58 @@
+{
+  "platforms": {
+    "pinterest": {
+      "enabled": true,
+      "accounts": {
+        "food": {
+          "name": "Chef Exotic",
+          "credentials_path": "../get-pin-ids/pinterest-credentials.json",
+          "color": "#E60023"
+        }
+      }
+    },
+    "instagram": {
+      "enabled": false,
+      "accounts": {
+        "food": {
+          "name": "Chef Exotic IG",
+          "credentials_path": "credentials/instagram-food.json",
+          "color": "#E1306C"
+        }
+      }
+    },
+    "tiktok": {
+      "enabled": false,
+      "accounts": {
+        "food": {
+          "name": "Chef Exotic TikTok",
+          "credentials_path": "credentials/tiktok-food.json",
+          "color": "#000000"
+        }
+      }
+    },
+    "reddit": {
+      "enabled": false,
+      "accounts": {
+        "food": {
+          "name": "r/cooking",
+          "credentials_path": "credentials/reddit-food.json",
+          "color": "#FF4500"
+        }
+      }
+    }
+  },
+  "niches": {
+    "food": {
+      "display_name": "Food & Cooking",
+      "color": "#FF6B35"
+    },
+    "travel": {
+      "display_name": "Travel",
+      "color": "#4ECDC4"
+    },
+    "fitness": {
+      "display_name": "Health & Fitness",
+      "color": "#45B7D1"
+    }
+  }
+}
