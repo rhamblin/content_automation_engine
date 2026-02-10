@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker get-pin-ids logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker get-pin-ids get-pin-stats logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -88,6 +88,9 @@ pin-maker:
 get-pin-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/get_pin_ids.py
 
+get-pin-stats:
+	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/get_pin_stats.py $(PIN_ID)
+
 logs:
 	docker compose logs -f
 
@@ -143,6 +146,7 @@ help:  ## Show this help message
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
 	@echo "  make pin-maker FOLDER=/path/to/images - Create Pinterest pins from images"
 	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
+	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"
