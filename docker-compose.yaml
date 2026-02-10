@@ -80,12 +80,12 @@ services:
       - db
     networks: [backend, database]
 
-  content-producer:
+  channel-worker:
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
       args:
-        SERVICE_NAME: content-producer
+        SERVICE_NAME: channel-worker
     restart: unless-stopped
     env_file:
       - config/local/variables.env
@@ -143,46 +143,12 @@ services:
       - db
     networks: [backend, database]
 
-  publication-worker:
-    build:
-      context: .
-      dockerfile: infra/docker/Dockerfile
-      args:
-        SERVICE_NAME: publication-worker
-    restart: unless-stopped
-    env_file:
-      - config/local/variables.env
-    secrets:
-      - openai-api-key
-      - azure-foundry-proj-default-api-key
-    depends_on:
-      - redis
-      - db
-    networks: [backend, database]
-
   scheduler:
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
       args:
         SERVICE_NAME: scheduler
-    restart: unless-stopped
-    env_file:
-      - config/local/variables.env
-    secrets:
-      - openai-api-key
-      - azure-foundry-proj-default-api-key
-    depends_on:
-      - redis
-      - db
-    networks: [backend, database]
-
-  visual-composer:
-    build:
-      context: .
-      dockerfile: infra/docker/Dockerfile
-      args:
-        SERVICE_NAME: visual-composer
     restart: unless-stopped
     env_file:
       - config/local/variables.env

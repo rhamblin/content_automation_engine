@@ -58,8 +58,8 @@ services:
 	  -f docker-compose.yaml \
 	  -f config/local/docker-compose.override.yaml \
 	  up --build -d --no-deps \
-	  management-api scheduler content-producer visual-composer \
-	  publication-worker analytics-collector activity-reporter promotion-orchestrator
+	  management-api scheduler channel-worker \
+	  analytics-collector activity-reporter promotion-orchestrator
 
 local: infra seed-images services frontendw
 
