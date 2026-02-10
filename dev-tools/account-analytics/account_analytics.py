@@ -239,22 +239,31 @@ def collect_campaign_data(access_token: str, days: int = 14) -> dict:
 
         analytics = fetch_campaign_analytics(access_token, ad_account_id, campaign_ids, days)
 
-        for item in analytics:
-            campaign_id = item.get("CAMPAIGN_ID")
+        # Group daily rows by campaign_id
+        campaign_daily = {}
+        for row in analytics:
+            cid = row.get("CAMPAIGN_ID")
+            if cid not in campaign_daily:
+                campaign_daily[cid] = []
+            campaign_daily[cid].append(row)
+
+        # Process each campaign
+        for campaign_id, daily_rows in campaign_daily.items():
             campaign_info = campaign_map.get(campaign_id, {})
 
             daily_data = {m: [] for m in CAMPAIGN_METRICS}
             dates = []
             totals = {m: 0 for m in CAMPAIGN_METRICS}
 
-            for day in item.get("metrics", []):
-                dates.append(day.get("date", ""))
+            # Sort by date
+            daily_rows.sort(key=lambda x: x.get("DATE", ""))
+
+            for row in daily_rows:
+                dates.append(row.get("DATE", ""))
                 for m in CAMPAIGN_METRICS:
-                    val = day.get(m, 0) or 0
+                    val = row.get(m, 0) or 0
                     daily_data[m].append(val)
-                    if m in ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH"]:
-                        totals[m] += val
-                    elif m == "SPEND_IN_DOLLAR":
+                    if m in ["TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH", "SPEND_IN_DOLLAR"]:
                         totals[m] += val
 
             # Calculate averages for rate metrics
@@ -265,7 +274,7 @@ def collect_campaign_data(access_token: str, days: int = 14) -> dict:
 
             all_campaign_data.append({
                 "campaign_id": campaign_id,
-                "campaign_name": campaign_info.get("name", item.get("CAMPAIGN_NAME", "Unknown")),
+                "campaign_name": campaign_info.get("name", "Unknown"),
                 "status": campaign_info.get("status", "UNKNOWN"),
                 "totals": totals,
                 "daily": daily_data,
