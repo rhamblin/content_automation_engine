@@ -12,7 +12,6 @@ class VisualStyle:
 
     name: str
     description: str
-    mood: list[str]
     title: TextElement
     watermark: TextElement
     prefix: TextElement | None = None
