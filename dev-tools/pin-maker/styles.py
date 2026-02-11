@@ -354,40 +354,42 @@ STYLES: dict[str, VisualStyle] = {
         overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
     ),
 
-    # 12. CONDENSED MODERN - Oswald + Sacramento
+    # 12. CONDENSED MODERN - Oswald + Sacramento in bordered box
     "condensed_modern": VisualStyle(
         name="condensed_modern",
-        description="Condensed sans with script accent. Modern food blog aesthetic.",
+        description="Script + bold in bordered box. Modern food blog aesthetic.",
         prefix=TextElement(
             font_file="Sacramento.ttf",
-            font_size=52,
-            color="#FF9F43",
-            y_position=45,
-            outline_width=3,
+            font_size=58,
+            color="#E91E8C",
+            y_position=620,
+            outline_width=0,
         ),
         title=TextElement(
             font_file="Oswald.ttf",
-            font_size=95,
-            color="white",
-            y_position=110,
-            outline_width=5,
-        ),
-        tagline=TextElement(
-            font_file="Oswald.ttf",
-            font_size=36,
-            color="white",
-            y_position=-140,
-            outline_width=3,
+            font_size=85,
+            color="#2D2D2D",
+            y_position=700,
+            outline_width=0,
         ),
         watermark=TextElement(
             font_file="Montserrat.ttf",
             font_size=22,
-            color="white",
+            color="#666666",
             y_position=-50,
-            alignment="left",
-            outline_width=2,
+            alignment="right",
+            outline_width=0,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.4),
+        overlay=ImageOverlay(
+            position="box",
+            color="#FFF8E7",
+            opacity=0.92,
+            width_pct=0.75,
+            height_pct=0.18,
+            center_y_pct=0.48,
+            border_color="#3D3D3D",
+            border_width=4,
+        ),
     ),
 
     # 13. ROMANTIC FLOWING - GreatVibes + Lora
