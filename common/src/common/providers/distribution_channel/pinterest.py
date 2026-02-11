@@ -139,7 +139,10 @@ Return ONLY valid JSON.
             for key, element in style.elements():
                 text = brand_text if key == "watermark" else text_data.get(key)
                 if text:
-                    element.draw(draw, text, img.width, img.height)
+                    result = element.draw(draw, text, img.width, img.height, base_img=img)
+                    if result is not None:
+                        img = result
+                        draw = ImageDraw.Draw(img)
 
         return img.convert("RGB")
 
