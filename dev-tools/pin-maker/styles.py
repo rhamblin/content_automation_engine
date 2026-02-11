@@ -100,8 +100,6 @@ STYLES: dict[str, VisualStyle] = {
             color="white",
             y_position=-140,
             outline_width=4,
-            banner_color=(0, 0, 0, 128),
-            banner_padding=12,
         ),
         watermark=TextElement(
             font_file="Montserrat.ttf",
@@ -110,7 +108,7 @@ STYLES: dict[str, VisualStyle] = {
             corner="bottom_left",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.4),
+        overlay=ImageOverlay(position="bottom", opacity=0.5, height_pct=0.25),
     ),
 
     # 4. MODERN CLEAN - Minimal sans-serif
@@ -432,8 +430,6 @@ STYLES: dict[str, VisualStyle] = {
             color="white",
             y_position=-140,
             outline_width=3,
-            banner_color=(0, 0, 0, 102),
-            banner_padding=10,
         ),
         watermark=TextElement(
             font_file="Montserrat.ttf",
@@ -442,36 +438,26 @@ STYLES: dict[str, VisualStyle] = {
             corner="bottom_right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
+        overlay=ImageOverlay(position="bottom", opacity=0.4, height_pct=0.25),
     ),
 
-    # 15. CENTER BANNER - Full-width bars behind text (like Classic & Savory example)
+    # 15. CENTER BANNER - Full-width band behind centered text (like Classic & Savory example)
     "center_banner": VisualStyle(
         name="center_banner",
-        description="Full-width banner bars behind centered text. Clean, professional look.",
+        description="Full-width banner band behind centered text. Clean, professional look.",
         prefix=TextElement(
             font_file="GreatVibes.ttf",
             font_size=72,
             color="#C71585",
-            y_position=670,
+            y_position=680,
             outline_width=0,
-            banner_color=(255, 255, 255, 210),
-            banner_padding=12,
-            banner_full_width=True,
-            banner_border_color=(180, 160, 140, 255),
-            banner_border_width=2,
         ),
         title=TextElement(
             font_file="BebasNeue.ttf",
             font_size=90,
             color="#5D3A3A",
-            y_position=755,
+            y_position=765,
             outline_width=0,
-            banner_color=(255, 255, 255, 210),
-            banner_padding=14,
-            banner_full_width=True,
-            banner_border_color=(180, 160, 140, 255),
-            banner_border_width=2,
         ),
         watermark=TextElement(
             font_file="Montserrat.ttf",
@@ -479,6 +465,13 @@ STYLES: dict[str, VisualStyle] = {
             color="#666666",
             corner="bottom_right",
             outline_width=0,
+        ),
+        overlay=ImageOverlay(
+            position="center",
+            color="#FFFFFF",
+            opacity=0.85,
+            height_pct=0.18,
+            center_y_pct=0.5,
         ),
     ),
 }

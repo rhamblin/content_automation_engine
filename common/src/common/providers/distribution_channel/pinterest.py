@@ -132,7 +132,6 @@ Return ONLY valid JSON.
         if style and style.overlay:
             img = style.overlay.apply(img)
 
-        # Convert to RGBA for alpha-blended banners
         img = img.convert("RGBA")
         draw = ImageDraw.Draw(img)
 
@@ -140,10 +139,7 @@ Return ONLY valid JSON.
             for key, element in style.elements():
                 text = brand_text if key == "watermark" else text_data.get(key)
                 if text:
-                    result = element.draw(draw, text, img.width, img.height, base_img=img)
-                    if result is not None:
-                        img = result
-                        draw = ImageDraw.Draw(img)
+                    element.draw(draw, text, img.width, img.height)
 
         return img.convert("RGB")
 
