@@ -15,15 +15,14 @@ class TextElement:
     font_file: str
     font_size: int
     color: str
-    y_position: int | None = None  # positive=from top, negative=from bottom
-    corner: str | None = None  # "bottom_right", "top_left", etc.
+    y_position: int  # positive=from top, negative=from bottom
     outline_width: int = 0
     outline_color: str = "black"
     alignment: str = "center"  # "center", "left", "right"
     max_width_pct: float = 0.85
 
-    def _get_font(self) -> ImageFont.FreeTypeFont:
-        return ImageFont.truetype(str(FONTS_DIR / self.font_file), self.font_size)
+    def _get_font(self, size: int | None = None) -> ImageFont.FreeTypeFont:
+        return ImageFont.truetype(str(FONTS_DIR / self.font_file), size or self.font_size)
 
     def _wrap_text(self, text: str, font: ImageFont.FreeTypeFont, max_width: int) -> list[str]:
         words = text.split()
@@ -48,33 +47,34 @@ class TextElement:
         img_height: int,
     ) -> None:
         """Draw text element on canvas."""
-        font = self._get_font()
+        max_width = int(img_width * self.max_width_pct)
         margin = int(img_width * (1 - self.max_width_pct) / 2)
 
-        # Calculate starting y
-        if self.corner:
-            bbox = font.getbbox(text)
-            text_h = bbox[3] - bbox[1]
-            y = margin if "top" in self.corner else img_height - text_h - margin
-        else:
-            y = self.y_position if self.y_position >= 0 else img_height + self.y_position
+        # Auto-shrink font to fit within 2 lines
+        font_size = self.font_size
+        font = self._get_font(font_size)
+        while font_size > 20:
+            lines = self._wrap_text(text, font, max_width)
+            if len(lines) <= 2:
+                break
+            font_size -= 4
+            font = self._get_font(font_size)
 
-        # Wrap text (skip for corner elements)
-        lines = [text] if self.corner else self._wrap_text(text, font, int(img_width * self.max_width_pct))
+        # Calculate y (positive=from top, negative=from bottom)
+        y = self.y_position if self.y_position >= 0 else img_height + self.y_position
+
+        lines = self._wrap_text(text, font, max_width)
 
         for line in lines:
             bbox = font.getbbox(line)
             text_w, text_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
 
-            # Calculate x
-            if self.corner:
-                x = margin if "left" in self.corner else img_width - text_w - margin
-            else:
-                x = {
-                    "center": (img_width - text_w) // 2,
-                    "left": margin,
-                    "right": img_width - text_w - margin,
-                }[self.alignment]
+            # Calculate x based on alignment
+            x = {
+                "center": (img_width - text_w) // 2,
+                "left": margin,
+                "right": img_width - text_w - margin,
+            }[self.alignment]
 
             # Outline
             if self.outline_width > 0:
