@@ -42,6 +42,18 @@ source_img = Image.open(uploaded).convert("RGB") if uploaded else Image.new("RGB
 
 st.sidebar.header("Style")
 style_name = st.sidebar.selectbox("Base style", list(STYLES.keys()))
+
+# Reset widget state when style changes
+if "current_style" not in st.session_state:
+    st.session_state.current_style = style_name
+elif st.session_state.current_style != style_name:
+    # Clear all widget keys to reset to new style defaults
+    keys_to_clear = [k for k in st.session_state.keys() if k.startswith(("ov_", "title_", "prefix_", "tagline_", "accent_", "watermark_", "num_overlay"))]
+    for k in keys_to_clear:
+        del st.session_state[k]
+    st.session_state.current_style = style_name
+    st.rerun()
+
 base_style = STYLES[style_name]
 
 st.sidebar.header("Text")
