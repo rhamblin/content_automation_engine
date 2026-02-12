@@ -23,11 +23,19 @@ def to_hex(color: str) -> str:
     return COLOR_MAP.get(color.lower(), color) if not color.startswith("#") else color
 
 st.set_page_config(page_title="Style Explorer", layout="wide")
+
+# Wider sidebar for larger preview
+st.markdown("""
+<style>
+[data-testid="stSidebar"] { min-width: 450px; max-width: 450px; }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("Style Explorer")
 
 channel = PinterestChannel()
 
-# Sidebar
+# Sidebar - Image upload and preview (sticky)
 st.sidebar.header("Image")
 uploaded = st.sidebar.file_uploader("Upload", type=["jpg", "jpeg", "png"])
 source_img = Image.open(uploaded).convert("RGB") if uploaded else Image.new("RGB", (1000, 1500), "#8B4513")
@@ -66,19 +74,20 @@ with col1:
             opacity = c2.slider("Opacity", 0.0, 1.0, defaults.opacity, key=f"ov_{idx}_op")
             c3, c4 = st.columns(2)
             height = c3.slider("Height %", 0.05, 0.5, defaults.height_pct, key=f"ov_{idx}_h")
-            center_y = c4.slider("Center Y %", 0.0, 1.0, defaults.center_y_pct, key=f"ov_{idx}_cy")
+            y_pos = c4.number_input("Y Position", -500, 1500, defaults.y_position, key=f"ov_{idx}_y")
 
-            width, border_color, border_width = defaults.width_pct, None, 0
-            if pos == "box":
+            width, border_color, border_width, angle = defaults.width_pct, "#000000", 0, 0
+            if pos in ["center", "box"]:
                 c5, c6, c7 = st.columns(3)
-                width = c5.slider("Width %", 0.3, 1.0, defaults.width_pct, key=f"ov_{idx}_w")
-                border_color = c6.color_picker("Border", defaults.border_color or "#333333", key=f"ov_{idx}_bc")
-                border_width = c7.slider("Border W", 0, 10, defaults.border_width, key=f"ov_{idx}_bw")
+                border_color = c5.color_picker("Border Color", defaults.border_color, key=f"ov_{idx}_bc")
+                border_width = c6.slider("Border W", 0, 10, defaults.border_width, key=f"ov_{idx}_bw")
+                angle = c7.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
+            if pos == "box":
+                width = st.slider("Width %", 0.3, 1.0, defaults.width_pct, key=f"ov_{idx}_w")
 
             return ImageOverlay(position=pos, color=color, opacity=opacity, height_pct=height,
-                                center_y_pct=center_y, width_pct=width,
-                                border_color=border_color if pos == "box" else None,
-                                border_width=border_width if pos == "box" else 0)
+                                y_position=y_pos, width_pct=width, border_color=border_color,
+                                border_width=border_width, angle=angle)
 
     # Dynamic overlay slots
     base_overlays = base_style.overlays if base_style.overlays else []
@@ -124,14 +133,18 @@ with col1:
             size = c2.number_input("Size", 10, 200, el.font_size if el else defaults[0], key=f"{name}_s")
             color = c3.color_picker("Color", to_hex(el.color) if el else "#FFFFFF", key=f"{name}_c")
 
-            c4, c5, c6 = st.columns(3)
-            outline = c4.number_input("Outline", 0, 10, el.outline_width if el else 3, key=f"{name}_o")
-            align = c5.selectbox("Align", ["center", "left", "right"],
+            c4, c5 = st.columns(2)
+            outline = c4.number_input("Outline W", 0, 10, el.outline_width if el else 3, key=f"{name}_o")
+            outline_color = c5.color_picker("Outline Color", to_hex(el.outline_color) if el else "#000000", key=f"{name}_oc")
+
+            c6, c7 = st.columns(2)
+            align = c6.selectbox("Align", ["center", "left", "right"],
                                  index=["center", "left", "right"].index(el.alignment) if el else 0, key=f"{name}_a")
-            angle = c6.number_input("Angle", -45, 45, el.angle if el else 0, key=f"{name}_ang")
+            angle = c7.number_input("Angle", -180, 180, el.angle if el else 0, key=f"{name}_ang")
 
         return TextElement(font_file=font_file, font_size=size, color=color,
-                           y_position=y, outline_width=outline, alignment=align, angle=angle)
+                           y_position=y, outline_width=outline, outline_color=outline_color,
+                           alignment=align, angle=angle)
 
     new_elements = {k: edit_element(k, getattr(base_style, k))
                     for k in ["title", "prefix", "tagline", "accent", "watermark"]}
@@ -143,32 +156,32 @@ modified_style = VisualStyle(
 )
 
 with col2:
-    st.subheader("Preview")
-    try:
-        preview = channel.render_content(source_img, text_data, modified_style, BRAND_TEXT)
-        st.image(preview, use_container_width=True)
-    except Exception as e:
-        st.error(f"Error: {e}")
-
-    # Config export - compact format
     st.subheader("Config")
 
     def fmt_el(name: str, el: TextElement) -> str:
         parts = [f'font_file="{el.font_file}"', f"font_size={el.font_size}",
                  f'color="{el.color}"', f"y_position={el.y_position}"]
-        if el.outline_width: parts.append(f"outline_width={el.outline_width}")
-        if el.alignment != "center": parts.append(f'alignment="{el.alignment}"')
-        if el.angle: parts.append(f"angle={el.angle}")
+        if el.outline_width:
+            parts.append(f"outline_width={el.outline_width}")
+        if el.outline_color != "#000000":
+            parts.append(f'outline_color="{el.outline_color}"')
+        if el.alignment != "center":
+            parts.append(f'alignment="{el.alignment}"')
+        if el.angle:
+            parts.append(f"angle={el.angle}")
         return f"        {name}=TextElement({', '.join(parts)}),"
 
     def fmt_ov(ov: ImageOverlay) -> str:
         parts = [f'position="{ov.position}"', f'color="{ov.color}"',
                  f"opacity={ov.opacity}", f"height_pct={ov.height_pct}"]
         if ov.position in ["center", "box"]:
-            parts.append(f"center_y_pct={ov.center_y_pct}")
+            parts.append(f"y_position={ov.y_position}")
+            if ov.border_width:
+                parts.extend([f'border_color="{ov.border_color}"', f"border_width={ov.border_width}"])
+            if ov.angle:
+                parts.append(f"angle={ov.angle}")
         if ov.position == "box":
-            parts.extend([f"width_pct={ov.width_pct}",
-                         f'border_color="{ov.border_color}"', f"border_width={ov.border_width}"])
+            parts.append(f"width_pct={ov.width_pct}")
         return f"ImageOverlay({', '.join(parts)})"
 
     lines = [f'    "{modified_style.name}": VisualStyle(name="{modified_style.name}", description="...",']
@@ -181,3 +194,11 @@ with col2:
     lines.append("    ),")
 
     st.code("\n".join(lines), language="python")
+
+# Preview in sidebar (naturally sticky)
+st.sidebar.header("Preview")
+try:
+    preview = channel.render_content(source_img, text_data, modified_style, BRAND_TEXT)
+    st.sidebar.image(preview, width=420)
+except Exception as e:
+    st.sidebar.error(f"Error: {e}")

@@ -17,7 +17,6 @@ class VisualStyle:
     prefix: TextElement | None = None
     accent: TextElement | None = None
     tagline: TextElement | None = None
-    time_text: TextElement | None = None
     overlays: list[ImageOverlay] = field(default_factory=list)
 
     def elements(self) -> list[tuple[str, TextElement]]:
@@ -29,7 +28,6 @@ class VisualStyle:
                 ("title", self.title),
                 ("accent", self.accent),
                 ("tagline", self.tagline),
-                ("time_text", self.time_text),
                 ("watermark", self.watermark),
             ]
             if el is not None
