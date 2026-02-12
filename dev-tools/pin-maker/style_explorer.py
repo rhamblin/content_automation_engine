@@ -48,34 +48,53 @@ text_data = {
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    # Overlay
-    st.subheader("Overlay")
-    ov = base_style.overlay
-    if ov:
-        ov_pos = st.selectbox("Position", ["top", "bottom", "center", "box", "full"],
-                              index=["top", "bottom", "center", "box", "full"].index(ov.position))
-        c1, c2 = st.columns(2)
-        ov_color = c1.color_picker("Color", to_hex(ov.color))
-        ov_opacity = c2.slider("Opacity", 0.0, 1.0, ov.opacity)
-        c3, c4 = st.columns(2)
-        ov_height = c3.slider("Height %", 0.05, 0.5, ov.height_pct)
-        ov_center_y = c4.slider("Center Y %", 0.0, 1.0, ov.center_y_pct)
+    # Overlays (multiple)
+    st.subheader("Overlays")
 
-        ov_width, ov_border_color, ov_border_width = ov.width_pct, None, 0
-        if ov_pos == "box":
-            c5, c6, c7 = st.columns(3)
-            ov_width = c5.slider("Width %", 0.3, 1.0, ov.width_pct)
-            ov_border_color = c6.color_picker("Border", ov.border_color or "#333333")
-            ov_border_width = c7.slider("Border W", 0, 10, ov.border_width)
+    def edit_overlay(idx: int, ov: ImageOverlay | None) -> ImageOverlay | None:
+        """Edit a single overlay, returns None if disabled."""
+        defaults = ov or ImageOverlay()
+        with st.expander(f"Overlay {idx + 1}" + (f" ({ov.position})" if ov else ""), expanded=ov is not None):
+            enabled = st.checkbox("Enable", value=ov is not None, key=f"ov_{idx}_en")
+            if not enabled:
+                return None
 
-        new_overlay = ImageOverlay(
-            position=ov_pos, color=ov_color, opacity=ov_opacity,
-            height_pct=ov_height, center_y_pct=ov_center_y, width_pct=ov_width,
-            border_color=ov_border_color if ov_pos == "box" else None,
-            border_width=ov_border_width if ov_pos == "box" else 0,
-        )
-    else:
-        new_overlay = None
+            pos = st.selectbox("Position", ["top", "bottom", "center", "box", "full"],
+                               index=["top", "bottom", "center", "box", "full"].index(defaults.position), key=f"ov_{idx}_pos")
+            c1, c2 = st.columns(2)
+            color = c1.color_picker("Color", to_hex(defaults.color), key=f"ov_{idx}_c")
+            opacity = c2.slider("Opacity", 0.0, 1.0, defaults.opacity, key=f"ov_{idx}_op")
+            c3, c4 = st.columns(2)
+            height = c3.slider("Height %", 0.05, 0.5, defaults.height_pct, key=f"ov_{idx}_h")
+            center_y = c4.slider("Center Y %", 0.0, 1.0, defaults.center_y_pct, key=f"ov_{idx}_cy")
+
+            width, border_color, border_width = defaults.width_pct, None, 0
+            if pos == "box":
+                c5, c6, c7 = st.columns(3)
+                width = c5.slider("Width %", 0.3, 1.0, defaults.width_pct, key=f"ov_{idx}_w")
+                border_color = c6.color_picker("Border", defaults.border_color or "#333333", key=f"ov_{idx}_bc")
+                border_width = c7.slider("Border W", 0, 10, defaults.border_width, key=f"ov_{idx}_bw")
+
+            return ImageOverlay(position=pos, color=color, opacity=opacity, height_pct=height,
+                                center_y_pct=center_y, width_pct=width,
+                                border_color=border_color if pos == "box" else None,
+                                border_width=border_width if pos == "box" else 0)
+
+    # Dynamic overlay slots
+    base_overlays = base_style.overlays if base_style.overlays else []
+    if "num_overlay_slots" not in st.session_state:
+        st.session_state.num_overlay_slots = max(1, len(base_overlays))
+
+    new_overlays = []
+    for i in range(st.session_state.num_overlay_slots):
+        ov = base_overlays[i] if i < len(base_overlays) else None
+        result = edit_overlay(i, ov)
+        if result:
+            new_overlays.append(result)
+
+    if st.button("+ Add Overlay"):
+        st.session_state.num_overlay_slots += 1
+        st.rerun()
 
     # Available fonts
     FONTS = ["Montserrat.ttf", "BebasNeue.ttf", "Oswald.ttf", "PlayfairDisplay.ttf",
@@ -120,7 +139,7 @@ with col1:
 # Build modified style
 modified_style = VisualStyle(
     name=base_style.name, description=base_style.description,
-    overlay=new_overlay, **new_elements
+    overlays=new_overlays, **new_elements
 )
 
 with col2:
@@ -145,16 +164,20 @@ with col2:
     def fmt_ov(ov: ImageOverlay) -> str:
         parts = [f'position="{ov.position}"', f'color="{ov.color}"',
                  f"opacity={ov.opacity}", f"height_pct={ov.height_pct}"]
-        if ov.position in ["center", "box"]: parts.append(f"center_y_pct={ov.center_y_pct}")
+        if ov.position in ["center", "box"]:
+            parts.append(f"center_y_pct={ov.center_y_pct}")
         if ov.position == "box":
             parts.extend([f"width_pct={ov.width_pct}",
                          f'border_color="{ov.border_color}"', f"border_width={ov.border_width}"])
-        return f"        overlay=ImageOverlay({', '.join(parts)}),"
+        return f"ImageOverlay({', '.join(parts)})"
 
     lines = [f'    "{modified_style.name}": VisualStyle(name="{modified_style.name}", description="...",']
     for k, el in new_elements.items():
-        if el: lines.append(fmt_el(k, el))
-    if new_overlay: lines.append(fmt_ov(new_overlay))
+        if el:
+            lines.append(fmt_el(k, el))
+    if new_overlays:
+        ov_strs = [fmt_ov(ov) for ov in new_overlays]
+        lines.append(f"        overlays=[{', '.join(ov_strs)}],")
     lines.append("    ),")
 
     st.code("\n".join(lines), language="python")

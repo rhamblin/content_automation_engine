@@ -129,8 +129,9 @@ Return ONLY valid JSON.
         """
         img = self._smart_crop_resize(source, width, height)
 
-        if style and style.overlay:
-            img = style.overlay.apply(img)
+        if style and style.overlays:
+            for overlay in style.overlays:
+                img = overlay.apply(img)
 
         img = img.convert("RGBA")
         draw = ImageDraw.Draw(img)

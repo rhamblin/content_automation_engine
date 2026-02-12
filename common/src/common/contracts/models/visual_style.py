@@ -1,6 +1,6 @@
 """VisualStyle - Complete visual style definition for image-based content."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .image_overlay import ImageOverlay
 from .text_element import TextElement
@@ -18,7 +18,7 @@ class VisualStyle:
     accent: TextElement | None = None
     tagline: TextElement | None = None
     time_text: TextElement | None = None
-    overlay: ImageOverlay | None = None
+    overlays: list[ImageOverlay] = field(default_factory=list)
 
     def elements(self) -> list[tuple[str, TextElement]]:
         """Return (key, element) pairs in render order."""

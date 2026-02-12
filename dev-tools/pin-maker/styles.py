@@ -39,7 +39,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
+        overlays=[ImageOverlay(position="top", opacity=0.3, height_pct=0.4)],
     ),
 
     # 2. ELEGANT SCRIPT - Serif title + elegant script accent
@@ -75,7 +75,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.45),
+        overlays=[ImageOverlay(position="top", opacity=0.35, height_pct=0.45)],
     ),
 
     # 3. QUICK & EASY - Script prefix + bold condensed
@@ -111,7 +111,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="left",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="bottom", opacity=0.5, height_pct=0.25),
+        overlays=[ImageOverlay(position="bottom", opacity=0.5, height_pct=0.25)],
     ),
 
     # 4. MODERN CLEAN - Minimal sans-serif
@@ -140,7 +140,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.25, height_pct=0.35),
+        overlays=[ImageOverlay(position="top", opacity=0.25, height_pct=0.35)],
     ),
 
     # 5. RETRO FUN - Lobster + Righteous
@@ -169,7 +169,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.35),
+        overlays=[ImageOverlay(position="top", opacity=0.3, height_pct=0.35)],
     ),
 
     # 6. DRAMATIC SERIF - Abril Fatface headlines
@@ -198,7 +198,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.4, height_pct=0.45),
+        overlays=[ImageOverlay(position="top", opacity=0.4, height_pct=0.45)],
     ),
 
     # 7. ALL CAPS IMPACT - Bebas Neue stacked
@@ -227,7 +227,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.4),
+        overlays=[ImageOverlay(position="top", opacity=0.35, height_pct=0.4)],
     ),
 
     # 8. FRIENDLY CASUAL - Pacifico + Montserrat
@@ -256,7 +256,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
+        overlays=[ImageOverlay(position="top", opacity=0.3, height_pct=0.4)],
     ),
 
     # 9. PLAYFUL BOLD - Bangers comic style
@@ -286,7 +286,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.25, height_pct=0.35),
+        overlays=[ImageOverlay(position="top", opacity=0.25, height_pct=0.35)],
     ),
 
     # 10. CLASSIC COOKBOOK - Merriweather + Sacramento
@@ -322,7 +322,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.45),
+        overlays=[ImageOverlay(position="top", opacity=0.35, height_pct=0.45)],
     ),
 
     # 11. HANDMADE MARKER - PermanentMarker
@@ -351,7 +351,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.3, height_pct=0.4),
+        overlays=[ImageOverlay(position="top", opacity=0.3, height_pct=0.4)],
     ),
 
     # 12. CONDENSED MODERN - Oswald + Sacramento in bordered box
@@ -380,7 +380,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=0,
         ),
-        overlay=ImageOverlay(
+        overlays=[ImageOverlay(
             position="box",
             color="#FFF8E7",
             opacity=0.92,
@@ -389,7 +389,7 @@ STYLES: dict[str, VisualStyle] = {
             center_y_pct=0.48,
             border_color="#3D3D3D",
             border_width=4,
-        ),
+        )],
     ),
 
     # 13. ROMANTIC FLOWING - GreatVibes + Lora
@@ -418,7 +418,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="top", opacity=0.35, height_pct=0.4),
+        overlays=[ImageOverlay(position="top", opacity=0.35, height_pct=0.4)],
     ),
 
     # 14. BOLD CONTRAST - Montserrat weight contrast
@@ -454,7 +454,7 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=2,
         ),
-        overlay=ImageOverlay(position="bottom", opacity=0.4, height_pct=0.25),
+        overlays=[ImageOverlay(position="bottom", opacity=0.4, height_pct=0.25)],
     ),
 
     # 15. CENTER BANNER - Full-width band behind centered text (like Classic & Savory example)
@@ -483,13 +483,13 @@ STYLES: dict[str, VisualStyle] = {
             alignment="right",
             outline_width=0,
         ),
-        overlay=ImageOverlay(
+        overlays=[ImageOverlay(
             position="center",
             color="#FFFFFF",
             opacity=0.85,
             height_pct=0.18,
             center_y_pct=0.5,
-        ),
+        )],
     ),
 }
 
