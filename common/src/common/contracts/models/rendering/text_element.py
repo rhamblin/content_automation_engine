@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-FONTS_DIR = Path(__file__).parent.parent.parent / "resources" / "fonts"
+FONTS_DIR = Path(__file__).parent.parent.parent.parent / "resources" / "rendering" / "fonts"
 
 
 @dataclass

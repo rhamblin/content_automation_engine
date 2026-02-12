@@ -1,9 +1,5 @@
 """Style registry - 15 Pinterest-optimized pin styles."""
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.contracts.models import ImageOverlay, TextElement, VisualStyle
 
 BRAND_TEXT = "chefexotic.com"

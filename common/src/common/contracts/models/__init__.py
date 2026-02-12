@@ -1,6 +1,4 @@
-from .image_overlay import ImageOverlay
-from .text_element import TextElement
-from .visual_style import VisualStyle
+from .rendering import ImageOverlay, TextElement, VisualStyle
 
 __all__ = [
     "ImageOverlay",

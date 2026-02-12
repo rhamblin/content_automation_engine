@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.contracts.models import ImageOverlay, TextElement, VisualStyle
 from common.providers.distribution_channel.pinterest import PinterestChannel
 
-from styles import BRAND_TEXT, STYLES
+from common.resources.rendering.styles import BRAND_TEXT, STYLES
 
 # Convert named colors to hex for Streamlit color_picker
 COLOR_MAP = {

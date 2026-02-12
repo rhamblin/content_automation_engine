@@ -86,7 +86,7 @@ pin-maker:
 	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(FOLDER) $(if $(STYLE),--style $(STYLE),)
 
 style-explorer:
-	. dev-tools/dev-shell.sh && cd dev-tools/pin-maker && streamlit run style_explorer.py
+	. dev-tools/dev-shell.sh && cd dev-tools/style-explorer && streamlit run style_explorer.py
 
 get-pin-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/get_pin_ids.py

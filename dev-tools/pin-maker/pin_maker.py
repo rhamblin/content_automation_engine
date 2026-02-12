@@ -14,7 +14,7 @@ from common.providers.text.azure_foundry import AzureFoundryTextProvider
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
-from styles import BRAND_TEXT, STYLES, get_style_brief, list_styles
+from common.resources.rendering.styles import BRAND_TEXT, STYLES, get_style_brief, list_styles
 
 
 def extract_keyword(filename: str) -> str:
