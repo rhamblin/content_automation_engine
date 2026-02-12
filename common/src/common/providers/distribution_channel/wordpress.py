@@ -19,63 +19,50 @@ class WordPressChannel(IDistributionChannel):
     PROVIDER_NAME = "wordpress"
 
     DEFAULT_PROMPT = """
-Role:
-You are a professional recipe content creator for ChefExotic.com.
-Your persona is a warm, friendly home cook (housewife style) who writes in an inviting, comforting, family-oriented tone.
+Generate a fully formatted, SEO-optimized recipe post.
+Output must be valid JSON with styled HTML suitable for WordPress visual editors (Elementor or Astra theme).
 
-Goal:
-Generate a fully formatted, SEO-optimized recipe post for a given keyword (#KEYWORD).
-The output must be returned as valid JSON with styled HTML suitable for WordPress visual editors (Elementor or Astra theme).
-
-Output Schema (must always use this format):
+Output Schema:
 {
   "title": "SEO-optimized recipe title",
   "content": "Full styled HTML ready for WordPress visual or Elementor editor"
 }
 
 Formatting Rules:
-- Wrap all content inside:
-  <div class="recipe-content" style="font-family: Arial, sans-serif; color:#333; line-height:1.6; max-width:860px; margin:auto;"> ... </div>
-- Use semantic HTML tags: <h2>, <h3>, <p>, <ul>, <ol>, <table>, <a>, <div>
-- Inline-style all key elements:
-  • Headings: font-size 26 to 28px; margin-top 20 to 24px
+- Wrap content in: <div class="recipe-content" style="font-family: Arial, sans-serif; color:#333; line-height:1.6; max-width:860px; margin:auto;">
+- Use semantic HTML: <h2>, <h3>, <p>, <ul>, <ol>, <table>, <a>, <div>
+- Inline-style elements:
+  • Headings: font-size 26-28px; margin-top 20-24px
   • Paragraphs: font-size 16px
-  • Amazon buttons uses this style: style="display: inline-block; background: #ff9900; color: #111; padding: 10px 16px; border-radius: 999px; font-weight: 700 bold; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  • Tables must use <table class="chefexotic-table"> with standard borders and padding
-- Include emoji icons to add warmth to headings and list items (e.g., 🍫 🧁 💕)
-- Never use Markdown or plaintext formatting.
-- Ensure all affiliate links include rel="nofollow noopener sponsored"
+  • Amazon buttons: style="display: inline-block; background: #ff9900; color: #111; padding: 10px 16px; border-radius: 999px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"
+  • Tables: <table class="chefexotic-table"> with borders and padding
+- Never use Markdown or plaintext formatting
+- Affiliate links must include rel="nofollow noopener sponsored"
 
-Content Structure (must appear in this order):
-1. Friendly Introduction 🍫
+Content Structure:
+1. Friendly Introduction
 2. "Jump to Recipe" button
-3. One image using the provided URL (if available) with alt text set to the keyword
-4. Ingredients list with icons
-5. Equipment Needed (with Amazon affiliate "Check price on Amazon" CTAs)
-6. Step-by-Step Instructions with icons
+3. Image (if URL provided) with keyword alt text
+4. Ingredients list
+5. Equipment Needed (with Amazon affiliate CTAs)
+6. Step-by-Step Instructions
 7. Health Benefits
 8. Nutritional Value Table
 9. Serving Suggestions
-10. ChefExotic Tips
+10. Tips
 11. Perfect For (occasions/audiences)
 12. Amazon Product Comparison Table
-13. Friendly Conclusion
+13. Conclusion
 
 Compliance:
-- Include FTC disclosure near all affiliate links:
-  <p style="font-size:12px; color:#666;">Disclosure: As an Amazon Associate I earn from qualifying purchases.
-  If you click a link and make a purchase, I may receive a commission at no extra cost to you.</p>
-- Must be compliant with Google AdSense, Amazon Associates, and ClickBank guidelines.
-- Avoid making medical or health claims beyond general benefits.
+- FTC disclosure near affiliate links: <p style="font-size:12px; color:#666;">Disclosure: As an Amazon Associate I earn from qualifying purchases.</p>
+- Compliant with Google AdSense, Amazon Associates, ClickBank guidelines
+- No medical/health claims beyond general benefits
 
-SEO & Style:
-- Integrate keywords naturally.
-- Use engaging, family-friendly tone; sound like you are chatting with friends in your kitchen.
-- Match tone and structure similar to:
-  https://chefexotic.com/main-dishes/baked-pork-tenderloin/
+SEO:
+- Integrate keywords naturally
 
-Output:
-Return ONLY valid JSON in the exact schema above, containing styled HTML with sectioned formatting for WordPress or Elementor editors.
+Output: Return ONLY valid JSON in the schema above.
 """
 
     def __init__(
