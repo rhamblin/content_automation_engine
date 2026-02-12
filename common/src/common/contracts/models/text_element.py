@@ -17,7 +17,7 @@ class TextElement:
     color: str
     y_position: int  # positive=from top, negative=from bottom
     outline_width: int = 0
-    outline_color: str = "black"
+    outline_color: str = "#000000"
     alignment: str = "center"  # "center", "left", "right"
     max_width_pct: float = 0.85
     angle: int = 0  # rotation in degrees (counter-clockwise)

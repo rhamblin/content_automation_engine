@@ -10,7 +10,7 @@ class ImageOverlay:
     """Gradient/solid overlay that knows how to apply itself."""
 
     position: str = "top"  # "top", "bottom", "full", "center", "box"
-    color: str = "black"
+    color: str = "#000000"
     opacity: float = 0.3
     height_pct: float = 0.35
     center_y_pct: float = 0.5  # vertical center for "center" and "box"
@@ -25,10 +25,7 @@ class ImageOverlay:
         h = int(img.height * self.height_pct)
         alpha = int(255 * self.opacity)
 
-        if self.color == "black":
-            rgb = (0, 0, 0)
-        else:
-            rgb = tuple(int(self.color.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4))
+        rgb = tuple(int(self.color.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4))
 
         if self.position == "top":
             for i in range(h):

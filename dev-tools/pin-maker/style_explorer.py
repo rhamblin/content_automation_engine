@@ -1,8 +1,6 @@
 """Style Explorer - Visual editor for Pinterest pin styles."""
 
 import sys
-from dataclasses import asdict, fields
-from io import BytesIO
 from pathlib import Path
 
 import streamlit as st
@@ -14,205 +12,149 @@ from common.providers.distribution_channel.pinterest import PinterestChannel
 
 from styles import BRAND_TEXT, STYLES
 
-# Page config
-st.set_page_config(page_title="Style Explorer", layout="wide")
-st.title("Pinterest Style Explorer")
-
-# Initialize channel
-channel = PinterestChannel()
-
-# Sidebar - Image upload
-st.sidebar.header("Sample Image")
-uploaded = st.sidebar.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
-
-if uploaded:
-    source_img = Image.open(uploaded).convert("RGB")
-else:
-    st.sidebar.info("Using placeholder image")
-    # Create a simple gradient placeholder
-    source_img = Image.new("RGB", (1000, 1500), "#8B4513")
-
-# Style selector
-st.sidebar.header("Style")
-style_name = st.sidebar.selectbox("Select style", list(STYLES.keys()))
-base_style = STYLES[style_name]
-
-# Sample text
-st.sidebar.header("Sample Text")
-sample_title = st.sidebar.text_input("Title", "Delicious Recipe Title")
-sample_prefix = st.sidebar.text_input("Prefix", "Quick & Easy")
-sample_tagline = st.sidebar.text_input("Tagline", "Perfect for any occasion")
-sample_accent = st.sidebar.text_input("Accent", "homemade goodness")
-
-text_data = {
-    "title": sample_title,
-    "prefix": sample_prefix,
-    "tagline": sample_tagline,
-    "accent": sample_accent,
+# Convert named colors to hex for Streamlit color_picker
+COLOR_MAP = {
+    "white": "#FFFFFF", "black": "#000000", "red": "#FF0000",
+    "green": "#00FF00", "blue": "#0000FF", "yellow": "#FFFF00",
+    "orange": "#FFA500", "pink": "#FFC0CB", "gray": "#808080",
 }
 
-# Main area - two columns
+def to_hex(color: str) -> str:
+    return COLOR_MAP.get(color.lower(), color) if not color.startswith("#") else color
+
+st.set_page_config(page_title="Style Explorer", layout="wide")
+st.title("Style Explorer")
+
+channel = PinterestChannel()
+
+# Sidebar
+st.sidebar.header("Image")
+uploaded = st.sidebar.file_uploader("Upload", type=["jpg", "jpeg", "png"])
+source_img = Image.open(uploaded).convert("RGB") if uploaded else Image.new("RGB", (1000, 1500), "#8B4513")
+
+st.sidebar.header("Style")
+style_name = st.sidebar.selectbox("Base style", list(STYLES.keys()))
+base_style = STYLES[style_name]
+
+st.sidebar.header("Text")
+text_data = {
+    "title": st.sidebar.text_input("Title", "Delicious Recipe"),
+    "prefix": st.sidebar.text_input("Prefix", "Quick & Easy"),
+    "tagline": st.sidebar.text_input("Tagline", "Perfect for dinner"),
+    "accent": st.sidebar.text_input("Accent", "homemade"),
+}
+
+# Controls and Preview
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.header("Adjust Style")
-
-    # Overlay settings
+    # Overlay
     st.subheader("Overlay")
-    overlay = base_style.overlay
-    if overlay:
-        ov_position = st.selectbox("Position", ["top", "bottom", "center", "box", "full"],
-                                   index=["top", "bottom", "center", "box", "full"].index(overlay.position))
-        ov_color = st.color_picker("Color", overlay.color if overlay.color != "black" else "#000000")
-        ov_opacity = st.slider("Opacity", 0.0, 1.0, overlay.opacity)
-        ov_height_pct = st.slider("Height %", 0.05, 0.5, overlay.height_pct)
-        ov_center_y_pct = st.slider("Center Y %", 0.0, 1.0, overlay.center_y_pct)
+    ov = base_style.overlay
+    if ov:
+        ov_pos = st.selectbox("Position", ["top", "bottom", "center", "box", "full"],
+                              index=["top", "bottom", "center", "box", "full"].index(ov.position))
+        c1, c2 = st.columns(2)
+        ov_color = c1.color_picker("Color", to_hex(ov.color))
+        ov_opacity = c2.slider("Opacity", 0.0, 1.0, ov.opacity)
+        c3, c4 = st.columns(2)
+        ov_height = c3.slider("Height %", 0.05, 0.5, ov.height_pct)
+        ov_center_y = c4.slider("Center Y %", 0.0, 1.0, ov.center_y_pct)
 
-        # Box-specific settings
-        if ov_position == "box":
-            ov_width_pct = st.slider("Width %", 0.3, 1.0, overlay.width_pct)
-            ov_border_color = st.color_picker("Border Color", overlay.border_color or "#333333")
-            ov_border_width = st.slider("Border Width", 0, 10, overlay.border_width)
-        else:
-            ov_width_pct = overlay.width_pct
-            ov_border_color = overlay.border_color
-            ov_border_width = overlay.border_width
+        ov_width, ov_border_color, ov_border_width = ov.width_pct, None, 0
+        if ov_pos == "box":
+            c5, c6, c7 = st.columns(3)
+            ov_width = c5.slider("Width %", 0.3, 1.0, ov.width_pct)
+            ov_border_color = c6.color_picker("Border", ov.border_color or "#333333")
+            ov_border_width = c7.slider("Border W", 0, 10, ov.border_width)
 
         new_overlay = ImageOverlay(
-            position=ov_position,
-            color=ov_color,
-            opacity=ov_opacity,
-            height_pct=ov_height_pct,
-            center_y_pct=ov_center_y_pct,
-            width_pct=ov_width_pct,
-            border_color=ov_border_color if ov_position == "box" else None,
-            border_width=ov_border_width if ov_position == "box" else 0,
+            position=ov_pos, color=ov_color, opacity=ov_opacity,
+            height_pct=ov_height, center_y_pct=ov_center_y, width_pct=ov_width,
+            border_color=ov_border_color if ov_pos == "box" else None,
+            border_width=ov_border_width if ov_pos == "box" else 0,
         )
     else:
         new_overlay = None
-        st.info("No overlay defined")
 
-    # Text elements
-    def edit_text_element(name: str, element: TextElement | None) -> TextElement | None:
-        if element is None:
-            return None
+    # Available fonts
+    FONTS = ["Montserrat.ttf", "BebasNeue.ttf", "Oswald.ttf", "PlayfairDisplay.ttf",
+             "GreatVibes.ttf", "Sacramento.ttf", "DancingScript.ttf", "Lobster.ttf",
+             "Pacifico.ttf", "Lora.ttf", "Merriweather.ttf", "Bangers.ttf",
+             "PermanentMarker.ttf", "Righteous.ttf", "AbrilFatface.ttf", "NexaRust.otf"]
 
-        st.subheader(f"{name.title()}")
-        col_a, col_b = st.columns(2)
-        with col_a:
-            y_pos = st.number_input(f"{name} Y position", -500, 1500, element.y_position, key=f"{name}_y")
-            font_size = st.number_input(f"{name} Font size", 10, 200, element.font_size, key=f"{name}_fs")
-            outline = st.number_input(f"{name} Outline", 0, 10, element.outline_width, key=f"{name}_ol")
-        with col_b:
-            color = st.color_picker(f"{name} Color", element.color, key=f"{name}_color")
-            alignment = st.selectbox(f"{name} Alignment", ["center", "left", "right"],
-                                     index=["center", "left", "right"].index(element.alignment), key=f"{name}_align")
-            angle = st.number_input(f"{name} Angle", -45, 45, element.angle, key=f"{name}_angle")
+    # Default element for new additions
+    DEFAULT_EL = {"title": (80, 70), "prefix": (52, 50), "tagline": (40, -140),
+                  "accent": (36, 180), "watermark": (20, -50)}
 
-        return TextElement(
-            font_file=element.font_file,
-            font_size=font_size,
-            color=color,
-            y_position=y_pos,
-            outline_width=outline,
-            outline_color=element.outline_color,
-            alignment=alignment,
-            angle=angle,
-        )
+    # Text elements - with enable toggle
+    def edit_element(name: str, el: TextElement | None) -> TextElement | None:
+        has_element = el is not None
+        defaults = DEFAULT_EL.get(name, (40, 100))
 
-    new_title = edit_text_element("title", base_style.title)
-    new_prefix = edit_text_element("prefix", base_style.prefix)
-    new_tagline = edit_text_element("tagline", base_style.tagline)
-    new_accent = edit_text_element("accent", base_style.accent)
-    new_watermark = edit_text_element("watermark", base_style.watermark)
+        with st.expander(f"{name.title()}", expanded=has_element):
+            enabled = st.checkbox("Enable", value=has_element, key=f"{name}_en")
+            if not enabled:
+                return None
 
-# Create modified style
+            font = el.font_file if el else FONTS[0]
+            font_file = st.selectbox("Font", FONTS, index=FONTS.index(font) if font in FONTS else 0, key=f"{name}_f")
+
+            c1, c2, c3 = st.columns(3)
+            y = c1.number_input("Y", -500, 1500, el.y_position if el else defaults[1], key=f"{name}_y")
+            size = c2.number_input("Size", 10, 200, el.font_size if el else defaults[0], key=f"{name}_s")
+            color = c3.color_picker("Color", to_hex(el.color) if el else "#FFFFFF", key=f"{name}_c")
+
+            c4, c5, c6 = st.columns(3)
+            outline = c4.number_input("Outline", 0, 10, el.outline_width if el else 3, key=f"{name}_o")
+            align = c5.selectbox("Align", ["center", "left", "right"],
+                                 index=["center", "left", "right"].index(el.alignment) if el else 0, key=f"{name}_a")
+            angle = c6.number_input("Angle", -45, 45, el.angle if el else 0, key=f"{name}_ang")
+
+        return TextElement(font_file=font_file, font_size=size, color=color,
+                           y_position=y, outline_width=outline, alignment=align, angle=angle)
+
+    new_elements = {k: edit_element(k, getattr(base_style, k))
+                    for k in ["title", "prefix", "tagline", "accent", "watermark"]}
+
+# Build modified style
 modified_style = VisualStyle(
-    name=base_style.name,
-    description=base_style.description,
-    title=new_title,
-    prefix=new_prefix,
-    tagline=new_tagline,
-    accent=new_accent,
-    watermark=new_watermark,
-    overlay=new_overlay,
+    name=base_style.name, description=base_style.description,
+    overlay=new_overlay, **new_elements
 )
 
 with col2:
-    st.header("Preview")
-
-    # Render preview
+    st.subheader("Preview")
     try:
-        preview = channel.render_content(
-            source=source_img,
-            text_data=text_data,
-            style=modified_style,
-            brand_text=BRAND_TEXT,
-        )
+        preview = channel.render_content(source_img, text_data, modified_style, BRAND_TEXT)
         st.image(preview, use_container_width=True)
     except Exception as e:
-        st.error(f"Render error: {e}")
+        st.error(f"Error: {e}")
 
-    # Export config
-    st.header("Config Export")
+    # Config export - compact format
+    st.subheader("Config")
 
-    def format_text_element(name: str, el: TextElement | None) -> str:
-        if el is None:
-            return ""
-        return f'''        {name}=TextElement(
-            font_file="{el.font_file}",
-            font_size={el.font_size},
-            color="{el.color}",
-            y_position={el.y_position},
-            outline_width={el.outline_width},
-            alignment="{el.alignment}",
-            angle={el.angle},
-        ),'''
+    def fmt_el(name: str, el: TextElement) -> str:
+        parts = [f'font_file="{el.font_file}"', f"font_size={el.font_size}",
+                 f'color="{el.color}"', f"y_position={el.y_position}"]
+        if el.outline_width: parts.append(f"outline_width={el.outline_width}")
+        if el.alignment != "center": parts.append(f'alignment="{el.alignment}"')
+        if el.angle: parts.append(f"angle={el.angle}")
+        return f"        {name}=TextElement({', '.join(parts)}),"
 
-    def format_overlay(ov: ImageOverlay | None) -> str:
-        if ov is None:
-            return ""
+    def fmt_ov(ov: ImageOverlay) -> str:
+        parts = [f'position="{ov.position}"', f'color="{ov.color}"',
+                 f"opacity={ov.opacity}", f"height_pct={ov.height_pct}"]
+        if ov.position in ["center", "box"]: parts.append(f"center_y_pct={ov.center_y_pct}")
         if ov.position == "box":
-            return f'''        overlay=ImageOverlay(
-            position="{ov.position}",
-            color="{ov.color}",
-            opacity={ov.opacity},
-            height_pct={ov.height_pct},
-            center_y_pct={ov.center_y_pct},
-            width_pct={ov.width_pct},
-            border_color="{ov.border_color}",
-            border_width={ov.border_width},
-        ),'''
-        else:
-            return f'''        overlay=ImageOverlay(
-            position="{ov.position}",
-            color="{ov.color}",
-            opacity={ov.opacity},
-            height_pct={ov.height_pct},
-            center_y_pct={ov.center_y_pct},
-        ),'''
+            parts.extend([f"width_pct={ov.width_pct}",
+                         f'border_color="{ov.border_color}"', f"border_width={ov.border_width}"])
+        return f"        overlay=ImageOverlay({', '.join(parts)}),"
 
-    config_parts = [f'''    "{modified_style.name}": VisualStyle(
-        name="{modified_style.name}",
-        description="{modified_style.description}",''']
+    lines = [f'    "{modified_style.name}": VisualStyle(name="{modified_style.name}", description="...",']
+    for k, el in new_elements.items():
+        if el: lines.append(fmt_el(k, el))
+    if new_overlay: lines.append(fmt_ov(new_overlay))
+    lines.append("    ),")
 
-    if new_title:
-        config_parts.append(format_text_element("title", new_title))
-    if new_prefix:
-        config_parts.append(format_text_element("prefix", new_prefix))
-    if new_tagline:
-        config_parts.append(format_text_element("tagline", new_tagline))
-    if new_accent:
-        config_parts.append(format_text_element("accent", new_accent))
-    if new_watermark:
-        config_parts.append(format_text_element("watermark", new_watermark))
-    if new_overlay:
-        config_parts.append(format_overlay(new_overlay))
-
-    config_parts.append("    ),")
-
-    config_code = "\n".join(config_parts)
-    st.code(config_code, language="python")
-
-    # Copy button hint
-    st.caption("Copy the config above and paste into styles.py")
+    st.code("\n".join(lines), language="python")
