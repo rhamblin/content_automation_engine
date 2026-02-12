@@ -29,7 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate Pinterest pins")
     parser.add_argument("folder", type=Path, help="Folder containing images")
     parser.add_argument("--niche", type=str, default="food", help="Content niche (default: food)")
-    parser.add_argument("--locale", type=str, default="en", help="Output language (default: en)")
+    parser.add_argument("--locale", type=str, default="en", choices=["en", "es", "sw"], help="Output language (default: en)")
     parser.add_argument("--style", type=str, help="Force a specific style")
     parser.add_argument("--list-styles", action="store_true", help="List available styles")
     args = parser.parse_args()

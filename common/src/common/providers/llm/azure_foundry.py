@@ -7,10 +7,7 @@ from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 LOCALE_INSTRUCTIONS = {
     "en": "Respond in English.",
     "es": "Responde en español.",
-    "fr": "Réponds en français.",
-    "de": "Antworte auf Deutsch.",
-    "pt": "Responda em português.",
-    "it": "Rispondi in italiano.",
+    "sw": "Jibu kwa Kiswahili.",
 }
 
 
@@ -60,7 +57,7 @@ Return ONLY valid JSON with the exact fields shown above.
             )
             prompt = f"{prompt}\n\n{style_section}"
 
-        locale_instruction = LOCALE_INSTRUCTIONS.get(locale, f"Respond in {locale}.")
+        locale_instruction = LOCALE_INSTRUCTIONS.get(locale, LOCALE_INSTRUCTIONS["en"])
         prompt = f"{prompt}\n\n{locale_instruction}"
 
         return prompt
