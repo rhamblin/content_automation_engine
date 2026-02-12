@@ -22,7 +22,7 @@ from pathlib import Path
 
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.wordpress import WordPressChannel
-from common.providers.text.azure_foundry import AzureFoundryTextProvider
+from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -41,12 +41,12 @@ def main():
         api_key=settings.azure_foundry_api_key,
         api_version=settings.azure_foundry_api_version,
     )
-    text_provider = AzureFoundryTextProvider(azure_client)
+    llm = AzureFoundryLLMProvider(azure_client)
     wp = WordPressChannel(
         site_url=settings.wp_site_url,
         username=settings.wp_username,
         app_password=settings.wp_app_password,
-        text_provider=text_provider,
+        llm=llm,
     )
 
     # Create output CSV for this run

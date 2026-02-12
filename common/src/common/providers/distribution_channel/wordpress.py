@@ -4,7 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from common.app_logger import AppLogger
-from common.contracts.interfaces import IDistributionChannel, ITextProvider
+from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 
 
 class WordPressChannel(IDistributionChannel):
@@ -70,35 +70,37 @@ Output: Return ONLY valid JSON in the schema above.
         site_url: str,
         username: str,
         app_password: str,
-        text_provider: ITextProvider,
+        llm: ILLMProvider,
     ):
         self.logger = AppLogger(__name__)
         self.site_url = site_url.rstrip("/")
         self.username = username
         self.app_password = app_password
         self.api_url = f"{self.site_url}/wp-json/wp/v2/posts"
-        self.text_provider = text_provider
+        self.llm = llm
 
     @property
     def system_prompt(self) -> str:
         return self.DEFAULT_PROMPT
 
     def render_content(self, source: Any, text_data: dict, style=None) -> dict:
-        """Render WordPress content via text provider.
+        """Render WordPress content via LLM provider.
 
         Args:
             source: Not used for WordPress (pass None)
-            text_data: Dict with niche, keyword, image_url
+            text_data: Dict with niche, keyword, image_url, persona, locale
             style: Optional VisualStyle for field schema
 
         Returns:
             Dict with title, content (HTML), etc.
         """
-        return self.text_provider.generate_text(
+        return self.llm.generate(
             niche=text_data.get("niche", ""),
             keyword=text_data.get("keyword", ""),
             channel=self,
+            persona=text_data.get("persona"),
             style=style,
+            locale=text_data.get("locale", "en"),
             image_url=text_data.get("image_url", ""),
         )
 

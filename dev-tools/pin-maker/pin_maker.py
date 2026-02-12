@@ -10,7 +10,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.providers.distribution_channel.pinterest import PinterestChannel
-from common.providers.text.azure_foundry import AzureFoundryTextProvider
+from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
@@ -29,6 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate Pinterest pins")
     parser.add_argument("folder", type=Path, help="Folder containing images")
     parser.add_argument("--niche", type=str, default="food", help="Content niche (default: food)")
+    parser.add_argument("--locale", type=str, default="en", help="Output language (default: en)")
     parser.add_argument("--style", type=str, help="Force a specific style")
     parser.add_argument("--list-styles", action="store_true", help="List available styles")
     args = parser.parse_args()
@@ -52,7 +53,7 @@ def main():
         api_key=settings.azure_foundry_api_key,
         api_version=settings.azure_foundry_api_version,
     )
-    text_provider = AzureFoundryTextProvider(client)
+    llm = AzureFoundryLLMProvider(client)
     channel = PinterestChannel()
     persona = get_persona(args.niche)
 
@@ -79,9 +80,9 @@ def main():
                 style_name = style_names[idx % len(style_names)]
             style = STYLES[style_name]
 
-            # Generate text - LLM provider combines: channel + persona + style
-            text_data = text_provider.generate_text(
-                niche=args.niche, keyword=keyword, channel=channel, persona=persona, style=style, image_url=""
+            # Generate content - LLM provider combines: channel + persona + style + locale
+            text_data = llm.generate(
+                niche=args.niche, keyword=keyword, channel=channel, persona=persona, style=style, locale=args.locale
             )
 
             print(f"  Style: {style_name} | Title: {text_data.get('title')}")

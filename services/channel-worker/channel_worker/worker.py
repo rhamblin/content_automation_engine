@@ -71,13 +71,13 @@ class ChannelWorker:
             niche = await niche_repo.get_by_id_with_keywords(profile.niche_id)
             channel_entity = await channel_repo.get_by_id(profile.channel_id)
             distribution_channel = self.registry.get_channel(channel_entity.identifier)
-            text_provider = self.registry.get_text_provider()
+            llm = self.registry.get_llm()
             blob_storage = self.registry.get_blob_storage()
 
             for keyword in niche.keywords:
                 try:
-                    # 1. GENERATE - call text provider
-                    generated = text_provider.generate_text(
+                    # 1. GENERATE - call LLM provider
+                    generated = llm.generate(
                         niche.title, keyword.term, distribution_channel
                     )
 

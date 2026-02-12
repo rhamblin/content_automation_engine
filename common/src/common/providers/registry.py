@@ -2,8 +2,8 @@ from common.contracts.interfaces import (
     IBlobStorage,
     IDatabase,
     IDistributionChannel,
+    ILLMProvider,
     IMessageBroker,
-    ITextProvider,
 )
 
 
@@ -13,14 +13,13 @@ class ProviderRegistry:
         database: IDatabase | None = None,
         message_broker: IMessageBroker | None = None,
         blob_storage: IBlobStorage | None = None,
-        text_providers: dict[str, ITextProvider] | None = None,
+        llm_providers: dict[str, ILLMProvider] | None = None,
         distribution_channels: dict[str, IDistributionChannel] | None = None,
     ):
-
         self.database = database
         self.blob_storage = blob_storage
         self.message_broker = message_broker
-        self.text_providers = text_providers or {}
+        self.llm_providers = llm_providers or {}
         self.channels = distribution_channels or {}
 
     def get_database(self) -> IDatabase:
@@ -38,22 +37,16 @@ class ProviderRegistry:
             raise LookupError("Message broker not available in this worker's registry")
         return self.message_broker
 
-    def get_text_provider(self, key: str = "") -> ITextProvider:
-        if not key and len(self.text_providers) >= 1:
-            first_item = list(self.text_providers.values())[0]
-            return first_item
-        elif key not in self.text_providers:
-            raise LookupError(
-                f"Text provider '{key}' not available in this worker's registry"
-            )
-        else:
-            return self.text_providers[key]
+    def get_llm(self, key: str = "") -> ILLMProvider:
+        if not key and len(self.llm_providers) >= 1:
+            return list(self.llm_providers.values())[0]
+        elif key not in self.llm_providers:
+            raise LookupError(f"LLM provider '{key}' not available in this worker's registry")
+        return self.llm_providers[key]
 
     def get_channel(self, key: str) -> IDistributionChannel:
         if key not in self.channels:
-            raise LookupError(
-                f"Channel '{key}' not available in this worker's registry"
-            )
+            raise LookupError(f"Channel '{key}' not available in this worker's registry")
         return self.channels[key]
 
     async def shutdown(self):

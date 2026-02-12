@@ -1,18 +1,18 @@
 from common.app_logger import AppLogger
-from common.contracts.interfaces import IDistributionChannel, ITextProvider
+from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 
 
-class LocalTextProvider(ITextProvider):
-    PROVIDER_NAME = "LocalTextProvider"
+class LocalLLMProvider(ILLMProvider):
+    PROVIDER_NAME = "local"
 
     def __init__(self):
         self.logger = AppLogger(__name__)
 
-    def generate_text(
-        self, niche: str, keyword: str, channel: IDistributionChannel, persona=None, style=None, **kwargs
+    def generate(
+        self, niche: str, keyword: str, channel: IDistributionChannel, persona=None, style=None, locale: str = "en", **kwargs
     ) -> dict:
         self.logger.info(
-            f"Generating text for niche: {niche}, keyword: {keyword}, channel: {channel.PROVIDER_NAME}"
+            f"Generating for niche: {niche}, keyword: {keyword}, channel: {channel.PROVIDER_NAME}, locale: {locale}"
         )
 
         # If style provided, return only fields defined in style

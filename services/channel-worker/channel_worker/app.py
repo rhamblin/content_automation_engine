@@ -4,7 +4,7 @@ import common.providers as providers
 from azure.storage.blob import BlobServiceClient
 from common.app_logger import AppLogger
 from common.constants import ENVIRONMENT_LOCAL
-from common.contracts.interfaces import IDistributionChannel, ITextProvider
+from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 from common.providers import registry
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.providers.messaging.redis_broker import RedisMessageBroker
@@ -28,7 +28,7 @@ async def main(logger: AppLogger):
         database = None
         message_broker = None
         blob_storage = None
-        text_providers = {}
+        llm_providers = {}
         distribution_channels = {}
 
         redis_instance = Redis(host="redis", port=6379)
@@ -42,8 +42,8 @@ async def main(logger: AppLogger):
         blob_storage = providers.AzureBlobStorageProvider(blob_client)
 
         if settings.app_environment == ENVIRONMENT_LOCAL:
-            text_providers: dict[str, ITextProvider] = {
-                providers.LocalTextProvider.PROVIDER_NAME: providers.LocalTextProvider()
+            llm_providers: dict[str, ILLMProvider] = {
+                providers.LocalLLMProvider.PROVIDER_NAME: providers.LocalLLMProvider()
             }
 
             distribution_channels: dict[str, IDistributionChannel] = {
@@ -61,8 +61,8 @@ async def main(logger: AppLogger):
                 azure_endpoint=settings.azure_foundry_endpoint,
                 api_key=settings.azure_foundry_proj_default_api_key,
             )
-            text_providers: dict[str, ITextProvider] = {
-                providers.AzureFoundryTextProvider.PROVIDER_NAME: providers.AzureFoundryTextProvider(
+            llm_providers: dict[str, ILLMProvider] = {
+                providers.AzureFoundryLLMProvider.PROVIDER_NAME: providers.AzureFoundryLLMProvider(
                     azure_openai_client
                 )
             }
@@ -76,7 +76,7 @@ async def main(logger: AppLogger):
 
         provider_registry = registry.ProviderRegistry(
             blob_storage=blob_storage,
-            text_providers=text_providers,
+            llm_providers=llm_providers,
             distribution_channels=distribution_channels,
             message_broker=message_broker,
             database=database,
