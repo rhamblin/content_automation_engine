@@ -15,11 +15,46 @@ class AzureFoundryTextProvider(ITextProvider):
 
     PROVIDER_NAME = "azure_foundry"
 
+    STYLE_PROMPT_TEMPLATE = """
+Generate text for the "{style_name}" style.
+Style description: {style_description}
+
+Generate ONLY these fields:
+{{
+{fields}
+}}
+
+Guidelines:
+- Include the main keyword naturally
+{field_guidelines}
+
+Return ONLY valid JSON with the exact fields shown above.
+"""
+
     def __init__(self, azure_open_ai_client: AzureOpenAI):
         self.client = azure_open_ai_client
 
+    def _build_prompt(self, channel: IDistributionChannel, persona=None, style=None) -> str:
+        """Build system prompt: channel (platform) + persona (voice) + style (fields)."""
+        prompt = channel.system_prompt
+
+        if persona:
+            prompt = f"{prompt}\n\n{persona.prompt}"
+
+        if style:
+            field_lines, guidelines = style.prompt_schema()
+            style_section = self.STYLE_PROMPT_TEMPLATE.format(
+                style_name=style.name,
+                style_description=style.description,
+                fields=",\n  ".join(field_lines),
+                field_guidelines="\n".join(f"- {g}" for g in guidelines) if guidelines else "",
+            )
+            prompt = f"{prompt}\n\n{style_section}"
+
+        return prompt
+
     def generate_text(
-        self, niche: str, keyword: str, channel: IDistributionChannel, image_url: str
+        self, niche: str, keyword: str, channel: IDistributionChannel, persona=None, style=None, image_url: str = ""
     ) -> dict:
         """Generate text content using Azure OpenAI.
 
@@ -32,7 +67,7 @@ class AzureFoundryTextProvider(ITextProvider):
                 messages=[
                     {
                         "role": "system",
-                        "content": channel.system_prompt,
+                        "content": self._build_prompt(channel, persona, style),
                     },
                     {
                         "role": "user",

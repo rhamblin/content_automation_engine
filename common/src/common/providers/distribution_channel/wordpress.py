@@ -96,16 +96,13 @@ Return ONLY valid JSON in the exact schema above, containing styled HTML with se
     def system_prompt(self) -> str:
         return self.DEFAULT_PROMPT
 
-    def render_content(
-        self,
-        source: Any,
-        text_data: dict,
-    ) -> dict:
+    def render_content(self, source: Any, text_data: dict, style=None) -> dict:
         """Render WordPress content via text provider.
 
         Args:
             source: Not used for WordPress (pass None)
             text_data: Dict with niche, keyword, image_url
+            style: Optional VisualStyle for field schema
 
         Returns:
             Dict with title, content (HTML), etc.
@@ -114,6 +111,7 @@ Return ONLY valid JSON in the exact schema above, containing styled HTML with se
             niche=text_data.get("niche", ""),
             keyword=text_data.get("keyword", ""),
             channel=self,
+            style=style,
             image_url=text_data.get("image_url", ""),
         )
 

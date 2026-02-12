@@ -7,6 +7,12 @@ from .distribution_channel import IDistributionChannel
 class ITextProvider(IBaseProviderWithName):
     @abstractmethod
     def generate_text(
-        self, niche: str, keyword: str, channel: IDistributionChannel, **kwargs
+        self,
+        niche: str,
+        keyword: str,
+        channel: IDistributionChannel,
+        persona=None,
+        style=None,
+        **kwargs,
     ) -> dict:
         pass

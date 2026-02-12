@@ -11,12 +11,13 @@ class IDistributionChannel(IBaseProviderWithName):
         pass
 
     @abstractmethod
-    def render_content(self, source: Any, text_data: dict) -> Any:
+    def render_content(self, source: Any, text_data: dict, style=None) -> Any:
         """Render core content for this channel.
 
         Args:
             source: Source content (Image.Image for visual channels, None for text channels)
             text_data: Text data from text provider (title, content, style, etc.)
+            style: Optional VisualStyle for rendering (visual channels only)
 
         Returns:
             Image.Image: For visual channels (Pinterest, Instagram)

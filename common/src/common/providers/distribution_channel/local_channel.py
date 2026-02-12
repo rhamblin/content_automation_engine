@@ -14,13 +14,13 @@ class LocalDistributionChannel(IDistributionChannel):
     def system_prompt(self) -> str:
         return "SYSTEM PROMPT"
 
-    def render_content(self, source: Any, text_data: dict) -> Any:
+    def render_content(self, source: Any, text_data: dict, style=None) -> Any:
         """Pass through - local channel doesn't render."""
         return text_data.get("content", "")
 
     def publish(self, title: str, description: str, content: Any, **kwargs) -> dict:
         self.logger.info(
-            f"Local Channel Publish Called with title: {title}, content: {content}..., image_url: {image_url}, extra: {kwargs}"
+            f"Local Channel Publish Called with title: {title}, content: {content}..., extra: {kwargs}"
         )
         import uuid
 

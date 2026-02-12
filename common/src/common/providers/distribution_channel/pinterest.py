@@ -41,49 +41,12 @@ STRICT OUTPUT RULES:
 - Description must include 2-5 hashtags and be 200 characters or fewer
 """
 
-    PIN_MAKER_PROMPT_TEMPLATE = """
-You are a Pinterest marketing expert creating eye-catching pin text for food/recipe images.
-
-Given a keyword, generate compelling pin text AND select the best visual style.
-
-{style_brief}
-
-Output Schema:
-{{
-  "style": "style_name from list above",
-  "title": "Catchy title (2-4 words, ALL CAPS)",
-  "tagline": "Benefit tagline (2-4 words, ALL CAPS, periods between words)",
-  "time_text": "Time indicator (e.g., 'In 30 MINUTES')",
-  "prefix": "Optional prefix like '30-Minute' or null",
-  "accent": "Optional elegant phrase like 'with Parmesan' or null"
-}}
-
-Guidelines:
-- Match style to the dish mood
-- Title should be punchy and appetizing
-- Include the main keyword naturally in the title
-- Tagline should highlight ease, occasion, or benefit
-- Time should be realistic for the dish type
-- Use prefix for time-based or descriptor prefixes (e.g., "Quick & Easy", "30-Minute")
-- Use accent for elegant sub-phrases (e.g., "with Parmesan", "with Ricotta Cheese")
-
-Return ONLY valid JSON.
-"""
-
-    def __init__(self, style_brief: str | None = None):
-        """Initialize Pinterest channel.
-
-        Args:
-            style_brief: If provided, uses PIN_MAKER_PROMPT with styles.
-                         If None, uses DEFAULT_PROMPT.
-        """
+    def __init__(self):
+        """Initialize Pinterest channel."""
         self.logger = AppLogger(__name__)
-        self._style_brief = style_brief
 
     @property
     def system_prompt(self) -> str:
-        if self._style_brief:
-            return self.PIN_MAKER_PROMPT_TEMPLATE.format(style_brief=self._style_brief)
         return self.DEFAULT_PROMPT
 
     def _smart_crop_resize(

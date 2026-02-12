@@ -3,7 +3,7 @@ config.env
 dev-tools/.env
 dev-tools/wp-uploader/input/
 dev-tools/wp-uploader/wp-app-password.txt
-dev-tools/wp-uploader/output/
+**/output/
 
 dev-tools/get-pin-ids/pinterest-credentials.json
 dev-tools/get-pin-ids/pinterest-credentials.example.json

@@ -14,7 +14,8 @@ from common.providers.text.azure_foundry import AzureFoundryTextProvider
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
-from common.resources.rendering.styles import BRAND_TEXT, STYLES, get_style_brief, list_styles
+from common.resources.personas import get_persona
+from common.resources.rendering.styles import BRAND_TEXT, STYLES, list_styles
 
 
 def extract_keyword(filename: str) -> str:
@@ -27,6 +28,7 @@ def extract_keyword(filename: str) -> str:
 def main():
     parser = argparse.ArgumentParser(description="Generate Pinterest pins")
     parser.add_argument("folder", type=Path, help="Folder containing images")
+    parser.add_argument("--niche", type=str, default="food", help="Content niche (default: food)")
     parser.add_argument("--style", type=str, help="Force a specific style")
     parser.add_argument("--list-styles", action="store_true", help="List available styles")
     args = parser.parse_args()
@@ -51,7 +53,8 @@ def main():
         api_version=settings.azure_foundry_api_version,
     )
     text_provider = AzureFoundryTextProvider(client)
-    channel = PinterestChannel(style_brief=get_style_brief())
+    channel = PinterestChannel()
+    persona = get_persona(args.niche)
 
     # Process images
     jpg_files = list(args.folder.glob("*.jpg")) + list(args.folder.glob("*.jpeg"))
@@ -69,17 +72,17 @@ def main():
         print(f"\n{img_path.name} -> '{keyword}'")
 
         try:
-            # Get text from provider
-            text_data = text_provider.generate_text(
-                niche="food", keyword=keyword, channel=channel, image_url=""
-            )
-
-            # Assign style: use forced style or cycle through styles (each used once)
+            # Select style first (use forced style or cycle through styles)
             if args.style:
                 style_name = args.style
             else:
                 style_name = style_names[idx % len(style_names)]
             style = STYLES[style_name]
+
+            # Generate text - LLM provider combines: channel + persona + style
+            text_data = text_provider.generate_text(
+                niche=args.niche, keyword=keyword, channel=channel, persona=persona, style=style, image_url=""
+            )
 
             print(f"  Style: {style_name} | Title: {text_data.get('title')}")
 
