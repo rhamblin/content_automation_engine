@@ -644,8 +644,8 @@ def generate_html(
         // Synchronized crosshair across all charts
         function setupCrosshairSync() {{
             var allChartIds = [];
-            document.querySelectorAll('.chart > div[id]').forEach(function(el) {{
-                allChartIds.push(el.id);
+            document.querySelectorAll('.plotly-graph-div').forEach(function(el) {{
+                if (el.id) allChartIds.push(el.id);
             }});
 
             allChartIds.forEach(function(srcId) {{
@@ -655,19 +655,22 @@ def generate_html(
                 srcEl.on('plotly_hover', function(data) {{
                     if (!data.points || !data.points.length) return;
                     var xVal = data.points[0].x;
-                    // Find sibling charts in same period
                     var period = srcId.split('_').pop();
                     allChartIds.forEach(function(tgtId) {{
                         if (tgtId === srcId) return;
                         if (tgtId.split('_').pop() !== period) return;
                         var tgtEl = document.getElementById(tgtId);
                         if (!tgtEl || !tgtEl.data) return;
-                        // Find matching point indices
                         var pts = [];
                         tgtEl.data.forEach(function(trace, ti) {{
-                            if (!trace.visible && trace.visible !== undefined) return;
-                            var xi = trace.x ? trace.x.indexOf(xVal) : -1;
-                            if (xi >= 0) pts.push({{curveNumber: ti, pointNumber: xi}});
+                            if (trace.visible === false || trace.visible === 'legendonly') return;
+                            if (!trace.x) return;
+                            for (var xi = 0; xi < trace.x.length; xi++) {{
+                                if (trace.x[xi] === xVal) {{
+                                    pts.push({{curveNumber: ti, pointNumber: xi}});
+                                    break;
+                                }}
+                            }}
                         }});
                         if (pts.length) Plotly.Fx.hover(tgtId, pts);
                     }});
@@ -678,7 +681,7 @@ def generate_html(
                     allChartIds.forEach(function(tgtId) {{
                         if (tgtId === srcId) return;
                         if (tgtId.split('_').pop() !== period) return;
-                        Plotly.Fx.hover(tgtId, []);
+                        Plotly.Fx.unhover(tgtId);
                     }});
                 }});
             }});
