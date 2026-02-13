@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker style-explorer get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager unified-dashboard title-generator amazon-affiliate amazon-get amazon-url amazon-search logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker style-editor get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager unified-dashboard title-generator amazon-affiliate amazon-get amazon-url amazon-search logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -85,8 +85,8 @@ wp-media-ids:
 pin-maker:
 	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(FOLDER) $(if $(STYLE),--style $(STYLE),)
 
-style-explorer:
-	. dev-tools/dev-shell.sh && cd dev-tools/style-explorer && streamlit run style_explorer.py
+style-editor:
+	. dev-tools/dev-shell.sh && cd dev-tools/style-editor && streamlit run style_editor.py
 
 get-pin-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/get_pin_ids.py
@@ -175,7 +175,7 @@ help:  ## Show this help message
 	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
 	@echo "  make pin-maker FOLDER=/path/to/images [STYLE=center_banner] - Create Pinterest pins"
-	@echo "  make style-explorer - Visual style editor for Pinterest pins"
+	@echo "  make style-editor   - Visual style editor for Pinterest pins"
 	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
 	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"
 	@echo "  make plot-pin-analytics PIN_ID=123 - Generate 14-day analytics HTML report"

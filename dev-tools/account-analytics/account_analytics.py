@@ -71,9 +71,7 @@ def fetch_pin_analytics(access_token: str, pin_id: str) -> dict | None:
     return response.json() if response.ok else None
 
 
-def collect_organic_data(
-    access_token: str, pins: list[dict]
-) -> tuple[dict, dict]:
+def collect_organic_data(access_token: str, pins: list[dict]) -> tuple[dict, dict]:
     """Collect organic analytics for all pins. Returns (pin_daily, daily_totals)."""
     pin_daily = {}  # {pin_id: {"title": ..., "link": ..., dates: {date: {metrics}}}}
     daily_totals = {}
@@ -190,11 +188,19 @@ def collect_paid_data(access_token: str, ad_account_id: str) -> tuple[dict, dict
 
         if date:
             ad_daily[ad_id]["dates"][date] = {
-                "IMPRESSION": imp, "CLICK": clk, "SAVE": sav, "SPEND": spd,
+                "IMPRESSION": imp,
+                "CLICK": clk,
+                "SAVE": sav,
+                "SPEND": spd,
             }
 
             if date not in daily_totals:
-                daily_totals[date] = {"IMPRESSION": 0, "CLICK": 0, "SAVE": 0, "SPEND": 0}
+                daily_totals[date] = {
+                    "IMPRESSION": 0,
+                    "CLICK": 0,
+                    "SAVE": 0,
+                    "SPEND": 0,
+                }
             daily_totals[date]["IMPRESSION"] += imp
             daily_totals[date]["CLICK"] += clk
             daily_totals[date]["SAVE"] += sav
@@ -245,15 +251,21 @@ def organic_leaderboard_for_period(pin_daily: dict, days: int) -> list[dict]:
             if date >= cutoff:
                 for m in totals:
                     totals[m] += metrics.get(m, 0)
-        ctr = (totals["OUTBOUND_CLICK"] / totals["IMPRESSION"] * 100) if totals["IMPRESSION"] > 0 else 0
-        results.append({
-            "pin_id": pin_id,
-            "title": info.get("title", "Untitled"),
-            "impressions": totals["IMPRESSION"],
-            "clicks": totals["OUTBOUND_CLICK"],
-            "saves": totals["SAVE"],
-            "ctr": ctr,
-        })
+        ctr = (
+            (totals["OUTBOUND_CLICK"] / totals["IMPRESSION"] * 100)
+            if totals["IMPRESSION"] > 0
+            else 0
+        )
+        results.append(
+            {
+                "pin_id": pin_id,
+                "title": info.get("title", "Untitled"),
+                "impressions": totals["IMPRESSION"],
+                "clicks": totals["OUTBOUND_CLICK"],
+                "saves": totals["SAVE"],
+                "ctr": ctr,
+            }
+        )
     return results
 
 
@@ -267,19 +279,25 @@ def paid_leaderboard_for_period(ad_daily: dict, days: int) -> list[dict]:
             if date >= cutoff:
                 for m in totals:
                     totals[m] += metrics.get(m, 0)
-        ctr = (totals["CLICK"] / totals["IMPRESSION"] * 100) if totals["IMPRESSION"] > 0 else 0
+        ctr = (
+            (totals["CLICK"] / totals["IMPRESSION"] * 100)
+            if totals["IMPRESSION"] > 0
+            else 0
+        )
         cpc = (totals["SPEND"] / totals["CLICK"]) if totals["CLICK"] > 0 else 0
-        results.append({
-            "ad_id": ad_id,
-            "name": info.get("name", "Unknown"),
-            "pin_id": info.get("pin_id", ""),
-            "impressions": totals["IMPRESSION"],
-            "clicks": totals["CLICK"],
-            "saves": totals["SAVE"],
-            "spend": totals["SPEND"],
-            "ctr": ctr,
-            "cpc": cpc,
-        })
+        results.append(
+            {
+                "ad_id": ad_id,
+                "name": info.get("name", "Unknown"),
+                "pin_id": info.get("pin_id", ""),
+                "impressions": totals["IMPRESSION"],
+                "clicks": totals["CLICK"],
+                "saves": totals["SAVE"],
+                "spend": totals["SPEND"],
+                "ctr": ctr,
+                "cpc": cpc,
+            }
+        )
     return results
 
 
@@ -473,7 +491,11 @@ def generate_period_content(
     )
 
     # Leaderboards filtered by period
-    paid_sorted = sorted(paid_leaderboard_for_period(ad_daily, days), key=lambda x: x["ctr"], reverse=True)[:10]
+    paid_sorted = sorted(
+        paid_leaderboard_for_period(ad_daily, days),
+        key=lambda x: x["ctr"],
+        reverse=True,
+    )[:10]
     paid_rows = ""
     for r in paid_sorted:
         link = f"https://pinterest.com/pin/{r['pin_id']}" if r["pin_id"] else "#"
@@ -486,7 +508,11 @@ def generate_period_content(
             <td><a href="{link}" target="_blank">View</a></td>
         </tr>"""
 
-    organic_sorted = sorted(organic_leaderboard_for_period(pin_daily, days), key=lambda x: x["impressions"], reverse=True)[:10]
+    organic_sorted = sorted(
+        organic_leaderboard_for_period(pin_daily, days),
+        key=lambda x: x["impressions"],
+        reverse=True,
+    )[:10]
     organic_rows = ""
     for r in organic_sorted:
         link = f"https://pinterest.com/pin/{r['pin_id']}"
@@ -578,7 +604,7 @@ def generate_html(
     # Generate content for each period
     period_contents = ""
     for period_key, days in PERIODS.items():
-        is_default = period_key == "2w"
+        is_default = period_key == "1w"
         content = generate_period_content(
             period_key, days, organic_daily, paid_daily, pin_daily, ad_daily
         )
@@ -725,8 +751,8 @@ def generate_html(
     <div class="meta">Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}</div>
 
     <div class="period-toggle">
-        <button class="period-btn" onclick="showPeriod('1w')">1 Week</button>
-        <button class="period-btn active" onclick="showPeriod('2w')">2 Weeks</button>
+        <button class="period-btn active" onclick="showPeriod('1w')">1 Week</button>
+        <button class="period-btn" onclick="showPeriod('2w')">2 Weeks</button>
         <button class="period-btn" onclick="showPeriod('4w')">4 Weeks</button>
     </div>
 
@@ -842,7 +868,9 @@ def main():
 
     print("Fetching account info...")
     account_info = fetch_account_info(access_token)
-    account_name = account_info.get("username", "Pinterest Account")
+    brand_name = account_info.get("business_name", "")
+    username = account_info.get("username", "Pinterest Account")
+    account_name = f"{brand_name} - {username}" if brand_name else username
 
     print("Fetching pins...")
     pins = fetch_all_pins(access_token)
@@ -864,9 +892,7 @@ def main():
     else:
         print("No ad accounts found")
 
-    html = generate_html(
-        account_name, pin_daily, organic_daily, ad_daily, paid_daily
-    )
+    html = generate_html(account_name, pin_daily, organic_daily, ad_daily, paid_daily)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
     output_file = OUTPUT_DIR / f"account_analytics_{timestamp}.html"

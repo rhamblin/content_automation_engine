@@ -1,4 +1,4 @@
-"""Style Explorer - Visual editor for Pinterest pin styles."""
+"""Style Editor - Visual editor for Pinterest pin styles."""
 
 import sys
 from pathlib import Path
@@ -22,7 +22,7 @@ COLOR_MAP = {
 def to_hex(color: str) -> str:
     return COLOR_MAP.get(color.lower(), color) if not color.startswith("#") else color
 
-st.set_page_config(page_title="Style Explorer", layout="wide")
+st.set_page_config(page_title="Style Editor", layout="wide")
 
 # Wider sidebar for larger preview
 st.markdown("""
@@ -31,7 +31,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Style Explorer")
+st.title("Style Editor")
 
 channel = PinterestChannel()
 
