@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker style-explorer get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager unified-dashboard title-generator amazon-affiliate logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker style-explorer get-pin-ids get-pin-stats plot-pin-analytics account-analytics campaign-manager unified-dashboard title-generator amazon-affiliate amazon-get amazon-url amazon-search logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -112,6 +112,15 @@ title-generator:
 amazon-affiliate:
 	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py $(CMD)
 
+amazon-get:
+	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py get $(ASIN) --json
+
+amazon-url:
+	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py url "$(URL)" --json
+
+amazon-search:
+	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py search "$(KEYWORDS)" --json
+
 logs:
 	docker compose logs -f
 
@@ -174,7 +183,10 @@ help:  ## Show this help message
 	@echo "  make campaign-manager CMD='list' - Manage Pinterest campaigns"
 	@echo "  make unified-dashboard - Multi-platform analytics dashboard"
 	@echo "  make title-generator CHANNEL=pinterest NICHE=food KEYWORD='air fryer' - Generate titles"
-	@echo "  make amazon-affiliate CMD='get B0BSHF7WHW' - Amazon affiliate links"
+	@echo "  make amazon-affiliate CMD='get B0BSHF7WHW' - Amazon affiliate (generic)"
+	@echo "  make amazon-get ASIN=B0BSHF7WHW - Fetch product by ASIN (JSON)"
+	@echo "  make amazon-url URL='https://www.amazon.com/dp/B0BSHF7WHW' - Fetch product by URL (JSON)"
+	@echo "  make amazon-search KEYWORDS='chef knife' - Search products (JSON)"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"
