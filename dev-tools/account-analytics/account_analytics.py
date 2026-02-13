@@ -1,4 +1,4 @@
-"""Pinterest Account Analytics - Simplified 14-day report."""
+"""Pinterest Account Analytics - With 1w/2w/4w toggle."""
 
 import argparse
 import sys
@@ -15,7 +15,8 @@ from auth import PINTEREST_API_URL, get_access_token
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-DAYS = 14
+MAX_DAYS = 28  # Fetch 4 weeks of data
+PERIODS = {"1w": 7, "2w": 14, "4w": 28}
 COLORS = {"organic": "#1f77b4", "paid": "#ff7f0e"}
 
 
@@ -23,9 +24,7 @@ def fetch_account_info(access_token: str) -> dict:
     """Fetch account info to get account name."""
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(f"{PINTEREST_API_URL}/user_account", headers=headers)
-    if response.ok:
-        return response.json()
-    return {}
+    return response.json() if response.ok else {}
 
 
 def fetch_all_pins(access_token: str) -> list[dict]:
@@ -53,9 +52,9 @@ def fetch_all_pins(access_token: str) -> list[dict]:
 
 
 def fetch_pin_analytics(access_token: str, pin_id: str) -> dict | None:
-    """Fetch analytics for a single pin."""
+    """Fetch analytics for a single pin (28 days)."""
     end_date = datetime.now() - timedelta(days=1)
-    start_date = end_date - timedelta(days=DAYS - 1)
+    start_date = end_date - timedelta(days=MAX_DAYS - 1)
 
     headers = {"Authorization": f"Bearer {access_token}"}
     params = {
@@ -96,7 +95,6 @@ def collect_organic_data(access_token: str, pins: list[dict]) -> tuple[list[dict
                     daily_totals[date] = {"IMPRESSION": 0, "SAVE": 0, "OUTBOUND_CLICK": 0}
                 daily_totals[date][m] = daily_totals[date].get(m, 0) + val
 
-        # Calculate CTR
         ctr = (totals["OUTBOUND_CLICK"] / totals["IMPRESSION"] * 100) if totals["IMPRESSION"] > 0 else 0
 
         results.append({
@@ -129,12 +127,12 @@ def fetch_ads(access_token: str, ad_account_id: str) -> list[dict]:
 
 
 def fetch_ad_analytics(access_token: str, ad_account_id: str, ad_ids: list[str]) -> list[dict]:
-    """Fetch analytics for ads."""
+    """Fetch analytics for ads (28 days)."""
     if not ad_ids:
         return []
 
     end_date = datetime.now() - timedelta(days=1)
-    start_date = end_date - timedelta(days=DAYS - 1)
+    start_date = end_date - timedelta(days=MAX_DAYS - 1)
 
     headers = {"Authorization": f"Bearer {access_token}"}
     params = {
@@ -165,7 +163,6 @@ def collect_paid_data(access_token: str, ad_account_id: str) -> tuple[list[dict]
 
     analytics = fetch_ad_analytics(access_token, ad_account_id, ad_ids)
 
-    # Aggregate by ad
     ad_data = {}
     daily_totals = {}
 
@@ -174,9 +171,7 @@ def collect_paid_data(access_token: str, ad_account_id: str) -> tuple[list[dict]
         date = row.get("DATE", "")
 
         if ad_id not in ad_data:
-            ad_data[ad_id] = {
-                "impressions": 0, "clicks": 0, "saves": 0, "spend": 0
-            }
+            ad_data[ad_id] = {"impressions": 0, "clicks": 0, "saves": 0, "spend": 0}
 
         ad_data[ad_id]["impressions"] += row.get("TOTAL_IMPRESSION", 0) or 0
         ad_data[ad_id]["clicks"] += row.get("TOTAL_CLICKTHROUGH", 0) or 0
@@ -212,17 +207,46 @@ def collect_paid_data(access_token: str, ad_account_id: str) -> tuple[list[dict]
     return results, daily_totals
 
 
-def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, title: str, chart_id: str, is_currency: bool = False) -> str:
+def filter_daily_by_period(daily: dict, days: int) -> dict:
+    """Filter daily data to last N days."""
+    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+    return {d: v for d, v in daily.items() if d >= cutoff}
+
+
+def calc_totals_from_daily(daily: dict, is_paid: bool = False) -> dict:
+    """Calculate totals from daily data."""
+    if is_paid:
+        impressions = sum(v.get("IMPRESSION", 0) for v in daily.values())
+        clicks = sum(v.get("CLICK", 0) for v in daily.values())
+        saves = sum(v.get("SAVE", 0) for v in daily.values())
+        spend = sum(v.get("SPEND", 0) for v in daily.values())
+    else:
+        impressions = sum(v.get("IMPRESSION", 0) for v in daily.values())
+        clicks = sum(v.get("OUTBOUND_CLICK", 0) for v in daily.values())
+        saves = sum(v.get("SAVE", 0) for v in daily.values())
+        spend = 0
+
+    ctr = (clicks / impressions * 100) if impressions > 0 else 0
+    cpc = (spend / clicks) if clicks > 0 else 0
+
+    return {
+        "impressions": impressions,
+        "clicks": clicks,
+        "saves": saves,
+        "spend": spend,
+        "ctr": ctr,
+        "cpc": cpc,
+    }
+
+
+def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, title: str, chart_id: str) -> str:
     """Create chart comparing organic vs paid."""
     fig = go.Figure()
 
-    # Get all dates sorted
     all_dates = sorted(set(list(organic_daily.keys()) + list(paid_daily.keys())))
-
     if not all_dates:
         return "<p>No data</p>"
 
-    # Organic line
     organic_values = [organic_daily.get(d, {}).get(metric, 0) for d in all_dates]
     if any(v > 0 for v in organic_values):
         fig.add_trace(go.Scatter(
@@ -231,8 +255,7 @@ def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, 
             line=dict(color=COLORS["organic"], width=2),
         ))
 
-    # Paid line
-    paid_metric = {"IMPRESSION": "IMPRESSION", "OUTBOUND_CLICK": "CLICK", "SAVE": "SAVE", "SPEND": "SPEND"}.get(metric, metric)
+    paid_metric = {"IMPRESSION": "IMPRESSION", "OUTBOUND_CLICK": "CLICK", "SAVE": "SAVE"}.get(metric, metric)
     paid_values = [paid_daily.get(d, {}).get(paid_metric, 0) for d in all_dates]
     if any(v > 0 for v in paid_values):
         fig.add_trace(go.Scatter(
@@ -244,7 +267,7 @@ def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, 
     fig.update_layout(
         title=title,
         xaxis=dict(tickangle=-45),
-        yaxis=dict(gridcolor="#eee", tickprefix="$" if is_currency else ""),
+        yaxis=dict(gridcolor="#eee"),
         plot_bgcolor="white",
         height=280,
         margin=dict(l=50, r=30, t=50, b=60),
@@ -254,7 +277,7 @@ def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, 
     return fig.to_html(full_html=False, include_plotlyjs=False, div_id=chart_id)
 
 
-def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, color: str, is_currency: bool = False, is_pct: bool = False) -> str:
+def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, color: str, is_currency: bool = False) -> str:
     """Create single metric chart."""
     dates = sorted(daily.keys())
     if not dates:
@@ -272,7 +295,7 @@ def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, col
     fig.update_layout(
         title=title,
         xaxis=dict(tickangle=-45),
-        yaxis=dict(gridcolor="#eee", tickprefix="$" if is_currency else "", ticksuffix="%" if is_pct else ""),
+        yaxis=dict(gridcolor="#eee", tickprefix="$" if is_currency else ""),
         plot_bgcolor="white",
         height=280,
         margin=dict(l=50, r=30, t=50, b=60),
@@ -282,70 +305,49 @@ def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, col
     return fig.to_html(full_html=False, include_plotlyjs=False, div_id=chart_id)
 
 
-def generate_html(
-    account_name: str,
-    organic_results: list[dict],
+def generate_period_content(
+    period_key: str,
+    days: int,
     organic_daily: dict,
-    paid_results: list[dict],
     paid_daily: dict,
+    organic_results: list[dict],
+    paid_results: list[dict],
 ) -> str:
-    """Generate HTML report."""
+    """Generate content for a specific time period."""
+    # Filter daily data
+    org_daily = filter_daily_by_period(organic_daily, days)
+    pd_daily = filter_daily_by_period(paid_daily, days)
 
     # Calculate totals
-    organic_impressions = sum(r["impressions"] for r in organic_results)
-    organic_clicks = sum(r["clicks"] for r in organic_results)
-    organic_saves = sum(r["saves"] for r in organic_results)
-    organic_ctr = (organic_clicks / organic_impressions * 100) if organic_impressions > 0 else 0
+    org_totals = calc_totals_from_daily(org_daily, is_paid=False)
+    pd_totals = calc_totals_from_daily(pd_daily, is_paid=True)
 
-    paid_impressions = sum(r["impressions"] for r in paid_results)
-    paid_clicks = sum(r["clicks"] for r in paid_results)
-    paid_saves = sum(r["saves"] for r in paid_results)
-    paid_spend = sum(r["spend"] for r in paid_results)
-    paid_ctr = (paid_clicks / paid_impressions * 100) if paid_impressions > 0 else 0
-    paid_cpc = (paid_spend / paid_clicks) if paid_clicks > 0 else 0
-
-    total_impressions = organic_impressions + paid_impressions
-    total_clicks = organic_clicks + paid_clicks
-    total_saves = organic_saves + paid_saves
+    total_impressions = org_totals["impressions"] + pd_totals["impressions"]
+    total_clicks = org_totals["clicks"] + pd_totals["clicks"]
+    total_saves = org_totals["saves"] + pd_totals["saves"]
     total_ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
 
     # Generate charts
-    impressions_chart = create_comparison_chart(organic_daily, paid_daily, "IMPRESSION", "Impressions", "chart_impressions")
-    clicks_chart = create_comparison_chart(organic_daily, paid_daily, "OUTBOUND_CLICK", "Clicks", "chart_clicks")
-    saves_chart = create_comparison_chart(organic_daily, paid_daily, "SAVE", "Saves", "chart_saves")
+    impressions_chart = create_comparison_chart(org_daily, pd_daily, "IMPRESSION", "Impressions", f"chart_imp_{period_key}")
+    clicks_chart = create_comparison_chart(org_daily, pd_daily, "OUTBOUND_CLICK", "Clicks", f"chart_clk_{period_key}")
+    saves_chart = create_comparison_chart(org_daily, pd_daily, "SAVE", "Saves", f"chart_sav_{period_key}")
 
-    # Calculate daily CTR for chart
-    ctr_daily_organic = {}
-    for d, v in organic_daily.items():
-        imp = v.get("IMPRESSION", 0)
-        clk = v.get("OUTBOUND_CLICK", 0)
-        ctr_daily_organic[d] = {"CTR": (clk / imp * 100) if imp > 0 else 0}
+    # CTR chart
+    ctr_org = {d: {"CTR": (v.get("OUTBOUND_CLICK", 0) / v.get("IMPRESSION", 1) * 100) if v.get("IMPRESSION", 0) > 0 else 0} for d, v in org_daily.items()}
+    ctr_pd = {d: {"CTR": (v.get("CLICK", 0) / v.get("IMPRESSION", 1) * 100) if v.get("IMPRESSION", 0) > 0 else 0} for d, v in pd_daily.items()}
+    ctr_chart = create_comparison_chart(ctr_org, ctr_pd, "CTR", "CTR (%)", f"chart_ctr_{period_key}")
 
-    ctr_daily_paid = {}
-    for d, v in paid_daily.items():
-        imp = v.get("IMPRESSION", 0)
-        clk = v.get("CLICK", 0)
-        ctr_daily_paid[d] = {"CTR": (clk / imp * 100) if imp > 0 else 0}
+    # CPC and Spend charts (paid only)
+    cpc_daily = {d: {"CPC": (v.get("SPEND", 0) / v.get("CLICK", 1)) if v.get("CLICK", 0) > 0 else 0} for d, v in pd_daily.items()}
+    cpc_chart = create_single_chart(cpc_daily, "CPC", "CPC ($) - Paid", f"chart_cpc_{period_key}", COLORS["paid"], is_currency=True)
+    spend_chart = create_single_chart(pd_daily, "SPEND", "Spend ($) - Paid", f"chart_spd_{period_key}", COLORS["paid"], is_currency=True)
 
-    ctr_chart = create_comparison_chart(ctr_daily_organic, ctr_daily_paid, "CTR", "CTR (%)", "chart_ctr")
-
-    # CPC and Spend (paid only)
-    cpc_daily = {}
-    for d, v in paid_daily.items():
-        clk = v.get("CLICK", 0)
-        spend = v.get("SPEND", 0)
-        cpc_daily[d] = {"CPC": (spend / clk) if clk > 0 else 0}
-
-    cpc_chart = create_single_chart(cpc_daily, "CPC", "CPC ($) - Paid", "chart_cpc", COLORS["paid"], is_currency=True)
-    spend_chart = create_single_chart(paid_daily, "SPEND", "Spend ($) - Paid", "chart_spend", COLORS["paid"], is_currency=True)
-
-    # Paid leaderboard (top 10 by CTR)
+    # Leaderboards (use full period results, but could filter if needed)
     paid_sorted = sorted(paid_results, key=lambda x: x["ctr"], reverse=True)[:10]
     paid_rows = ""
     for r in paid_sorted:
         link = f"https://pinterest.com/pin/{r['pin_id']}" if r['pin_id'] else "#"
-        paid_rows += f"""
-        <tr>
+        paid_rows += f"""<tr>
             <td title="{r['name']}">{r['name'][:40]}</td>
             <td class="num">{r['impressions']:,}</td>
             <td class="num">{r['clicks']:,}</td>
@@ -354,13 +356,11 @@ def generate_html(
             <td><a href="{link}" target="_blank">View</a></td>
         </tr>"""
 
-    # Organic leaderboard (top 10 by impressions)
     organic_sorted = sorted(organic_results, key=lambda x: x["impressions"], reverse=True)[:10]
     organic_rows = ""
     for r in organic_sorted:
         link = f"https://pinterest.com/pin/{r['pin_id']}"
-        organic_rows += f"""
-        <tr>
+        organic_rows += f"""<tr>
             <td title="{r['title']}">{r['title'][:40] if r['title'] else 'Untitled'}</td>
             <td class="num">{r['impressions']:,}</td>
             <td class="num">{r['clicks']:,}</td>
@@ -368,6 +368,84 @@ def generate_html(
             <td class="num">{r['ctr']:.2f}%</td>
             <td><a href="{link}" target="_blank">View</a></td>
         </tr>"""
+
+    return f"""
+    <div class="summary">
+        <div class="stat">
+            <div class="stat-value">{total_impressions:,}</div>
+            <div class="stat-label">Impressions</div>
+            <div class="stat-breakdown">Organic: {org_totals['impressions']:,} | Paid: {pd_totals['impressions']:,}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{total_clicks:,}</div>
+            <div class="stat-label">Clicks</div>
+            <div class="stat-breakdown">Organic: {org_totals['clicks']:,} | Paid: {pd_totals['clicks']:,}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{total_ctr:.2f}%</div>
+            <div class="stat-label">CTR</div>
+            <div class="stat-breakdown">Organic: {org_totals['ctr']:.2f}% | Paid: {pd_totals['ctr']:.2f}%</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{total_saves:,}</div>
+            <div class="stat-label">Saves</div>
+            <div class="stat-breakdown">Organic: {org_totals['saves']:,} | Paid: {pd_totals['saves']:,}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">${pd_totals['spend']:.2f}</div>
+            <div class="stat-label">Spend</div>
+            <div class="stat-breakdown">Paid only</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">${pd_totals['cpc']:.2f}</div>
+            <div class="stat-label">CPC</div>
+            <div class="stat-breakdown">Paid only</div>
+        </div>
+    </div>
+
+    <h2>Trends</h2>
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color" style="background: {COLORS['organic']}"></div> Organic</div>
+        <div class="legend-item"><div class="legend-color" style="background: {COLORS['paid']}"></div> Paid</div>
+    </div>
+    <div class="charts">
+        <div class="chart">{impressions_chart}</div>
+        <div class="chart">{clicks_chart}</div>
+        <div class="chart">{ctr_chart}</div>
+        <div class="chart">{saves_chart}</div>
+        <div class="chart">{cpc_chart}</div>
+        <div class="chart">{spend_chart}</div>
+    </div>
+
+    <h2>Paid Ads Leaderboard (Top 10 by CTR)</h2>
+    <table>
+        <thead><tr><th>Ad Name</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">CTR</th><th class="num">Spend</th><th>Link</th></tr></thead>
+        <tbody>{paid_rows if paid_rows else '<tr><td colspan="6">No paid ads data</td></tr>'}</tbody>
+    </table>
+
+    <h2>Organic Leaderboard (Top 10 by Impressions)</h2>
+    <table>
+        <thead><tr><th>Pin Title</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">Saves</th><th class="num">CTR</th><th>Link</th></tr></thead>
+        <tbody>{organic_rows if organic_rows else '<tr><td colspan="6">No organic data</td></tr>'}</tbody>
+    </table>
+    """
+
+
+def generate_html(
+    account_name: str,
+    organic_results: list[dict],
+    organic_daily: dict,
+    paid_results: list[dict],
+    paid_daily: dict,
+) -> str:
+    """Generate HTML report with period toggle."""
+
+    # Generate content for each period
+    period_contents = ""
+    for period_key, days in PERIODS.items():
+        is_default = period_key == "2w"
+        content = generate_period_content(period_key, days, organic_daily, paid_daily, organic_results, paid_results)
+        period_contents += f'<div id="period_{period_key}" class="period-content {"active" if is_default else ""}">{content}</div>\n'
 
     html = f"""<!DOCTYPE html>
 <html>
@@ -384,8 +462,37 @@ def generate_html(
             background: #f5f5f5;
         }}
         h1 {{ color: #333; margin-bottom: 5px; }}
-        .meta {{ color: #666; margin-bottom: 25px; }}
+        .meta {{ color: #666; margin-bottom: 15px; }}
         h2 {{ color: #555; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top: 30px; }}
+
+        .period-toggle {{
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            width: fit-content;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }}
+        .period-btn {{
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
+        }}
+        .period-btn:hover {{ background: #f0f0f0; }}
+        .period-btn.active {{
+            background: #1f77b4;
+            color: white;
+        }}
+        .period-content {{ display: none; }}
+        .period-content.active {{ display: block; }}
 
         .summary {{
             display: grid;
@@ -442,6 +549,7 @@ def generate_html(
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }}
         th, td {{
             padding: 12px;
@@ -458,73 +566,27 @@ def generate_html(
 </head>
 <body>
     <h1>{account_name} Pinterest Analytics</h1>
-    <div class="meta">Last {DAYS} days | Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}</div>
+    <div class="meta">Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}</div>
 
-    <h2>Account Summary</h2>
-    <div class="summary">
-        <div class="stat">
-            <div class="stat-value">{total_impressions:,}</div>
-            <div class="stat-label">Impressions</div>
-            <div class="stat-breakdown">Organic: {organic_impressions:,} | Paid: {paid_impressions:,}</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{total_clicks:,}</div>
-            <div class="stat-label">Clicks</div>
-            <div class="stat-breakdown">Organic: {organic_clicks:,} | Paid: {paid_clicks:,}</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{total_ctr:.2f}%</div>
-            <div class="stat-label">CTR</div>
-            <div class="stat-breakdown">Organic: {organic_ctr:.2f}% | Paid: {paid_ctr:.2f}%</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{total_saves:,}</div>
-            <div class="stat-label">Saves</div>
-            <div class="stat-breakdown">Organic: {organic_saves:,} | Paid: {paid_saves:,}</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">${paid_spend:.2f}</div>
-            <div class="stat-label">Spend</div>
-            <div class="stat-breakdown">Paid only</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">${paid_cpc:.2f}</div>
-            <div class="stat-label">CPC</div>
-            <div class="stat-breakdown">Paid only</div>
-        </div>
+    <div class="period-toggle">
+        <button class="period-btn" onclick="showPeriod('1w')">1 Week</button>
+        <button class="period-btn active" onclick="showPeriod('2w')">2 Weeks</button>
+        <button class="period-btn" onclick="showPeriod('4w')">4 Weeks</button>
     </div>
 
-    <h2>Trends</h2>
-    <div class="legend">
-        <div class="legend-item"><div class="legend-color" style="background: {COLORS['organic']}"></div> Organic</div>
-        <div class="legend-item"><div class="legend-color" style="background: {COLORS['paid']}"></div> Paid</div>
-    </div>
-    <div class="charts">
-        <div class="chart">{impressions_chart}</div>
-        <div class="chart">{clicks_chart}</div>
-        <div class="chart">{ctr_chart}</div>
-        <div class="chart">{saves_chart}</div>
-        <div class="chart">{cpc_chart}</div>
-        <div class="chart">{spend_chart}</div>
-    </div>
-
-    <h2>Paid Ads Leaderboard (Top 10 by CTR)</h2>
-    <table>
-        <thead>
-            <tr><th>Ad Name</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">CTR</th><th class="num">Spend</th><th>Link</th></tr>
-        </thead>
-        <tbody>{paid_rows if paid_rows else '<tr><td colspan="6">No paid ads data</td></tr>'}</tbody>
-    </table>
-
-    <h2>Organic Leaderboard (Top 10 by Impressions)</h2>
-    <table>
-        <thead>
-            <tr><th>Pin Title</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">Saves</th><th class="num">CTR</th><th>Link</th></tr>
-        </thead>
-        <tbody>{organic_rows if organic_rows else '<tr><td colspan="6">No organic data</td></tr>'}</tbody>
-    </table>
+    {period_contents}
 
     <div class="footer">Pinterest Account Analytics</div>
+
+    <script>
+        function showPeriod(period) {{
+            document.querySelectorAll('.period-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.period-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('period_' + period).classList.add('active');
+            event.target.classList.add('active');
+            window.dispatchEvent(new Event('resize'));
+        }}
+    </script>
 </body>
 </html>"""
 
@@ -543,23 +605,20 @@ def main():
         print(f"Error: {e}")
         sys.exit(1)
 
-    # Get account info
     print("Fetching account info...")
     account_info = fetch_account_info(access_token)
     account_name = account_info.get("username", "Pinterest Account")
 
-    # Fetch organic data
     print("Fetching pins...")
     pins = fetch_all_pins(access_token)
     if args.limit:
         pins = pins[:args.limit]
     print(f"Found {len(pins)} pins")
 
-    print(f"Fetching organic analytics...")
+    print("Fetching organic analytics (28 days)...")
     organic_results, organic_daily = collect_organic_data(access_token, pins)
     print(f"Collected organic data for {len(organic_results)} pins")
 
-    # Fetch paid data
     print("Fetching paid ads data...")
     ad_accounts = fetch_ad_accounts(access_token)
     paid_results, paid_daily = [], {}
@@ -570,7 +629,6 @@ def main():
     else:
         print("No ad accounts found")
 
-    # Generate report
     html = generate_html(account_name, organic_results, organic_daily, paid_results, paid_daily)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")

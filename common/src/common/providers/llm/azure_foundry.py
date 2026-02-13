@@ -8,6 +8,7 @@ LOCALE_INSTRUCTIONS = {
     "en": "Respond in English.",
     "es": "Responde en español.",
     "sw": "Jibu kwa Kiswahili.",
+    "pt": "Responda em português.",
 }
 
 
@@ -40,7 +41,13 @@ Return ONLY valid JSON with the exact fields shown above.
     def __init__(self, azure_open_ai_client: AzureOpenAI):
         self.client = azure_open_ai_client
 
-    def _build_prompt(self, channel: IDistributionChannel, persona=None, style=None, locale: str = "en") -> str:
+    def _build_prompt(
+        self,
+        channel: IDistributionChannel,
+        persona=None,
+        style=None,
+        locale: str = "en",
+    ) -> str:
         """Build system prompt: channel (platform) + persona (voice) + style (fields) + locale."""
         prompt = channel.system_prompt
 
@@ -53,7 +60,9 @@ Return ONLY valid JSON with the exact fields shown above.
                 style_name=style.name,
                 style_description=style.description,
                 fields=",\n  ".join(field_lines),
-                field_guidelines="\n".join(f"- {g}" for g in guidelines) if guidelines else "",
+                field_guidelines=(
+                    "\n".join(f"- {g}" for g in guidelines) if guidelines else ""
+                ),
             )
             prompt = f"{prompt}\n\n{style_section}"
 
@@ -63,7 +72,14 @@ Return ONLY valid JSON with the exact fields shown above.
         return prompt
 
     def generate(
-        self, niche: str, keyword: str, channel: IDistributionChannel, persona=None, style=None, locale: str = "en", image_url: str = ""
+        self,
+        niche: str,
+        keyword: str,
+        channel: IDistributionChannel,
+        persona=None,
+        style=None,
+        locale: str = "en",
+        image_url: str = "",
     ) -> dict:
         """Generate content using Azure OpenAI.
 
