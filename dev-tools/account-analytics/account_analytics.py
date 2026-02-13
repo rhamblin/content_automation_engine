@@ -38,7 +38,9 @@ def fetch_all_pins(access_token: str) -> list[dict]:
         if bookmark:
             params["bookmark"] = bookmark
 
-        response = requests.get(f"{PINTEREST_API_URL}/pins", headers=headers, params=params)
+        response = requests.get(
+            f"{PINTEREST_API_URL}/pins", headers=headers, params=params
+        )
         if not response.ok:
             break
 
@@ -63,13 +65,17 @@ def fetch_pin_analytics(access_token: str, pin_id: str) -> dict | None:
         "metric_types": "IMPRESSION,SAVE,PIN_CLICK,OUTBOUND_CLICK",
     }
 
-    response = requests.get(f"{PINTEREST_API_URL}/pins/{pin_id}/analytics", headers=headers, params=params)
+    response = requests.get(
+        f"{PINTEREST_API_URL}/pins/{pin_id}/analytics", headers=headers, params=params
+    )
     return response.json() if response.ok else None
 
 
-def collect_organic_data(access_token: str, pins: list[dict]) -> tuple[list[dict], dict]:
-    """Collect organic analytics for all pins."""
-    results = []
+def collect_organic_data(
+    access_token: str, pins: list[dict]
+) -> tuple[dict, dict]:
+    """Collect organic analytics for all pins. Returns (pin_daily, daily_totals)."""
+    pin_daily = {}  # {pin_id: {"title": ..., "link": ..., dates: {date: {metrics}}}}
     daily_totals = {}
 
     for i, pin in enumerate(pins):
@@ -82,34 +88,29 @@ def collect_organic_data(access_token: str, pins: list[dict]) -> tuple[list[dict
             continue
 
         daily = analytics.get("all", {}).get("daily_metrics", [])
-        totals = {"IMPRESSION": 0, "SAVE": 0, "PIN_CLICK": 0, "OUTBOUND_CLICK": 0}
+        pin_daily[pin_id] = {
+            "title": pin.get("title", "Untitled"),
+            "link": pin.get("link", ""),
+            "dates": {},
+        }
 
         for day in daily:
             date = day.get("date", "")
             metrics = day.get("metrics", {})
-            for m in totals.keys():
-                val = metrics.get(m, 0)
-                totals[m] += val
+            pin_daily[pin_id]["dates"][date] = {
+                "IMPRESSION": metrics.get("IMPRESSION", 0),
+                "SAVE": metrics.get("SAVE", 0),
+                "OUTBOUND_CLICK": metrics.get("OUTBOUND_CLICK", 0),
+            }
 
-                if date not in daily_totals:
-                    daily_totals[date] = {"IMPRESSION": 0, "SAVE": 0, "OUTBOUND_CLICK": 0}
-                daily_totals[date][m] = daily_totals[date].get(m, 0) + val
-
-        ctr = (totals["OUTBOUND_CLICK"] / totals["IMPRESSION"] * 100) if totals["IMPRESSION"] > 0 else 0
-
-        results.append({
-            "pin_id": pin_id,
-            "title": pin.get("title", "Untitled"),
-            "link": pin.get("link", ""),
-            "impressions": totals["IMPRESSION"],
-            "clicks": totals["OUTBOUND_CLICK"],
-            "saves": totals["SAVE"],
-            "ctr": ctr,
-        })
+            if date not in daily_totals:
+                daily_totals[date] = {"IMPRESSION": 0, "SAVE": 0, "OUTBOUND_CLICK": 0}
+            for m in daily_totals[date]:
+                daily_totals[date][m] += metrics.get(m, 0)
 
         time.sleep(0.3)
 
-    return results, daily_totals
+    return pin_daily, daily_totals
 
 
 def fetch_ad_accounts(access_token: str) -> list[dict]:
@@ -122,11 +123,15 @@ def fetch_ad_accounts(access_token: str) -> list[dict]:
 def fetch_ads(access_token: str, ad_account_id: str) -> list[dict]:
     """Fetch all ads."""
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(f"{PINTEREST_API_URL}/ad_accounts/{ad_account_id}/ads", headers=headers)
+    response = requests.get(
+        f"{PINTEREST_API_URL}/ad_accounts/{ad_account_id}/ads", headers=headers
+    )
     return response.json().get("items", []) if response.ok else []
 
 
-def fetch_ad_analytics(access_token: str, ad_account_id: str, ad_ids: list[str]) -> list[dict]:
+def fetch_ad_analytics(
+    access_token: str, ad_account_id: str, ad_ids: list[str]
+) -> list[dict]:
     """Fetch analytics for ads (28 days)."""
     if not ad_ids:
         return []
@@ -152,59 +157,50 @@ def fetch_ad_analytics(access_token: str, ad_account_id: str, ad_ids: list[str])
     return response.json() if response.ok else []
 
 
-def collect_paid_data(access_token: str, ad_account_id: str) -> tuple[list[dict], dict]:
-    """Collect paid ads analytics."""
+def collect_paid_data(access_token: str, ad_account_id: str) -> tuple[dict, dict]:
+    """Collect paid ads analytics. Returns (ad_daily, daily_totals)."""
     ads = fetch_ads(access_token, ad_account_id)
     if not ads:
-        return [], {}
+        return {}, {}
 
     ad_map = {a["id"]: a for a in ads}
     ad_ids = list(ad_map.keys())
 
     analytics = fetch_ad_analytics(access_token, ad_account_id, ad_ids)
 
-    ad_data = {}
+    ad_daily = {}  # {ad_id: {"name": ..., "pin_id": ..., dates: {date: {metrics}}}}
     daily_totals = {}
 
     for row in analytics:
         ad_id = row.get("AD_ID")
         date = row.get("DATE", "")
 
-        if ad_id not in ad_data:
-            ad_data[ad_id] = {"impressions": 0, "clicks": 0, "saves": 0, "spend": 0}
+        if ad_id not in ad_daily:
+            ad_info = ad_map.get(ad_id, {})
+            ad_daily[ad_id] = {
+                "name": ad_info.get("name", "Unknown"),
+                "pin_id": ad_info.get("pin_id", ""),
+                "dates": {},
+            }
 
-        ad_data[ad_id]["impressions"] += row.get("TOTAL_IMPRESSION", 0) or 0
-        ad_data[ad_id]["clicks"] += row.get("TOTAL_CLICKTHROUGH", 0) or 0
-        ad_data[ad_id]["saves"] += row.get("REPIN_1", 0) or 0
-        ad_data[ad_id]["spend"] += row.get("SPEND_IN_DOLLAR", 0) or 0
+        imp = row.get("TOTAL_IMPRESSION", 0) or 0
+        clk = row.get("TOTAL_CLICKTHROUGH", 0) or 0
+        sav = row.get("REPIN_1", 0) or 0
+        spd = row.get("SPEND_IN_DOLLAR", 0) or 0
 
         if date:
+            ad_daily[ad_id]["dates"][date] = {
+                "IMPRESSION": imp, "CLICK": clk, "SAVE": sav, "SPEND": spd,
+            }
+
             if date not in daily_totals:
                 daily_totals[date] = {"IMPRESSION": 0, "CLICK": 0, "SAVE": 0, "SPEND": 0}
-            daily_totals[date]["IMPRESSION"] += row.get("TOTAL_IMPRESSION", 0) or 0
-            daily_totals[date]["CLICK"] += row.get("TOTAL_CLICKTHROUGH", 0) or 0
-            daily_totals[date]["SAVE"] += row.get("REPIN_1", 0) or 0
-            daily_totals[date]["SPEND"] += row.get("SPEND_IN_DOLLAR", 0) or 0
+            daily_totals[date]["IMPRESSION"] += imp
+            daily_totals[date]["CLICK"] += clk
+            daily_totals[date]["SAVE"] += sav
+            daily_totals[date]["SPEND"] += spd
 
-    results = []
-    for ad_id, data in ad_data.items():
-        ad_info = ad_map.get(ad_id, {})
-        ctr = (data["clicks"] / data["impressions"] * 100) if data["impressions"] > 0 else 0
-        cpc = (data["spend"] / data["clicks"]) if data["clicks"] > 0 else 0
-
-        results.append({
-            "ad_id": ad_id,
-            "name": ad_info.get("name", "Unknown"),
-            "pin_id": ad_info.get("pin_id", ""),
-            "impressions": data["impressions"],
-            "clicks": data["clicks"],
-            "saves": data["saves"],
-            "spend": data["spend"],
-            "ctr": ctr,
-            "cpc": cpc,
-        })
-
-    return results, daily_totals
+    return ad_daily, daily_totals
 
 
 def filter_daily_by_period(daily: dict, days: int) -> dict:
@@ -239,7 +235,57 @@ def calc_totals_from_daily(daily: dict, is_paid: bool = False) -> dict:
     }
 
 
-def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, title: str, chart_id: str) -> str:
+def organic_leaderboard_for_period(pin_daily: dict, days: int) -> list[dict]:
+    """Compute organic leaderboard from per-pin daily data filtered by period."""
+    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+    results = []
+    for pin_id, info in pin_daily.items():
+        totals = {"IMPRESSION": 0, "SAVE": 0, "OUTBOUND_CLICK": 0}
+        for date, metrics in info["dates"].items():
+            if date >= cutoff:
+                for m in totals:
+                    totals[m] += metrics.get(m, 0)
+        ctr = (totals["OUTBOUND_CLICK"] / totals["IMPRESSION"] * 100) if totals["IMPRESSION"] > 0 else 0
+        results.append({
+            "pin_id": pin_id,
+            "title": info.get("title", "Untitled"),
+            "impressions": totals["IMPRESSION"],
+            "clicks": totals["OUTBOUND_CLICK"],
+            "saves": totals["SAVE"],
+            "ctr": ctr,
+        })
+    return results
+
+
+def paid_leaderboard_for_period(ad_daily: dict, days: int) -> list[dict]:
+    """Compute paid leaderboard from per-ad daily data filtered by period."""
+    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+    results = []
+    for ad_id, info in ad_daily.items():
+        totals = {"IMPRESSION": 0, "CLICK": 0, "SAVE": 0, "SPEND": 0}
+        for date, metrics in info["dates"].items():
+            if date >= cutoff:
+                for m in totals:
+                    totals[m] += metrics.get(m, 0)
+        ctr = (totals["CLICK"] / totals["IMPRESSION"] * 100) if totals["IMPRESSION"] > 0 else 0
+        cpc = (totals["SPEND"] / totals["CLICK"]) if totals["CLICK"] > 0 else 0
+        results.append({
+            "ad_id": ad_id,
+            "name": info.get("name", "Unknown"),
+            "pin_id": info.get("pin_id", ""),
+            "impressions": totals["IMPRESSION"],
+            "clicks": totals["CLICK"],
+            "saves": totals["SAVE"],
+            "spend": totals["SPEND"],
+            "ctr": ctr,
+            "cpc": cpc,
+        })
+    return results
+
+
+def create_comparison_chart(
+    organic_daily: dict, paid_daily: dict, metric: str, title: str, chart_id: str
+) -> str:
     """Create chart comparing organic vs paid."""
     fig = go.Figure()
 
@@ -248,25 +294,42 @@ def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, 
         return "<p>No data</p>"
 
     organic_values = [organic_daily.get(d, {}).get(metric, 0) for d in all_dates]
-    if any(v > 0 for v in organic_values):
-        fig.add_trace(go.Scatter(
-            x=all_dates, y=organic_values,
-            mode="lines+markers", name="Organic",
+    fig.add_trace(
+        go.Scatter(
+            x=all_dates,
+            y=organic_values,
+            mode="lines+markers",
+            name="Organic",
             line=dict(color=COLORS["organic"], width=2),
-        ))
+        )
+    )
 
-    paid_metric = {"IMPRESSION": "IMPRESSION", "OUTBOUND_CLICK": "CLICK", "SAVE": "SAVE"}.get(metric, metric)
+    paid_metric = {
+        "IMPRESSION": "IMPRESSION",
+        "OUTBOUND_CLICK": "CLICK",
+        "SAVE": "SAVE",
+    }.get(metric, metric)
     paid_values = [paid_daily.get(d, {}).get(paid_metric, 0) for d in all_dates]
-    if any(v > 0 for v in paid_values):
-        fig.add_trace(go.Scatter(
-            x=all_dates, y=paid_values,
-            mode="lines+markers", name="Paid",
+    fig.add_trace(
+        go.Scatter(
+            x=all_dates,
+            y=paid_values,
+            mode="lines+markers",
+            name="Paid",
             line=dict(color=COLORS["paid"], width=2),
-        ))
+        )
+    )
 
     fig.update_layout(
         title=title,
-        xaxis=dict(tickangle=-45, showspikes=True, spikemode="across", spikethickness=1, spikecolor="#999", spikedash="dot"),
+        xaxis=dict(
+            tickangle=-45,
+            showspikes=True,
+            spikemode="across",
+            spikethickness=1,
+            spikecolor="#999",
+            spikedash="dot",
+        ),
         yaxis=dict(gridcolor="#eee"),
         plot_bgcolor="white",
         height=280,
@@ -278,7 +341,14 @@ def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, 
     return fig.to_html(full_html=False, include_plotlyjs=False, div_id=chart_id)
 
 
-def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, color: str, is_currency: bool = False) -> str:
+def create_single_chart(
+    daily: dict,
+    metric: str,
+    title: str,
+    chart_id: str,
+    color: str,
+    is_currency: bool = False,
+) -> str:
     """Create single metric chart."""
     dates = sorted(daily.keys())
     if not dates:
@@ -287,15 +357,26 @@ def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, col
     values = [daily.get(d, {}).get(metric, 0) for d in dates]
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=dates, y=values,
-        mode="lines+markers", fill="tozeroy",
-        line=dict(color=color, width=2),
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=dates,
+            y=values,
+            mode="lines+markers",
+            fill="tozeroy",
+            line=dict(color=color, width=2),
+        )
+    )
 
     fig.update_layout(
         title=title,
-        xaxis=dict(tickangle=-45, showspikes=True, spikemode="across", spikethickness=1, spikecolor="#999", spikedash="dot"),
+        xaxis=dict(
+            tickangle=-45,
+            showspikes=True,
+            spikemode="across",
+            spikethickness=1,
+            spikecolor="#999",
+            spikedash="dot",
+        ),
         yaxis=dict(gridcolor="#eee", tickprefix="$" if is_currency else ""),
         plot_bgcolor="white",
         height=280,
@@ -312,8 +393,8 @@ def generate_period_content(
     days: int,
     organic_daily: dict,
     paid_daily: dict,
-    organic_results: list[dict],
-    paid_results: list[dict],
+    pin_daily: dict,
+    ad_daily: dict,
 ) -> str:
     """Generate content for a specific time period."""
     # Filter daily data
@@ -330,25 +411,72 @@ def generate_period_content(
     total_ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
 
     # Generate charts
-    impressions_chart = create_comparison_chart(org_daily, pd_daily, "IMPRESSION", "Impressions", f"chart_imp_{period_key}")
-    clicks_chart = create_comparison_chart(org_daily, pd_daily, "OUTBOUND_CLICK", "Clicks", f"chart_clk_{period_key}")
-    saves_chart = create_comparison_chart(org_daily, pd_daily, "SAVE", "Saves", f"chart_sav_{period_key}")
+    impressions_chart = create_comparison_chart(
+        org_daily, pd_daily, "IMPRESSION", "Impressions", f"chart_imp_{period_key}"
+    )
+    clicks_chart = create_comparison_chart(
+        org_daily, pd_daily, "OUTBOUND_CLICK", "Clicks", f"chart_clk_{period_key}"
+    )
+    saves_chart = create_comparison_chart(
+        org_daily, pd_daily, "SAVE", "Saves", f"chart_sav_{period_key}"
+    )
 
     # CTR chart
-    ctr_org = {d: {"CTR": (v.get("OUTBOUND_CLICK", 0) / v.get("IMPRESSION", 1) * 100) if v.get("IMPRESSION", 0) > 0 else 0} for d, v in org_daily.items()}
-    ctr_pd = {d: {"CTR": (v.get("CLICK", 0) / v.get("IMPRESSION", 1) * 100) if v.get("IMPRESSION", 0) > 0 else 0} for d, v in pd_daily.items()}
-    ctr_chart = create_comparison_chart(ctr_org, ctr_pd, "CTR", "CTR (%)", f"chart_ctr_{period_key}")
+    ctr_org = {
+        d: {
+            "CTR": (
+                (v.get("OUTBOUND_CLICK", 0) / v.get("IMPRESSION", 1) * 100)
+                if v.get("IMPRESSION", 0) > 0
+                else 0
+            )
+        }
+        for d, v in org_daily.items()
+    }
+    ctr_pd = {
+        d: {
+            "CTR": (
+                (v.get("CLICK", 0) / v.get("IMPRESSION", 1) * 100)
+                if v.get("IMPRESSION", 0) > 0
+                else 0
+            )
+        }
+        for d, v in pd_daily.items()
+    }
+    ctr_chart = create_comparison_chart(
+        ctr_org, ctr_pd, "CTR", "CTR (%)", f"chart_ctr_{period_key}"
+    )
 
     # CPC and Spend charts (paid only)
-    cpc_daily = {d: {"CPC": (v.get("SPEND", 0) / v.get("CLICK", 1)) if v.get("CLICK", 0) > 0 else 0} for d, v in pd_daily.items()}
-    cpc_chart = create_single_chart(cpc_daily, "CPC", "CPC ($) - Paid", f"chart_cpc_{period_key}", COLORS["paid"], is_currency=True)
-    spend_chart = create_single_chart(pd_daily, "SPEND", "Spend ($) - Paid", f"chart_spd_{period_key}", COLORS["paid"], is_currency=True)
+    cpc_daily = {
+        d: {
+            "CPC": (
+                (v.get("SPEND", 0) / v.get("CLICK", 1)) if v.get("CLICK", 0) > 0 else 0
+            )
+        }
+        for d, v in pd_daily.items()
+    }
+    cpc_chart = create_single_chart(
+        cpc_daily,
+        "CPC",
+        "CPC ($) - Paid",
+        f"chart_cpc_{period_key}",
+        COLORS["paid"],
+        is_currency=True,
+    )
+    spend_chart = create_single_chart(
+        pd_daily,
+        "SPEND",
+        "Spend ($) - Paid",
+        f"chart_spd_{period_key}",
+        COLORS["paid"],
+        is_currency=True,
+    )
 
-    # Leaderboards (use full period results, but could filter if needed)
-    paid_sorted = sorted(paid_results, key=lambda x: x["ctr"], reverse=True)[:10]
+    # Leaderboards filtered by period
+    paid_sorted = sorted(paid_leaderboard_for_period(ad_daily, days), key=lambda x: x["ctr"], reverse=True)[:10]
     paid_rows = ""
     for r in paid_sorted:
-        link = f"https://pinterest.com/pin/{r['pin_id']}" if r['pin_id'] else "#"
+        link = f"https://pinterest.com/pin/{r['pin_id']}" if r["pin_id"] else "#"
         paid_rows += f"""<tr>
             <td title="{r['name']}">{r['name'][:40]}</td>
             <td class="num">{r['impressions']:,}</td>
@@ -358,7 +486,7 @@ def generate_period_content(
             <td><a href="{link}" target="_blank">View</a></td>
         </tr>"""
 
-    organic_sorted = sorted(organic_results, key=lambda x: x["impressions"], reverse=True)[:10]
+    organic_sorted = sorted(organic_leaderboard_for_period(pin_daily, days), key=lambda x: x["impressions"], reverse=True)[:10]
     organic_rows = ""
     for r in organic_sorted:
         link = f"https://pinterest.com/pin/{r['pin_id']}"
@@ -440,9 +568,9 @@ def generate_period_content(
 
 def generate_html(
     account_name: str,
-    organic_results: list[dict],
+    pin_daily: dict,
     organic_daily: dict,
-    paid_results: list[dict],
+    ad_daily: dict,
     paid_daily: dict,
 ) -> str:
     """Generate HTML report with period toggle."""
@@ -451,7 +579,9 @@ def generate_html(
     period_contents = ""
     for period_key, days in PERIODS.items():
         is_default = period_key == "2w"
-        content = generate_period_content(period_key, days, organic_daily, paid_daily, organic_results, paid_results)
+        content = generate_period_content(
+            period_key, days, organic_daily, paid_daily, pin_daily, ad_daily
+        )
         period_contents += f'<div id="period_{period_key}" class="period-content {"active" if is_default else ""}">{content}</div>\n'
 
     html = f"""<!DOCTYPE html>
@@ -717,24 +847,26 @@ def main():
     print("Fetching pins...")
     pins = fetch_all_pins(access_token)
     if args.limit:
-        pins = pins[:args.limit]
+        pins = pins[: args.limit]
     print(f"Found {len(pins)} pins")
 
     print("Fetching organic analytics (28 days)...")
-    organic_results, organic_daily = collect_organic_data(access_token, pins)
-    print(f"Collected organic data for {len(organic_results)} pins")
+    pin_daily, organic_daily = collect_organic_data(access_token, pins)
+    print(f"Collected organic data for {len(pin_daily)} pins")
 
     print("Fetching paid ads data...")
     ad_accounts = fetch_ad_accounts(access_token)
-    paid_results, paid_daily = [], {}
+    ad_daily, paid_daily = {}, {}
     if ad_accounts:
         ad_account_id = ad_accounts[0]["id"]
-        paid_results, paid_daily = collect_paid_data(access_token, ad_account_id)
-        print(f"Collected paid data for {len(paid_results)} ads")
+        ad_daily, paid_daily = collect_paid_data(access_token, ad_account_id)
+        print(f"Collected paid data for {len(ad_daily)} ads")
     else:
         print("No ad accounts found")
 
-    html = generate_html(account_name, organic_results, organic_daily, paid_results, paid_daily)
+    html = generate_html(
+        account_name, pin_daily, organic_daily, ad_daily, paid_daily
+    )
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
     output_file = OUTPUT_DIR / f"account_analytics_{timestamp}.html"
@@ -744,6 +876,7 @@ def main():
 
     if args.open:
         import webbrowser
+
         webbrowser.open(f"file://{output_file.absolute()}")
 
 
