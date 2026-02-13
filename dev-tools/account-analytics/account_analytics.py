@@ -266,12 +266,13 @@ def create_comparison_chart(organic_daily: dict, paid_daily: dict, metric: str, 
 
     fig.update_layout(
         title=title,
-        xaxis=dict(tickangle=-45),
+        xaxis=dict(tickangle=-45, showspikes=True, spikemode="across", spikethickness=1, spikecolor="#999", spikedash="dot"),
         yaxis=dict(gridcolor="#eee"),
         plot_bgcolor="white",
         height=280,
         margin=dict(l=50, r=30, t=50, b=60),
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
+        hovermode="x",
     )
 
     return fig.to_html(full_html=False, include_plotlyjs=False, div_id=chart_id)
@@ -294,12 +295,13 @@ def create_single_chart(daily: dict, metric: str, title: str, chart_id: str, col
 
     fig.update_layout(
         title=title,
-        xaxis=dict(tickangle=-45),
+        xaxis=dict(tickangle=-45, showspikes=True, spikemode="across", spikethickness=1, spikecolor="#999", spikedash="dot"),
         yaxis=dict(gridcolor="#eee", tickprefix="$" if is_currency else ""),
         plot_bgcolor="white",
         height=280,
         margin=dict(l=50, r=30, t=50, b=60),
         showlegend=False,
+        hovermode="x",
     )
 
     return fig.to_html(full_html=False, include_plotlyjs=False, div_id=chart_id)
@@ -404,9 +406,14 @@ def generate_period_content(
     </div>
 
     <h2>Trends</h2>
-    <div class="legend">
-        <div class="legend-item"><div class="legend-color" style="background: {COLORS['organic']}"></div> Organic</div>
-        <div class="legend-item"><div class="legend-color" style="background: {COLORS['paid']}"></div> Paid</div>
+    <div class="source-toggle">
+        <button class="source-btn active" data-source="both" onclick="toggleSource('both', '{period_key}')">Both</button>
+        <button class="source-btn" data-source="organic" onclick="toggleSource('organic', '{period_key}')">
+            <span class="legend-dot" style="background:{COLORS['organic']}"></span> Organic
+        </button>
+        <button class="source-btn" data-source="paid" onclick="toggleSource('paid', '{period_key}')">
+            <span class="legend-dot" style="background:{COLORS['paid']}"></span> Paid
+        </button>
     </div>
     <div class="charts">
         <div class="chart">{impressions_chart}</div>
@@ -524,22 +531,41 @@ def generate_html(
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }}
 
-        .legend {{
+        .source-toggle {{
             display: flex;
-            gap: 20px;
+            gap: 5px;
             justify-content: center;
             margin-bottom: 20px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }}
-        .legend-item {{
+        .source-btn {{
+            padding: 8px 18px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 6px;
         }}
-        .legend-color {{
-            width: 20px;
-            height: 3px;
-            border-radius: 2px;
+        .source-btn:hover {{ background: #f0f0f0; }}
+        .source-btn.active {{ background: #1f77b4; color: white; }}
+        .source-btn.active .legend-dot {{ border: 1px solid white; }}
+        .legend-dot {{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
         }}
 
         table {{
@@ -586,6 +612,82 @@ def generate_html(
             event.target.classList.add('active');
             window.dispatchEvent(new Event('resize'));
         }}
+
+        function toggleSource(source, periodKey) {{
+            // Update button state within the active period
+            var container = document.getElementById('period_' + periodKey);
+            container.querySelectorAll('.source-btn').forEach(function(b) {{ b.classList.remove('active'); }});
+            container.querySelector('[data-source="' + source + '"]').classList.add('active');
+
+            // Chart prefixes for comparison charts (have Organic/Paid traces)
+            var compPrefixes = ['chart_imp_', 'chart_clk_', 'chart_ctr_', 'chart_sav_'];
+            compPrefixes.forEach(function(prefix) {{
+                var divId = prefix + periodKey;
+                var gd = document.getElementById(divId);
+                if (!gd || !gd.data) return;
+                var update = {{}};
+                gd.data.forEach(function(trace, i) {{
+                    if (trace.name === 'Organic') {{
+                        update['visible'] = update['visible'] || [];
+                        update['visible'][i] = (source === 'both' || source === 'organic');
+                    }} else if (trace.name === 'Paid') {{
+                        update['visible'] = update['visible'] || [];
+                        update['visible'][i] = (source === 'both' || source === 'paid');
+                    }}
+                }});
+                if (update['visible']) {{
+                    Plotly.restyle(gd, {{'visible': update['visible']}});
+                }}
+            }});
+        }}
+
+        // Synchronized crosshair across all charts
+        function setupCrosshairSync() {{
+            var allChartIds = [];
+            document.querySelectorAll('.chart > div[id]').forEach(function(el) {{
+                allChartIds.push(el.id);
+            }});
+
+            allChartIds.forEach(function(srcId) {{
+                var srcEl = document.getElementById(srcId);
+                if (!srcEl) return;
+
+                srcEl.on('plotly_hover', function(data) {{
+                    if (!data.points || !data.points.length) return;
+                    var xVal = data.points[0].x;
+                    // Find sibling charts in same period
+                    var period = srcId.split('_').pop();
+                    allChartIds.forEach(function(tgtId) {{
+                        if (tgtId === srcId) return;
+                        if (tgtId.split('_').pop() !== period) return;
+                        var tgtEl = document.getElementById(tgtId);
+                        if (!tgtEl || !tgtEl.data) return;
+                        // Find matching point indices
+                        var pts = [];
+                        tgtEl.data.forEach(function(trace, ti) {{
+                            if (!trace.visible && trace.visible !== undefined) return;
+                            var xi = trace.x ? trace.x.indexOf(xVal) : -1;
+                            if (xi >= 0) pts.push({{curveNumber: ti, pointNumber: xi}});
+                        }});
+                        if (pts.length) Plotly.Fx.hover(tgtId, pts);
+                    }});
+                }});
+
+                srcEl.on('plotly_unhover', function() {{
+                    var period = srcId.split('_').pop();
+                    allChartIds.forEach(function(tgtId) {{
+                        if (tgtId === srcId) return;
+                        if (tgtId.split('_').pop() !== period) return;
+                        Plotly.Fx.hover(tgtId, []);
+                    }});
+                }});
+            }});
+        }}
+
+        // Run sync setup after charts render
+        window.addEventListener('load', function() {{
+            setTimeout(setupCrosshairSync, 500);
+        }});
     </script>
 </body>
 </html>"""
