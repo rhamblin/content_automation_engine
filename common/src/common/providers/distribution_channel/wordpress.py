@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 
 from common.app_logger import AppLogger
 from common.contracts.interfaces import IDistributionChannel, ILLMProvider
+from common.contracts.models import CanvasSpec, VisualStyle
 
 
 class WordPressChannel(IDistributionChannel):
@@ -15,8 +16,6 @@ class WordPressChannel(IDistributionChannel):
         RuntimeError: When WordPress API returns an error response.
         ValueError: When response data is invalid or missing required fields.
     """
-
-    PROVIDER_NAME = "wordpress"
 
     DEFAULT_PROMPT = """
 You are Marge, a stay-at-home mom cooking for a large family and sharing recipes with friends.
@@ -105,6 +104,18 @@ Output: Return ONLY valid JSON in the schema above.
         self.api_url = f"{self.site_url}/wp-json/wp/v2/posts"
         self.llm = llm
         self.amazon_tag = amazon_tag
+
+    @property
+    def provider_name(self) -> str:
+        return "wordpress"
+
+    @property
+    def canvas(self) -> CanvasSpec | None:
+        return None
+
+    @property
+    def styles(self) -> dict[str, VisualStyle]:
+        return {}
 
     @property
     def system_prompt(self) -> str:

@@ -20,7 +20,9 @@ class AzureFoundryLLMProvider(ILLMProvider):
         ValueError: When response is empty or invalid JSON.
     """
 
-    PROVIDER_NAME = "azure_foundry"
+    @property
+    def provider_name(self) -> str:
+        return "azure_foundry"
 
     STYLE_PROMPT_TEMPLATE = """
 Generate text for the "{style_name}" style.

@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
 
+
 class IBaseProviderWithName(ABC):
-    PROVIDER_NAME: str
+    @property
+    @abstractmethod
+    def provider_name(self) -> str: ...

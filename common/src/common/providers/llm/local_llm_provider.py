@@ -3,7 +3,9 @@ from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 
 
 class LocalLLMProvider(ILLMProvider):
-    PROVIDER_NAME = "local"
+    @property
+    def provider_name(self) -> str:
+        return "local"
 
     def __init__(self):
         self.logger = AppLogger(__name__)
@@ -12,7 +14,7 @@ class LocalLLMProvider(ILLMProvider):
         self, niche: str, keyword: str, channel: IDistributionChannel, persona=None, style=None, locale: str = "en", **kwargs
     ) -> dict:
         self.logger.info(
-            f"Generating for niche: {niche}, keyword: {keyword}, channel: {channel.PROVIDER_NAME}, locale: {locale}"
+            f"Generating for niche: {niche}, keyword: {keyword}, channel: {channel.provider_name}, locale: {locale}"
         )
 
         # If style provided, return only fields defined in style

@@ -42,12 +42,14 @@ async def main(logger: AppLogger):
         blob_storage = providers.AzureBlobStorageProvider(blob_client)
 
         if settings.app_environment == ENVIRONMENT_LOCAL:
+            local_llm = providers.LocalLLMProvider()
             llm_providers: dict[str, ILLMProvider] = {
-                providers.LocalLLMProvider.PROVIDER_NAME: providers.LocalLLMProvider()
+                local_llm.provider_name: local_llm
             }
 
+            local_channel = providers.LocalDistributionChannel()
             distribution_channels: dict[str, IDistributionChannel] = {
-                providers.LocalDistributionChannel.PROVIDER_NAME: providers.LocalDistributionChannel()
+                local_channel.provider_name: local_channel
             }
 
         else:
@@ -61,14 +63,14 @@ async def main(logger: AppLogger):
                 azure_endpoint=settings.azure_foundry_endpoint,
                 api_key=settings.azure_foundry_proj_default_api_key,
             )
+            azure_llm = providers.AzureFoundryLLMProvider(azure_openai_client)
             llm_providers: dict[str, ILLMProvider] = {
-                providers.AzureFoundryLLMProvider.PROVIDER_NAME: providers.AzureFoundryLLMProvider(
-                    azure_openai_client
-                )
+                azure_llm.provider_name: azure_llm
             }
 
+            pinterest = providers.PinterestChannel()
             distribution_channels: dict[str, IDistributionChannel] = {
-                providers.PinterestChannel.PROVIDER_NAME: providers.PinterestChannel()
+                pinterest.provider_name: pinterest
             }
 
         if database:

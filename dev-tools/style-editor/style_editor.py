@@ -18,11 +18,9 @@ from settings import load_dev_settings
 
 def _load_channel(name: str):
     """Dynamically load STYLES dict and CanvasSpec for a channel."""
-    styles_mod = importlib.import_module(f"common.resources.rendering.channels.{name}.styles")
-    canvas_mod = importlib.import_module(f"common.resources.rendering.channels.{name}.canvas")
-    # Convention: module exposes STYLES dict and a *_CANVAS constant
-    styles = styles_mod.STYLES
-    canvas = next(v for v in vars(canvas_mod).values()
+    mod = importlib.import_module(f"common.providers.distribution_channel.{name}")
+    styles = mod.STYLES
+    canvas = next(v for v in vars(mod).values()
                   if hasattr(v, "width") and hasattr(v, "height") and hasattr(v, "format"))
     return styles, canvas
 

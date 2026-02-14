@@ -16,7 +16,9 @@ class AzureBlobStorageProvider(IBlobStorage):
         FileNotFoundError: When container or blobs are not found.
     """
 
-    PROVIDER_NAME = "azure_blob_storage"
+    @property
+    def provider_name(self) -> str:
+        return "azure_blob_storage"
     IMAGE_PREFIX = "keywords/{keyword_external_id}/"
 
     def __init__(self, blob_client: BlobServiceClient):

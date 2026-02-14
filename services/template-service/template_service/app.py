@@ -35,12 +35,14 @@ async def main(logger: AppLogger):
 
             blob_storage = providers.LocalImageProvider()
 
+            local_llm = providers.LocalLLMProvider()
             llm_providers: dict[str, ILLMProvider] = {
-                providers.LocalLLMProvider.PROVIDER_NAME: providers.LocalLLMProvider()
+                local_llm.provider_name: local_llm
             }
 
+            local_channel = providers.LocalDistributionChannel()
             distribution_channels: dict[str, IDistributionChannel] = {
-                providers.LocalDistributionChannel.PROVIDER_NAME: providers.LocalDistributionChannel()
+                local_channel.provider_name: local_channel
             }
 
         if database:

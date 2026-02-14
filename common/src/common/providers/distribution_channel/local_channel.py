@@ -2,13 +2,25 @@ from typing import Any
 
 from common.app_logger import AppLogger
 from common.contracts.interfaces import IDistributionChannel
+from common.contracts.models import CanvasSpec, VisualStyle
 
 
 class LocalDistributionChannel(IDistributionChannel):
-    PROVIDER_NAME = "LocalDistributionChannel"
 
     def __init__(self):
         self.logger = AppLogger(__name__)
+
+    @property
+    def provider_name(self) -> str:
+        return "LocalDistributionChannel"
+
+    @property
+    def canvas(self) -> CanvasSpec | None:
+        return None
+
+    @property
+    def styles(self) -> dict[str, VisualStyle]:
+        return {}
 
     @property
     def system_prompt(self) -> str:

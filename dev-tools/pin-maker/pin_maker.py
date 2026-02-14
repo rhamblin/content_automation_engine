@@ -15,7 +15,7 @@ from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 from common.resources.personas import get_persona
-from common.resources.rendering.channels.pinterest.styles import STYLES, list_styles
+from common.providers.distribution_channel.pinterest import STYLES, list_styles
 
 
 def extract_keyword(filename: str) -> str:

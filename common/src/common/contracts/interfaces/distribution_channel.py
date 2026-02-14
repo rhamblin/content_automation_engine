@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from typing import Any
 
+from common.contracts.models import CanvasSpec, VisualStyle
+
 from .base_provider_with_name import IBaseProviderWithName
 
 
@@ -8,6 +10,16 @@ class IDistributionChannel(IBaseProviderWithName):
     @property
     @abstractmethod
     def system_prompt(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def canvas(self) -> CanvasSpec | None:
+        pass
+
+    @property
+    @abstractmethod
+    def styles(self) -> dict[str, VisualStyle]:
         pass
 
     @abstractmethod
