@@ -171,7 +171,7 @@ CREATE TABLE renders (
   content_id       UUID          NOT NULL REFERENCES contents(external_id) ON DELETE CASCADE,
   niche_id         UUID          NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
   keyword_id       UUID          NOT NULL REFERENCES keywords(external_id) ON DELETE CASCADE,
-  input_image_uri  TEXT,
+  input_image_uri  TEXT          NOT NULL,
   output_image_uri TEXT,
   style_name       TEXT,
   status           TEXT          NOT NULL DEFAULT 'pending',

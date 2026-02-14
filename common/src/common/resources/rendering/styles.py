@@ -23,6 +23,7 @@ STYLES: dict[str, VisualStyle] = {
             y_position=600,
             outline_width=0,
             max_width_pct=0.65,
+            max_lines=1,
         ),
         watermark=TextElement(
             font_file="PlayfairDisplay.ttf",
@@ -65,6 +66,7 @@ STYLES: dict[str, VisualStyle] = {
             color="#7B3F00",
             y_position=640,
             outline_width=0,
+            max_lines=1,
         ),
         accent=TextElement(
             font_file="DancingScript.ttf",
@@ -111,6 +113,7 @@ STYLES: dict[str, VisualStyle] = {
             y_position=700,
             outline_width=0,
             max_width_pct=0.75,
+            max_lines=1,
         ),
         watermark=TextElement(
             font_file="Montserrat.ttf",
@@ -150,6 +153,7 @@ STYLES: dict[str, VisualStyle] = {
             color="#1a1a1a",
             y_position=700,
             outline_width=0,
+            max_lines=1,
         ),
         tagline=TextElement(
             font_file="Montserrat.ttf",

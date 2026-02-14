@@ -20,6 +20,7 @@ class TextElement:
     outline_color: str = "#000000"
     alignment: str = "center"  # "center", "left", "right"
     max_width_pct: float = 0.85
+    max_lines: int = 2  # shrink font until text fits in this many lines
     angle: int = 0  # rotation in degrees (counter-clockwise)
 
     def _get_font(self, size: int | None = None) -> ImageFont.FreeTypeFont:
@@ -52,12 +53,12 @@ class TextElement:
         max_width = int(img_width * self.max_width_pct)
         margin = int(img_width * (1 - self.max_width_pct) / 2)
 
-        # Auto-shrink font to fit within 2 lines
+        # Auto-shrink font to fit within max_lines
         font_size = self.font_size
         font = self._get_font(font_size)
         while font_size > 20:
             lines = self._wrap_text(text, font, max_width)
-            if len(lines) <= 2:
+            if len(lines) <= self.max_lines:
                 break
             font_size -= 4
             font = self._get_font(font_size)

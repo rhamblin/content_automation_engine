@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -20,7 +20,7 @@ class RenderRepository(BaseTenantScopedRepository[Render]):
         content_id: UUID,
         niche_id: UUID,
         keyword_id: UUID,
-        input_image_uri: Optional[str] = None,
+        input_image_uri: str,
         style_name: Optional[str] = None,
     ) -> Render:
         render = Render(

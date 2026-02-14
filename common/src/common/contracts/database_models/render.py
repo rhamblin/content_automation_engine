@@ -24,7 +24,7 @@ class Render(Base):
     content_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("contents.external_id", ondelete="CASCADE"), nullable=False)
     niche_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("niches.external_id", ondelete="CASCADE"), nullable=False)
     keyword_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("keywords.external_id", ondelete="CASCADE"), nullable=False)
-    input_image_uri: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    input_image_uri: Mapped[str] = mapped_column(String, nullable=False)
     output_image_uri: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     style_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     status: Mapped[RenderStatus] = mapped_column(String, nullable=False, default=RenderStatus.PENDING.value)
