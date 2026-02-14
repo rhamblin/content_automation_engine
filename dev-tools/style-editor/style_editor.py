@@ -8,9 +8,18 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.contracts.models import ImageOverlay, TextElement, VisualStyle
+from common.contracts.models.rendering.image_overlay import STICKERS_DIR
 from common.providers.distribution_channel.pinterest import PinterestChannel
 
 from common.resources.rendering.styles import BRAND_TEXT, STYLES
+
+SHAPES = ["rectangle", "ribbon", "pill", "sticker"]
+
+def _list_stickers() -> list[str]:
+    """List available sticker PNGs."""
+    if not STICKERS_DIR.exists():
+        return []
+    return sorted(f.name for f in STICKERS_DIR.glob("*.png"))
 
 # Convert named colors to hex for Streamlit color_picker
 COLOR_MAP = {
@@ -79,6 +88,36 @@ with col1:
             if not enabled:
                 return None
 
+            shape = st.selectbox("Shape", SHAPES,
+                                 index=SHAPES.index(defaults.shape) if defaults.shape in SHAPES else 0,
+                                 key=f"ov_{idx}_shape")
+
+            # Sticker mode - simplified controls
+            if shape == "sticker":
+                stickers = _list_stickers()
+                if not stickers:
+                    st.warning("No stickers found. Add PNGs to resources/rendering/stickers/")
+                    return None
+                sticker_file = st.selectbox("Sticker", stickers,
+                                            index=stickers.index(defaults.sticker_file) if defaults.sticker_file in stickers else 0,
+                                            key=f"ov_{idx}_stk")
+                c1, c2 = st.columns(2)
+                color = c1.color_picker("Color", to_hex(defaults.color), key=f"ov_{idx}_c")
+                opacity = c2.slider("Opacity", 0.0, 1.0, defaults.opacity, key=f"ov_{idx}_op")
+                c3, c4 = st.columns(2)
+                height = c3.slider("Height %", 0.05, 0.5, defaults.height_pct, key=f"ov_{idx}_h")
+                y_pos = c4.number_input("Y Position", -500, 1500, defaults.y_position, key=f"ov_{idx}_y")
+                c5, c6 = st.columns(2)
+                x_pos = c5.number_input("X Position", -500, 500, defaults.x_position, key=f"ov_{idx}_x")
+                angle = c6.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
+                c7, c8 = st.columns(2)
+                flip_h = c7.checkbox("Flip H", value=defaults.flip_h, key=f"ov_{idx}_fh")
+                flip_v = c8.checkbox("Flip V", value=defaults.flip_v, key=f"ov_{idx}_fv")
+                return ImageOverlay(shape="sticker", sticker_file=sticker_file, color=color,
+                                    opacity=opacity, height_pct=height, y_position=y_pos,
+                                    x_position=x_pos, angle=angle, flip_h=flip_h, flip_v=flip_v)
+
+            # Geometric shapes
             pos = st.selectbox("Position", ["top", "bottom", "center", "box", "full"],
                                index=["top", "bottom", "center", "box", "full"].index(defaults.position), key=f"ov_{idx}_pos")
             c1, c2 = st.columns(2)
@@ -89,6 +128,7 @@ with col1:
             y_pos = c4.number_input("Y Position", -500, 1500, defaults.y_position, key=f"ov_{idx}_y")
 
             width, border_color, border_width, x_pos, angle = defaults.width_pct, "#000000", 0, 0, 0
+            notch_pct, corner_radius = defaults.notch_pct, defaults.corner_radius
             if pos in ["center", "box"]:
                 c5, c6, c7, c8 = st.columns(4)
                 border_color = c5.color_picker("Border Color", defaults.border_color, key=f"ov_{idx}_bc")
@@ -97,10 +137,15 @@ with col1:
                 angle = c8.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
             if pos == "box":
                 width = st.slider("Width %", 0.3, 1.0, defaults.width_pct, key=f"ov_{idx}_w")
+            if shape == "ribbon":
+                notch_pct = st.slider("Notch %", 0.01, 0.10, defaults.notch_pct, key=f"ov_{idx}_notch")
+            if shape == "pill":
+                corner_radius = st.number_input("Corner Radius", 1, 100, defaults.corner_radius, key=f"ov_{idx}_cr")
 
             return ImageOverlay(position=pos, color=color, opacity=opacity, height_pct=height,
                                 y_position=y_pos, width_pct=width, border_color=border_color,
-                                border_width=border_width, x_position=x_pos, angle=angle)
+                                border_width=border_width, x_position=x_pos, angle=angle,
+                                shape=shape, notch_pct=notch_pct, corner_radius=corner_radius)
 
     # Dynamic overlay slots
     base_overlays = base_style.overlays if base_style.overlays else []
@@ -184,8 +229,24 @@ with col2:
         return f"        {name}=TextElement({', '.join(parts)}),"
 
     def fmt_ov(ov: ImageOverlay) -> str:
+        if ov.shape == "sticker":
+            parts = [f'shape="sticker"', f'sticker_file="{ov.sticker_file}"',
+                     f'color="{ov.color}"', f"opacity={ov.opacity}",
+                     f"height_pct={ov.height_pct}", f"y_position={ov.y_position}"]
+            if ov.x_position:
+                parts.append(f"x_position={ov.x_position}")
+            if ov.angle:
+                parts.append(f"angle={ov.angle}")
+            if ov.flip_h:
+                parts.append("flip_h=True")
+            if ov.flip_v:
+                parts.append("flip_v=True")
+            return f"ImageOverlay({', '.join(parts)})"
+
         parts = [f'position="{ov.position}"', f'color="{ov.color}"',
                  f"opacity={ov.opacity}", f"height_pct={ov.height_pct}"]
+        if ov.shape != "rectangle":
+            parts.append(f'shape="{ov.shape}"')
         if ov.position in ["center", "box"]:
             parts.append(f"y_position={ov.y_position}")
             if ov.border_width:
@@ -196,6 +257,10 @@ with col2:
                 parts.append(f"angle={ov.angle}")
         if ov.position == "box":
             parts.append(f"width_pct={ov.width_pct}")
+        if ov.shape == "ribbon":
+            parts.append(f"notch_pct={ov.notch_pct}")
+        if ov.shape == "pill":
+            parts.append(f"corner_radius={ov.corner_radius}")
         return f"ImageOverlay({', '.join(parts)})"
 
     lines = [f'    "{modified_style.name}": VisualStyle(name="{modified_style.name}", description="...",']
