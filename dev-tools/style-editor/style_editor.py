@@ -1,5 +1,6 @@
-"""Style Editor - Visual editor for Pinterest pin styles."""
+"""Style Editor - Visual editor for pin styles. Pass ?channel=pinterest in URL."""
 
+import importlib
 import sys
 from pathlib import Path
 
@@ -9,12 +10,21 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.contracts.models import ImageOverlay, TextElement, VisualStyle
 from common.contracts.models.rendering.image_overlay import STICKERS_DIR
-from common.providers.distribution_channel.pinterest import PinterestChannel
-
-from common.resources.rendering.styles import STYLES
+from common.rendering import render_image
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
+
+
+def _load_channel(name: str):
+    """Dynamically load STYLES dict and CanvasSpec for a channel."""
+    styles_mod = importlib.import_module(f"common.resources.rendering.channels.{name}.styles")
+    canvas_mod = importlib.import_module(f"common.resources.rendering.channels.{name}.canvas")
+    # Convention: module exposes STYLES dict and a *_CANVAS constant
+    styles = styles_mod.STYLES
+    canvas = next(v for v in vars(canvas_mod).values()
+                  if hasattr(v, "width") and hasattr(v, "height") and hasattr(v, "format"))
+    return styles, canvas
 
 SHAPES = ["rectangle", "ribbon", "pill", "sticker"]
 
@@ -45,7 +55,8 @@ st.markdown("""
 
 st.title("Style Editor")
 
-channel = PinterestChannel()
+channel_name = st.query_params.get("channel", "pinterest")
+STYLES, CANVAS = _load_channel(channel_name)
 
 # Sidebar - Image upload and preview (sticky)
 st.sidebar.header("Image")
@@ -281,7 +292,7 @@ with col2:
 st.sidebar.header("Preview")
 try:
     _settings = load_dev_settings()
-    preview = channel.render_content(source_img, text_data, modified_style, _settings.brand_text)
+    preview = render_image(source_img, CANVAS, modified_style, text_data, _settings.brand_text)
     st.sidebar.image(preview, width=420)
 except Exception as e:
     st.sidebar.error(f"Error: {e}")

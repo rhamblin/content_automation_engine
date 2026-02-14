@@ -112,6 +112,8 @@ make logs
 
 2. This system supports text and images only. There is no support of video in the rendering layer
 
+3. There is multiple locales support but
+
 ## Data Model
 
 ### Entity Relationship Diagram

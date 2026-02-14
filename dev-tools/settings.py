@@ -5,10 +5,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-if not Path(".env").exists():
+_ENV_FILE = Path(__file__).parent / ".env"
+
+if not _ENV_FILE.exists():
     sys.exit("Error: Run from dev-tools/ directory or use 'make wp-upload'")
 
-load_dotenv(".env")
+load_dotenv(_ENV_FILE)
 
 
 def _read_secret(path: str) -> str:
@@ -38,14 +40,14 @@ def load_dev_settings() -> DevToolSettings:
         brand_text=os.getenv("BRAND_TEXT", ""),
         azure_foundry_endpoint=os.getenv("AZURE_FOUNDRY_ENDPOINT", ""),
         azure_foundry_api_key=_read_secret(
-            "../secrets/azure-foundry-proj-default-api-key.txt"
+            str(_ENV_FILE.parent / "../secrets/azure-foundry-proj-default-api-key.txt")
         ),
         azure_foundry_api_version=os.getenv(
             "AZURE_FOUNDRY_API_VERSION", "2024-12-01-preview"
         ),
         wp_site_url=os.getenv("WP_SITE_URL", ""),
         wp_username=os.getenv("WP_USERNAME", ""),
-        wp_app_password=_read_secret("wp-uploader/wp-app-password.txt"),
+        wp_app_password=_read_secret(str(_ENV_FILE.parent / "wp-uploader/wp-app-password.txt")),
         wp_niche=os.getenv("WP_NICHE", "food"),
         wp_amazon_tag=os.getenv("WP_AMAZON_TAG", ""),
     )

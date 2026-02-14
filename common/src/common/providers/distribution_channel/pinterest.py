@@ -1,9 +1,12 @@
 from typing import Any
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from common.app_logger import AppLogger
 from common.contracts.interfaces import IDistributionChannel
+from common.contracts.models import CanvasSpec
+from common.rendering import render_image
+from common.resources.rendering.channels.pinterest.canvas import PINTEREST_CANVAS
 
 
 class PinterestChannel(IDistributionChannel):
@@ -42,25 +45,6 @@ STRICT OUTPUT RULES:
     def system_prompt(self) -> str:
         return self.DEFAULT_PROMPT
 
-    def _smart_crop_resize(
-        self, img: Image.Image, target_w: int, target_h: int
-    ) -> Image.Image:
-        """Resize and crop image to target dimensions."""
-        orig_w, orig_h = img.size
-        target_ratio = target_w / target_h
-        orig_ratio = orig_w / orig_h
-
-        if orig_ratio > target_ratio:
-            new_w = int(orig_h * target_ratio)
-            left = (orig_w - new_w) // 2
-            img = img.crop((left, 0, left + new_w, orig_h))
-        else:
-            new_h = int(orig_w / target_ratio)
-            top = (orig_h - new_h) // 3
-            img = img.crop((0, top, orig_w, top + new_h))
-
-        return img.resize((target_w, target_h), Image.Resampling.LANCZOS)
-
     def render_content(
         self,
         source: Image.Image,
@@ -83,25 +67,12 @@ STRICT OUTPUT RULES:
         Returns:
             PIL Image with text overlay
         """
-        img = self._smart_crop_resize(source, width, height)
+        if width != PINTEREST_CANVAS.width or height != PINTEREST_CANVAS.height:
+            canvas = CanvasSpec(width=width, height=height)
+        else:
+            canvas = PINTEREST_CANVAS
 
-        if style and style.overlays:
-            for overlay in style.overlays:
-                img = overlay.apply(img)
-
-        img = img.convert("RGBA")
-        draw = ImageDraw.Draw(img)
-
-        if style:
-            for key, element in style.elements():
-                text = brand_text if key == "watermark" else text_data.get(key)
-                if text:
-                    result = element.draw(draw, text, img.width, img.height, base_img=img)
-                    if result is not None:
-                        img = result
-                        draw = ImageDraw.Draw(img)
-
-        return img.convert("RGB")
+        return render_image(source, canvas, style, text_data, brand_text)
 
     def publish(self, title: str, description: str, content: Any, **kwargs) -> dict:
         """Publish content to Pinterest.

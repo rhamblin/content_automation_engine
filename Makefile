@@ -175,7 +175,7 @@ help:  ## Show this help message
 	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
 	@echo "  make pin-maker FOLDER=/path/to/images [STYLE=center_banner] - Create Pinterest pins"
-	@echo "  make style-editor   - Visual style editor for Pinterest pins"
+	@echo "  make style-editor   - Visual style editor (add ?channel=name in URL, default: pinterest)"
 	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
 	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"
 	@echo "  make plot-pin-analytics PIN_ID=123 - Generate 14-day analytics HTML report"
