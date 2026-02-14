@@ -40,8 +40,8 @@ class VisualStyle:
             "Title MUST be plain text, no emoji/unicode symbols. Use power words that trigger clicks: Easy, Best, Perfect, Ultimate, Crispy, Creamy, Loaded. Keep it under 25 characters",
         ),
         "tagline": (
-            '"tagline": "Benefit phrase, 2-4 words, ALL CAPS, no emoji"',
-            "Tagline highlights a benefit, occasion, or ease (e.g., READY IN MINUTES, PERFECT FOR DINNER, CROWD FAVORITE). Plain text only, no emoji",
+            '"tagline": "Punchy 3-word phrase, ALL CAPS, no emoji"',
+            "Tagline is exactly 3 punchy words. MUST be unique and specific to the content - never repeat generic phrases. Vary the angle: craving trigger (MELT IN MOUTH, CRISPY GOLDEN BITES), occasion (DATE NIGHT WINNER, SUNDAY BRUNCH HERO), ease (JUST FIVE STEPS, ONE PAN MAGIC), or bold claim (FLAVOR BOMB ALERT, BETTER THAN TAKEOUT). Plain text only, no emoji",
         ),
         "prefix": (
             '"prefix": "Short label, 1-3 words, ALL CAPS, no emoji"',

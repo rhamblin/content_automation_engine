@@ -12,7 +12,7 @@ PINTEREST_CANVAS = CanvasSpec(width=1000, height=1500, format="RGB")
 STYLES: dict[str, VisualStyle] = {
     "ribbon_box": VisualStyle(
         name="ribbon_box",
-        description="White card with red ribbon banner above a bold serif title. The ribbon holds a short descriptor, the card holds the main title. Clean editorial look with strong contrast.",
+        description="White card with red ribbon banner above a bold serif title and tagline. The ribbon holds a short descriptor, the card holds the main title and a supporting benefit phrase. Clean editorial look with strong contrast.",
         prefix=TextElement(
             font_file="Montserrat.ttf",
             font_size=36,
@@ -28,7 +28,7 @@ STYLES: dict[str, VisualStyle] = {
             y_position=600,
             outline_width=0,
             max_width_pct=0.70,
-            max_lines=1,
+            max_lines=2,
         ),
         watermark=TextElement(
             font_file="DancingScript.ttf",
@@ -43,7 +43,7 @@ STYLES: dict[str, VisualStyle] = {
             ImageOverlay(
                 position="box",
                 color="#FFFFFF",
-                opacity=0.92,
+                opacity=0.76,
                 height_pct=0.35,
                 y_position=700,
                 width_pct=0.82,
