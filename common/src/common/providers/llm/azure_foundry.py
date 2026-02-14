@@ -1,6 +1,9 @@
 import json
 
 from openai import APIError, AzureOpenAI
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+from common.app_logger import AppLogger
 
 from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 
@@ -44,6 +47,7 @@ Return ONLY valid JSON with the exact fields shown above.
 
     def __init__(self, azure_open_ai_client: AzureOpenAI):
         self.client = azure_open_ai_client
+        self.logger = AppLogger(__name__)
 
     def _build_prompt(
         self,
@@ -75,7 +79,8 @@ Return ONLY valid JSON with the exact fields shown above.
 
         return prompt
 
-    def generate(
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+    def _call_llm(
         self,
         niche: str,
         keyword: str,
@@ -84,13 +89,7 @@ Return ONLY valid JSON with the exact fields shown above.
         style=None,
         locale: str = "en",
         image_url: str = "",
-    ) -> dict:
-        """Generate content using Azure OpenAI.
-
-        Raises:
-            ConnectionError: When Azure OpenAI API is unreachable.
-            ValueError: When response is empty or invalid JSON.
-        """
+    ) -> str:
         try:
             response = self.client.chat.completions.create(
                 messages=[
@@ -113,12 +112,32 @@ Return ONLY valid JSON with the exact fields shown above.
         except APIError as e:
             raise ConnectionError(f"Azure OpenAI API error: {e}") from e
 
-        if not response.choices:
-            raise ValueError("Azure OpenAI returned no choices")
-
-        raw_result = response.choices[0].message.content
-        if raw_result is None:
+        if not response.choices or response.choices[0].message.content is None:
+            self.logger.warning(
+                f"Empty response from Azure OpenAI, "
+                f"finish_reason={getattr(response.choices[0], 'finish_reason', 'N/A') if response.choices else 'no choices'}"
+            )
             raise ValueError("Azure OpenAI returned empty content")
+
+        return response.choices[0].message.content
+
+    def generate(
+        self,
+        niche: str,
+        keyword: str,
+        channel: IDistributionChannel,
+        persona=None,
+        style=None,
+        locale: str = "en",
+        image_url: str = "",
+    ) -> dict:
+        """Generate content using Azure OpenAI.
+
+        Raises:
+            ConnectionError: When Azure OpenAI API is unreachable.
+            ValueError: When response is empty or invalid JSON.
+        """
+        raw_result = self._call_llm(niche, keyword, channel, persona, style, locale, image_url)
         try:
             json_equiv = json.loads(raw_result)
         except json.JSONDecodeError as e:

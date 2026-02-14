@@ -42,6 +42,12 @@ COLOR_MAP = {
 def to_hex(color: str) -> str:
     return COLOR_MAP.get(color.lower(), color) if not color.startswith("#") else color
 
+def _kw(key: str, **default):
+    """Return widget kwargs, omitting default value if session_state already owns the key."""
+    if key in st.session_state:
+        return {"key": key}
+    return {"key": key, **default}
+
 st.set_page_config(page_title="Style Editor", layout="wide")
 
 # Wider sidebar for larger preview
@@ -101,8 +107,7 @@ with col1:
                 return None
 
             shape = st.selectbox("Shape", SHAPES,
-                                 index=SHAPES.index(defaults.shape) if defaults.shape in SHAPES else 0,
-                                 key=f"ov_{idx}_shape")
+                                 **_kw(f"ov_{idx}_shape", index=SHAPES.index(defaults.shape) if defaults.shape in SHAPES else 0))
 
             # Sticker mode - simplified controls
             if shape == "sticker":
@@ -111,48 +116,48 @@ with col1:
                     st.warning("No stickers found. Add PNGs to resources/rendering/stickers/")
                     return None
                 sticker_file = st.selectbox("Sticker", stickers,
-                                            index=stickers.index(defaults.sticker_file) if defaults.sticker_file in stickers else 0,
-                                            key=f"ov_{idx}_stk")
+                                            **_kw(f"ov_{idx}_stk", index=stickers.index(defaults.sticker_file) if defaults.sticker_file in stickers else 0))
                 c1, c2 = st.columns(2)
-                color = c1.color_picker("Color", to_hex(defaults.color), key=f"ov_{idx}_c")
-                opacity = c2.slider("Opacity", 0.0, 1.0, defaults.opacity, key=f"ov_{idx}_op")
+                color = c1.color_picker("Color", **_kw(f"ov_{idx}_c", value=to_hex(defaults.color)))
+                opacity = c2.slider("Opacity", 0.0, 1.0, **_kw(f"ov_{idx}_op", value=defaults.opacity))
                 c3, c4 = st.columns(2)
-                height = c3.slider("Height %", 0.05, 0.5, defaults.height_pct, key=f"ov_{idx}_h")
-                y_pos = c4.number_input("Y Position", -500, 1500, defaults.y_position, key=f"ov_{idx}_y")
+                height = c3.slider("Height %", 0.05, 0.5, **_kw(f"ov_{idx}_h", value=defaults.height_pct))
+                y_pos = c4.number_input("Y Position", -500, 1500, **_kw(f"ov_{idx}_y", value=defaults.y_position))
                 c5, c6 = st.columns(2)
-                x_pos = c5.number_input("X Position", -500, 500, defaults.x_position, key=f"ov_{idx}_x")
-                angle = c6.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
+                x_pos = c5.number_input("X Position", -500, 500, **_kw(f"ov_{idx}_x", value=defaults.x_position))
+                angle = c6.number_input("Angle", -180, 180, **_kw(f"ov_{idx}_ang", value=defaults.angle))
                 c7, c8 = st.columns(2)
-                flip_h = c7.checkbox("Flip H", value=defaults.flip_h, key=f"ov_{idx}_fh")
-                flip_v = c8.checkbox("Flip V", value=defaults.flip_v, key=f"ov_{idx}_fv")
+                flip_h = c7.checkbox("Flip H", **_kw(f"ov_{idx}_fh", value=defaults.flip_h))
+                flip_v = c8.checkbox("Flip V", **_kw(f"ov_{idx}_fv", value=defaults.flip_v))
                 return ImageOverlay(shape="sticker", sticker_file=sticker_file, color=color,
                                     opacity=opacity, height_pct=height, y_position=y_pos,
                                     x_position=x_pos, angle=angle, flip_h=flip_h, flip_v=flip_v)
 
             # Geometric shapes
-            pos = st.selectbox("Position", ["top", "bottom", "center", "box", "full"],
-                               index=["top", "bottom", "center", "box", "full"].index(defaults.position), key=f"ov_{idx}_pos")
+            positions = ["top", "bottom", "center", "box", "full"]
+            pos = st.selectbox("Position", positions,
+                               **_kw(f"ov_{idx}_pos", index=positions.index(defaults.position)))
             c1, c2 = st.columns(2)
-            color = c1.color_picker("Color", to_hex(defaults.color), key=f"ov_{idx}_c")
-            opacity = c2.slider("Opacity", 0.0, 1.0, defaults.opacity, key=f"ov_{idx}_op")
+            color = c1.color_picker("Color", **_kw(f"ov_{idx}_c", value=to_hex(defaults.color)))
+            opacity = c2.slider("Opacity", 0.0, 1.0, **_kw(f"ov_{idx}_op", value=defaults.opacity))
             c3, c4 = st.columns(2)
-            height = c3.slider("Height %", 0.05, 0.5, defaults.height_pct, key=f"ov_{idx}_h")
-            y_pos = c4.number_input("Y Position", -500, 1500, defaults.y_position, key=f"ov_{idx}_y")
+            height = c3.slider("Height %", 0.05, 0.5, **_kw(f"ov_{idx}_h", value=defaults.height_pct))
+            y_pos = c4.number_input("Y Position", -500, 1500, **_kw(f"ov_{idx}_y", value=defaults.y_position))
 
             width, border_color, border_width, x_pos, angle = defaults.width_pct, "#000000", 0, 0, 0
             notch_pct, corner_radius = defaults.notch_pct, defaults.corner_radius
             if pos in ["center", "box"]:
                 c5, c6, c7, c8 = st.columns(4)
-                border_color = c5.color_picker("Border Color", defaults.border_color, key=f"ov_{idx}_bc")
-                border_width = c6.slider("Border W", 0, 10, defaults.border_width, key=f"ov_{idx}_bw")
-                x_pos = c7.number_input("X Position", -500, 500, defaults.x_position, key=f"ov_{idx}_x")
-                angle = c8.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
+                border_color = c5.color_picker("Border Color", **_kw(f"ov_{idx}_bc", value=defaults.border_color))
+                border_width = c6.slider("Border W", 0, 10, **_kw(f"ov_{idx}_bw", value=defaults.border_width))
+                x_pos = c7.number_input("X Position", -500, 500, **_kw(f"ov_{idx}_x", value=defaults.x_position))
+                angle = c8.number_input("Angle", -180, 180, **_kw(f"ov_{idx}_ang", value=defaults.angle))
             if pos == "box":
-                width = st.slider("Width %", 0.3, 1.0, defaults.width_pct, key=f"ov_{idx}_w")
+                width = st.slider("Width %", 0.3, 1.0, **_kw(f"ov_{idx}_w", value=defaults.width_pct))
             if shape == "ribbon":
-                notch_pct = st.slider("Notch %", 0.01, 0.10, defaults.notch_pct, key=f"ov_{idx}_notch")
+                notch_pct = st.slider("Notch %", 0.01, 0.10, **_kw(f"ov_{idx}_notch", value=defaults.notch_pct))
             if shape == "pill":
-                corner_radius = st.number_input("Corner Radius", 1, 100, defaults.corner_radius, key=f"ov_{idx}_cr")
+                corner_radius = st.number_input("Corner Radius", 1, 100, **_kw(f"ov_{idx}_cr", value=defaults.corner_radius))
 
             return ImageOverlay(position=pos, color=color, opacity=opacity, height_pct=height,
                                 y_position=y_pos, width_pct=width, border_color=border_color,
@@ -195,21 +200,22 @@ with col1:
                 return None
 
             font = el.font_file if el else FONTS[0]
-            font_file = st.selectbox("Font", FONTS, index=FONTS.index(font) if font in FONTS else 0, key=f"{name}_f")
+            font_file = st.selectbox("Font", FONTS, **_kw(f"{name}_f", index=FONTS.index(font) if font in FONTS else 0))
 
             c1, c2, c3 = st.columns(3)
-            y = c1.number_input("Y", -500, 1500, el.y_position if el else defaults[1], key=f"{name}_y")
-            size = c2.number_input("Size", 10, 200, el.font_size if el else defaults[0], key=f"{name}_s")
-            color = c3.color_picker("Color", to_hex(el.color) if el else "#FFFFFF", key=f"{name}_c")
+            y = c1.number_input("Y", -500, 1500, **_kw(f"{name}_y", value=el.y_position if el else defaults[1]))
+            size = c2.number_input("Size", 10, 200, **_kw(f"{name}_s", value=el.font_size if el else defaults[0]))
+            color = c3.color_picker("Color", **_kw(f"{name}_c", value=to_hex(el.color) if el else "#FFFFFF"))
 
             c4, c5 = st.columns(2)
-            outline = c4.number_input("Outline W", 0, 10, el.outline_width if el else 3, key=f"{name}_o")
-            outline_color = c5.color_picker("Outline Color", to_hex(el.outline_color) if el else "#000000", key=f"{name}_oc")
+            outline = c4.number_input("Outline W", 0, 10, **_kw(f"{name}_o", value=el.outline_width if el else 3))
+            outline_color = c5.color_picker("Outline Color", **_kw(f"{name}_oc", value=to_hex(el.outline_color) if el else "#000000"))
 
             c6, c7 = st.columns(2)
-            align = c6.selectbox("Align", ["center", "left", "right"],
-                                 index=["center", "left", "right"].index(el.alignment) if el else 0, key=f"{name}_a")
-            angle = c7.number_input("Angle", -180, 180, el.angle if el else 0, key=f"{name}_ang")
+            aligns = ["center", "left", "right"]
+            align = c6.selectbox("Align", aligns,
+                                 **_kw(f"{name}_a", index=aligns.index(el.alignment) if el else 0))
+            angle = c7.number_input("Angle", -180, 180, **_kw(f"{name}_ang", value=el.angle if el else 0))
 
         return TextElement(font_file=font_file, font_size=size, color=color,
                            y_position=y, outline_width=outline, outline_color=outline_color,
