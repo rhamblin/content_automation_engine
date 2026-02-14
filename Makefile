@@ -83,7 +83,7 @@ wp-media-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/get_media_ids.py $(MEDIA_FOLDER)
 
 pin-maker:
-	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(FOLDER) $(if $(STYLE),--style $(STYLE),)
+	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(FOLDER) $(if $(STYLE),--style $(STYLE),) $(if $(LOCALE),--locale $(LOCALE),)
 
 style-editor:
 	. dev-tools/dev-shell.sh && cd dev-tools/style-editor && streamlit run style_editor.py
