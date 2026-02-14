@@ -110,6 +110,8 @@ make logs
 ## Assumptions made
 1.  Channel is being passed into common/providers/text/azure_foundry.py generate_text method which is the implementation of the interface but we don't use it as of yet.The system messages was tailored to be Pinterest centric. This can be decoupled at a later time if expansion to other channels is desired. **Currently, Pinterest is the only supported channel**
 
+2. This system supports text and images only. There is no support of video in the rendering layer
+
 ## Data Model
 
 ### Entity Relationship Diagram
