@@ -2,6 +2,7 @@ from .base import Base
 from .enums import (
     RenderStatus,
     PublicationStatus,
+    PublicationActionTaken,
     PromotionActionTaken,
     PromotionStatus,
     ScheduleMessageType,
@@ -31,6 +32,7 @@ __all__ = [
     # Enums
     "RenderStatus",
     "PublicationStatus",
+    "PublicationActionTaken",
     "PromotionActionTaken",
     "PromotionStatus",
     "ScheduleMessageType",

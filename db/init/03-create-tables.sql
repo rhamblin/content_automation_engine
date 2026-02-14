@@ -210,7 +210,7 @@ CREATE TABLE promotions (
   publication_id UUID                   NOT NULL REFERENCES publications(external_id) ON DELETE CASCADE,
   channel_id     UUID                   NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
   payload        JSONB,
-  action_taken   TEXT                   NOT NULL DEFAULT 'boost',
+  action_taken   TEXT                   NOT NULL DEFAULT 'none',
   status         TEXT                   NOT NULL DEFAULT 'pending',
   created_at     TIMESTAMPTZ            NOT NULL DEFAULT now(),
   executed_at    TIMESTAMPTZ,

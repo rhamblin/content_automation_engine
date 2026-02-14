@@ -24,7 +24,7 @@ class Promotion(Base):
     publication_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("publications.external_id", ondelete="CASCADE"), nullable=False)
     channel_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("channels.external_id", ondelete="CASCADE"), nullable=False)
     payload: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
-    action_taken: Mapped[PromotionActionTaken] = mapped_column(String, nullable=False, default=PromotionActionTaken.BOOST.value)
+    action_taken: Mapped[PromotionActionTaken] = mapped_column(String, nullable=False, default=PromotionActionTaken.NONE.value)
     status: Mapped[PromotionStatus] = mapped_column(String, nullable=False, default=PromotionStatus.PENDING.value)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     executed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)

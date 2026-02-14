@@ -22,10 +22,18 @@ class PublicationStatus(str, Enum):
     FAILED = "failed"
 
 
+class PublicationActionTaken(str, Enum):
+    NONE = "none"
+    UPDATE = "update"
+    DELETE = "delete"
+    ADD_TO_CAMPAIGN = "add_to_campaign"
+
+
 class PromotionActionTaken(str, Enum):
-    BOOST = "boost"
-    FEATURE = "feature"
-    CROSS_POST = "cross_post"
+    NONE = "none"
+    ADJUST = "adjust"
+    PAUSE = "pause"
+    REMOVE = "remove"
 
 
 class PromotionStatus(str, Enum):
