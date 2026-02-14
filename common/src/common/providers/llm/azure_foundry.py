@@ -1,17 +1,29 @@
 import json
 
 from openai import APIError, AzureOpenAI
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from common.app_logger import AppLogger
 
 from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 
 LOCALE_INSTRUCTIONS = {
-    "en": "Respond in English.",
-    "es": "Responde en español.",
-    "sw": "Jibu kwa Kiswahili.",
-    "pt": "Responda em português.",
+    "en": "",
+    "es": (
+        "IMPORTANT: You MUST write ALL content in Spanish (español). "
+        "Every field — title, tagline, prefix, accent, description — must be in Spanish. "
+        "Do NOT leave any field in English. Ignore English examples; translate the intent."
+    ),
+    "sw": (
+        "IMPORTANT: You MUST write ALL content in Swahili (Kiswahili). "
+        "Every field — title, tagline, prefix, accent, description — must be in Swahili. "
+        "Do NOT leave any field in English. Ignore English examples; translate the intent."
+    ),
+    "pt": (
+        "IMPORTANT: You MUST write ALL content in Portuguese (português). "
+        "Every field — title, tagline, prefix, accent, description — must be in Portuguese. "
+        "Do NOT leave any field in English. Ignore English examples; translate the intent."
+    ),
 }
 
 
@@ -57,7 +69,12 @@ Return ONLY valid JSON with the exact fields shown above.
         locale: str = "en",
     ) -> str:
         """Build system prompt: channel (platform) + persona (voice) + style (fields) + locale."""
+        locale_instruction = LOCALE_INSTRUCTIONS.get(locale, LOCALE_INSTRUCTIONS["en"])
+
         prompt = channel.system_prompt
+
+        if locale_instruction:
+            prompt = f"{locale_instruction}\n\n{prompt}"
 
         if persona:
             prompt = f"{prompt}\n\n{persona.prompt}"
@@ -74,12 +91,14 @@ Return ONLY valid JSON with the exact fields shown above.
             )
             prompt = f"{prompt}\n\n{style_section}"
 
-        locale_instruction = LOCALE_INSTRUCTIONS.get(locale, LOCALE_INSTRUCTIONS["en"])
-        prompt = f"{prompt}\n\n{locale_instruction}"
-
         return prompt
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type(ValueError),
+        reraise=True,
+    )
     def _call_llm(
         self,
         niche: str,

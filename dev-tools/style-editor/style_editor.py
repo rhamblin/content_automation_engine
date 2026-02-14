@@ -104,6 +104,9 @@ with col1:
         with st.expander(f"Overlay {idx + 1}" + (f" ({ov.position})" if ov else ""), expanded=ov is not None):
             enabled = st.checkbox("Enable", value=ov is not None, key=f"ov_{idx}_en")
             if not enabled:
+                for suffix in ("shape", "pos", "c", "op", "h", "y", "w", "bc", "bw",
+                               "x", "ang", "notch", "cr", "stk", "fh", "fv"):
+                    st.session_state.pop(f"ov_{idx}_{suffix}", None)
                 return None
 
             shape = st.selectbox("Shape", SHAPES,
@@ -144,20 +147,36 @@ with col1:
             height = c3.slider("Height %", 0.05, 0.5, **_kw(f"ov_{idx}_h", value=defaults.height_pct))
             y_pos = c4.number_input("Y Position", -500, 1500, **_kw(f"ov_{idx}_y", value=defaults.y_position))
 
-            width, border_color, border_width, x_pos, angle = defaults.width_pct, "#000000", 0, 0, 0
-            notch_pct, corner_radius = defaults.notch_pct, defaults.corner_radius
+            # Conditional widgets: show controls and clean up orphaned keys
+            center_box_keys = [f"ov_{idx}_{s}" for s in ("bc", "bw", "x", "ang")]
             if pos in ["center", "box"]:
                 c5, c6, c7, c8 = st.columns(4)
                 border_color = c5.color_picker("Border Color", **_kw(f"ov_{idx}_bc", value=defaults.border_color))
                 border_width = c6.slider("Border W", 0, 10, **_kw(f"ov_{idx}_bw", value=defaults.border_width))
                 x_pos = c7.number_input("X Position", -500, 500, **_kw(f"ov_{idx}_x", value=defaults.x_position))
                 angle = c8.number_input("Angle", -180, 180, **_kw(f"ov_{idx}_ang", value=defaults.angle))
+            else:
+                for k in center_box_keys:
+                    st.session_state.pop(k, None)
+                border_color, border_width, x_pos, angle = "#000000", 0, 0, 0
+
             if pos == "box":
                 width = st.slider("Width %", 0.3, 1.0, **_kw(f"ov_{idx}_w", value=defaults.width_pct))
+            else:
+                st.session_state.pop(f"ov_{idx}_w", None)
+                width = defaults.width_pct
+
             if shape == "ribbon":
                 notch_pct = st.slider("Notch %", 0.01, 0.10, **_kw(f"ov_{idx}_notch", value=defaults.notch_pct))
+            else:
+                st.session_state.pop(f"ov_{idx}_notch", None)
+                notch_pct = defaults.notch_pct
+
             if shape == "pill":
                 corner_radius = st.number_input("Corner Radius", 1, 100, **_kw(f"ov_{idx}_cr", value=defaults.corner_radius))
+            else:
+                st.session_state.pop(f"ov_{idx}_cr", None)
+                corner_radius = defaults.corner_radius
 
             return ImageOverlay(position=pos, color=color, opacity=opacity, height_pct=height,
                                 y_position=y_pos, width_pct=width, border_color=border_color,
@@ -197,6 +216,8 @@ with col1:
         with st.expander(f"{name.title()}", expanded=has_element):
             enabled = st.checkbox("Enable", value=has_element, key=f"{name}_en")
             if not enabled:
+                for suffix in ("f", "y", "s", "c", "o", "oc", "a", "ang"):
+                    st.session_state.pop(f"{name}_{suffix}", None)
                 return None
 
             font = el.font_file if el else FONTS[0]

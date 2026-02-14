@@ -17,8 +17,9 @@ STYLES: dict[str, VisualStyle] = {
             font_file="Montserrat.ttf",
             font_size=36,
             color="#FFFFFF",
-            y_position=520,
-            outline_width=0,
+            outline_color="#FFFFFF",
+            y_position=505,
+            outline_width=1,
         ),
         title=TextElement(
             font_file="PlayfairDisplay.ttf",
@@ -30,13 +31,13 @@ STYLES: dict[str, VisualStyle] = {
             max_lines=1,
         ),
         watermark=TextElement(
-            font_file="PlayfairDisplay.ttf",
+            font_file="DancingScript.ttf",
             font_size=48,
             color="#FFFFFF",
             y_position=-60,
             alignment="right",
             outline_width=2,
-            outline_color="#000000",
+            outline_color="#5C3A1E",
         ),
         overlays=[
             ImageOverlay(
@@ -52,7 +53,7 @@ STYLES: dict[str, VisualStyle] = {
             ImageOverlay(
                 position="box",
                 color="#d63031",
-                opacity=0.95,
+                opacity=0.77,
                 height_pct=0.04,
                 y_position=530,
                 width_pct=0.45,
@@ -93,51 +94,10 @@ STYLES: dict[str, VisualStyle] = {
             ImageOverlay(
                 position="center",
                 color="#FFFFFF",
-                opacity=0.88,
+                opacity=0.70,
                 height_pct=0.22,
                 y_position=710,
                 border_color="#5C3A1E",
-                border_width=3,
-            ),
-        ],
-    ),
-    "editorial_card": VisualStyle(
-        name="editorial_card",
-        description="White card with thin dark border, uppercase prefix above and a large serif title. Magazine editorial feel. Prefix is a short category or time label, title is the main dish name.",
-        prefix=TextElement(
-            font_file="Montserrat.ttf",
-            font_size=36,
-            color="#333333",
-            y_position=640,
-            outline_width=0,
-        ),
-        title=TextElement(
-            font_file="PlayfairDisplay.ttf",
-            font_size=105,
-            color="#1a1a1a",
-            y_position=700,
-            outline_width=0,
-            max_width_pct=0.78,
-            max_lines=1,
-        ),
-        watermark=TextElement(
-            font_file="Montserrat.ttf",
-            font_size=48,
-            color="#FFFFFF",
-            y_position=-60,
-            alignment="right",
-            outline_width=2,
-            outline_color="#000000",
-        ),
-        overlays=[
-            ImageOverlay(
-                position="box",
-                color="#FFFFFF",
-                opacity=0.94,
-                height_pct=0.32,
-                y_position=770,
-                width_pct=0.88,
-                border_color="#1a1a1a",
                 border_width=3,
             ),
         ],
@@ -150,7 +110,7 @@ STYLES: dict[str, VisualStyle] = {
             font_size=38,
             color="#3D4A1A",
             y_position=640,
-            outline_width=0,
+            outline_width=1,
         ),
         title=TextElement(
             font_file="BebasNeue.ttf",
@@ -165,16 +125,16 @@ STYLES: dict[str, VisualStyle] = {
             font_size=36,
             color="#3D4A1A",
             y_position=850,
-            outline_width=0,
+            outline_width=1,
         ),
         watermark=TextElement(
-            font_file="Montserrat.ttf",
+            font_file="DancingScript.ttf",
             font_size=48,
             color="#FFFFFF",
             y_position=-60,
             alignment="right",
             outline_width=2,
-            outline_color="#000000",
+            outline_color="#5C3A1E",
         ),
         overlays=[
             ImageOverlay(
@@ -233,7 +193,7 @@ GOALS:
 STRICT OUTPUT RULES:
 - Output ONLY valid JSON, no markdown, no explanations
 - NEVER use emoji, unicode symbols, or special characters in any field
-- All text must be plain ASCII - it will be rendered directly onto images
+- All text must be plain text (no emoji/unicode symbols) - it will be rendered directly onto images
 - Keep titles short (2-4 words) so they fit on one line at large font sizes
 """
 
