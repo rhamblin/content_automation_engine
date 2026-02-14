@@ -35,10 +35,22 @@ class VisualStyle:
 
     # Field prompt info for LLM text generation
     FIELD_SCHEMA = {
-        "title": ('"title": "Catchy title (2-4 words, ALL CAPS)"', None),
-        "tagline": ('"tagline": "Benefit phrase (1-3 words, ALL CAPS or sentence case)"', "Tagline highlights ease, occasion, or benefit"),
-        "prefix": ('"prefix": "Descriptor prefix (e.g., Quick & Easy, 30-Minute)"', "Prefix is time-based or descriptor"),
-        "accent": ('"accent": "Elegant sub-phrase (e.g., with Parmesan)"', "Accent adds elegant detail"),
+        "title": (
+            '"title": "Short punchy title, 2-4 words, ALL CAPS, no emoji"',
+            "Title MUST be plain text, no emoji/unicode symbols. Use power words that trigger clicks: Easy, Best, Perfect, Ultimate, Crispy, Creamy, Loaded. Keep it under 25 characters",
+        ),
+        "tagline": (
+            '"tagline": "Benefit phrase, 2-4 words, ALL CAPS, no emoji"',
+            "Tagline highlights a benefit, occasion, or ease (e.g., READY IN MINUTES, PERFECT FOR DINNER, CROWD FAVORITE). Plain text only, no emoji",
+        ),
+        "prefix": (
+            '"prefix": "Short label, 1-3 words, ALL CAPS, no emoji"',
+            "Prefix is a time or category label (e.g., 30-MINUTE, QUICK & EASY, ONE-POT, WEEKNIGHT). Plain text only, no emoji",
+        ),
+        "accent": (
+            '"accent": "Elegant detail, 2-4 words, Title Case, no emoji"',
+            "Accent adds a flavor or ingredient detail (e.g., with Garlic Butter, Crispy Golden Crust). Plain text only, no emoji",
+        ),
     }
 
     def text_fields(self) -> list[str]:

@@ -118,6 +118,153 @@ def fetch_ad_accounts(access_token: str) -> list[dict]:
     return response.json().get("items", []) if response.ok else []
 
 
+def fetch_campaigns(access_token: str, ad_account_id: str) -> list[dict]:
+    """Fetch all campaigns for an ad account."""
+    headers = {"Authorization": f"Bearer {access_token}"}
+    params = {"entity_statuses": "ACTIVE,PAUSED,ARCHIVED"}
+    response = requests.get(
+        f"{PINTEREST_API_URL}/ad_accounts/{ad_account_id}/campaigns",
+        headers=headers,
+        params=params,
+    )
+    return response.json().get("items", []) if response.ok else []
+
+
+def fetch_campaign_analytics(
+    access_token: str, ad_account_id: str, campaign_ids: list[str]
+) -> dict:
+    """Fetch spend analytics for campaigns (last 7 days)."""
+    if not campaign_ids:
+        return {}
+
+    end_date = datetime.now() - timedelta(days=1)
+    start_date = end_date - timedelta(days=6)
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+    params = {
+        "start_date": start_date.strftime("%Y-%m-%d"),
+        "end_date": end_date.strftime("%Y-%m-%d"),
+        "campaign_ids": ",".join(campaign_ids),
+        "columns": "CAMPAIGN_NAME,TOTAL_IMPRESSION,TOTAL_CLICKTHROUGH,SPEND_IN_DOLLAR",
+        "granularity": "TOTAL",
+    }
+
+    response = requests.get(
+        f"{PINTEREST_API_URL}/ad_accounts/{ad_account_id}/campaigns/analytics",
+        headers=headers,
+        params=params,
+    )
+
+    if not response.ok:
+        return {}
+
+    result = {}
+    for item in response.json():
+        cid = item.get("CAMPAIGN_ID")
+        if cid:
+            result[cid] = {
+                "impressions": item.get("TOTAL_IMPRESSION", 0) or 0,
+                "clicks": item.get("TOTAL_CLICKTHROUGH", 0) or 0,
+                "spend": item.get("SPEND_IN_DOLLAR", 0) or 0,
+            }
+    return result
+
+
+def _parse_timestamp(value) -> datetime | None:
+    """Parse a Pinterest API timestamp (unix epoch int/str or ISO string)."""
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value)
+    if isinstance(value, str):
+        if value.isdigit():
+            return datetime.fromtimestamp(int(value))
+        return datetime.fromisoformat(value.replace("Z", "+00:00")).replace(tzinfo=None)
+    return None
+
+
+def collect_recently_ended(access_token: str, ad_account_id: str) -> list[dict]:
+    """Find campaigns that ended in the last 48 hours with reason."""
+    campaigns = fetch_campaigns(access_token, ad_account_id)
+    if not campaigns:
+        return []
+
+    cutoff = datetime.now() - timedelta(hours=48)
+    candidates = []
+
+    for c in campaigns:
+        end_time_raw = c.get("end_time")
+        status = c.get("status", "")
+        lifetime_cap = c.get("lifetime_spend_cap", 0) / 1_000_000  # microdollars -> dollars
+
+        ended = False
+        end_dt = None
+
+        # Check if campaign has an end_time in the last 48 hours
+        # Pinterest API returns timestamps as unix epoch (int) or ISO string
+        if end_time_raw:
+            try:
+                end_dt = _parse_timestamp(end_time_raw)
+                if end_dt and cutoff <= end_dt <= datetime.now():
+                    ended = True
+            except (ValueError, TypeError, OSError):
+                pass
+
+        # Check if campaign was recently paused/archived (no end_time but status changed)
+        if not ended and status in ("PAUSED", "ARCHIVED"):
+            updated_raw = c.get("updated_time")
+            if updated_raw:
+                try:
+                    updated_dt = _parse_timestamp(updated_raw)
+                    if updated_dt and cutoff <= updated_dt <= datetime.now():
+                        ended = True
+                        end_dt = updated_dt
+                except (ValueError, TypeError, OSError):
+                    pass
+
+        if not ended:
+            continue
+
+        candidates.append({
+            "id": c.get("id"),
+            "name": c.get("name", "Unknown"),
+            "status": status,
+            "end_time": end_dt,
+            "lifetime_spend_cap": lifetime_cap,
+            "daily_spend_cap": c.get("daily_spend_cap", 0) / 1_000_000,
+        })
+
+    if not candidates:
+        return []
+
+    # Fetch spend analytics to determine reason
+    campaign_ids = [c["id"] for c in candidates]
+    analytics = fetch_campaign_analytics(access_token, ad_account_id, campaign_ids)
+
+    results = []
+    for c in candidates:
+        spend = analytics.get(c["id"], {}).get("spend", 0)
+        impressions = analytics.get(c["id"], {}).get("impressions", 0)
+        clicks = analytics.get(c["id"], {}).get("clicks", 0)
+
+        # Determine reason
+        if c["lifetime_spend_cap"] > 0 and spend >= c["lifetime_spend_cap"] * 0.95:
+            reason = "Budget Exhausted"
+        else:
+            reason = "Campaign Ended"
+
+        results.append({
+            "name": c["name"],
+            "status": c["status"],
+            "ended_at": c["end_time"].strftime("%Y-%m-%d %H:%M") if c["end_time"] else "Unknown",
+            "reason": reason,
+            "spend": spend,
+            "lifetime_cap": c["lifetime_spend_cap"],
+            "impressions": impressions,
+            "clicks": clicks,
+        })
+
+    return results
+
+
 def fetch_ads(access_token: str, ad_account_id: str) -> list[dict]:
     """Fetch all ads."""
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -413,6 +560,7 @@ def generate_period_content(
     paid_daily: dict,
     pin_daily: dict,
     ad_daily: dict,
+    recently_ended: list[dict] | None = None,
 ) -> str:
     """Generate content for a specific time period."""
     # Filter daily data
@@ -584,11 +732,48 @@ def generate_period_content(
         <tbody>{paid_rows if paid_rows else '<tr><td colspan="6">No paid ads data</td></tr>'}</tbody>
     </table>
 
+    {generate_recently_ended_html(recently_ended or [])}
+
     <h2>Organic Leaderboard (Top 10 by Impressions)</h2>
     <table>
         <thead><tr><th>Pin Title</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">Saves</th><th class="num">CTR</th><th>Link</th></tr></thead>
         <tbody>{organic_rows if organic_rows else '<tr><td colspan="6">No organic data</td></tr>'}</tbody>
     </table>
+    """
+
+
+def generate_recently_ended_html(recently_ended: list[dict]) -> str:
+    """Generate HTML section for recently ended campaigns."""
+    if not recently_ended:
+        return ""
+
+    rows = ""
+    for c in recently_ended:
+        reason_class = "reason-budget" if c["reason"] == "Budget Exhausted" else "reason-ended"
+        cap_display = f"${c['lifetime_cap']:.2f}" if c["lifetime_cap"] > 0 else "-"
+        rows += f"""<tr>
+            <td title="{c['name']}">{c['name'][:45]}</td>
+            <td>{c['status']}</td>
+            <td>{c['ended_at']}</td>
+            <td><span class="reason-badge {reason_class}">{c['reason']}</span></td>
+            <td class="num">${c['spend']:.2f}</td>
+            <td class="num">{cap_display}</td>
+            <td class="num">{c['impressions']:,}</td>
+            <td class="num">{c['clicks']:,}</td>
+        </tr>"""
+
+    return f"""
+    <div class="recently-ended">
+        <h2>Recently Ended (Last 48 Hours)</h2>
+        <table>
+            <thead><tr>
+                <th>Campaign</th><th>Status</th><th>Ended At</th><th>Reason</th>
+                <th class="num">Spend</th><th class="num">Lifetime Cap</th>
+                <th class="num">Impressions</th><th class="num">Clicks</th>
+            </tr></thead>
+            <tbody>{rows}</tbody>
+        </table>
+    </div>
     """
 
 
@@ -598,6 +783,7 @@ def generate_html(
     organic_daily: dict,
     ad_daily: dict,
     paid_daily: dict,
+    recently_ended: list[dict] | None = None,
 ) -> str:
     """Generate HTML report with period toggle."""
 
@@ -606,7 +792,7 @@ def generate_html(
     for period_key, days in PERIODS.items():
         is_default = period_key == "1w"
         content = generate_period_content(
-            period_key, days, organic_daily, paid_daily, pin_daily, ad_daily
+            period_key, days, organic_daily, paid_daily, pin_daily, ad_daily, recently_ended
         )
         period_contents += f'<div id="period_{period_key}" class="period-content {"active" if is_default else ""}">{content}</div>\n'
 
@@ -744,6 +930,24 @@ def generate_html(
         a:hover {{ text-decoration: underline; }}
 
         .footer {{ margin-top: 30px; color: #999; font-size: 12px; text-align: center; }}
+
+        .recently-ended {{ margin-bottom: 30px; }}
+        .reason-badge {{
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }}
+        .reason-budget {{
+            background: #fff3cd;
+            color: #856404;
+        }}
+        .reason-ended {{
+            background: #d4edda;
+            color: #155724;
+        }}
     </style>
 </head>
 <body>
@@ -885,14 +1089,19 @@ def main():
     print("Fetching paid ads data...")
     ad_accounts = fetch_ad_accounts(access_token)
     ad_daily, paid_daily = {}, {}
+    recently_ended = []
     if ad_accounts:
         ad_account_id = ad_accounts[0]["id"]
         ad_daily, paid_daily = collect_paid_data(access_token, ad_account_id)
         print(f"Collected paid data for {len(ad_daily)} ads")
+
+        print("Checking for recently ended campaigns (last 48h)...")
+        recently_ended = collect_recently_ended(access_token, ad_account_id)
+        print(f"Found {len(recently_ended)} recently ended campaign(s)")
     else:
         print("No ad accounts found")
 
-    html = generate_html(account_name, pin_daily, organic_daily, ad_daily, paid_daily)
+    html = generate_html(account_name, pin_daily, organic_daily, ad_daily, paid_daily, recently_ended)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
     output_file = OUTPUT_DIR / f"account_analytics_{timestamp}.html"

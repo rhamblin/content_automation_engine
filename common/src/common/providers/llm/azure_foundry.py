@@ -33,6 +33,8 @@ Generate ONLY these fields:
 
 Guidelines:
 - Include the main keyword naturally
+- NEVER use emoji or unicode symbols - plain text only
+- Text is rendered on images at large sizes, keep it short and punchy
 {field_guidelines}
 
 Return ONLY valid JSON with the exact fields shown above.
