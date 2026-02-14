@@ -23,6 +23,8 @@ class DevToolSettings:
     azure_foundry_api_key: str
     azure_foundry_api_version: str = "2024-12-01-preview"
 
+    brand_text: str = ""
+
     wp_site_url: str = ""
     wp_username: str = ""
     wp_app_password: str = ""
@@ -33,6 +35,7 @@ class DevToolSettings:
 
 def load_dev_settings() -> DevToolSettings:
     return DevToolSettings(
+        brand_text=os.getenv("BRAND_TEXT", ""),
         azure_foundry_endpoint=os.getenv("AZURE_FOUNDRY_ENDPOINT", ""),
         azure_foundry_api_key=_read_secret(
             "../secrets/azure-foundry-proj-default-api-key.txt"

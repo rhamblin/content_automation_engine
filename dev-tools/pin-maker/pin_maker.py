@@ -15,7 +15,7 @@ from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 from common.resources.personas import get_persona
-from common.resources.rendering.styles import BRAND_TEXT, STYLES, list_styles
+from common.resources.rendering.styles import STYLES, list_styles
 
 
 def extract_keyword(filename: str) -> str:
@@ -95,7 +95,7 @@ def main():
                 source=source_image,
                 text_data=text_data,
                 style=style,
-                brand_text=BRAND_TEXT,
+                brand_text=settings.brand_text,
             )
 
             # Save with style name appended

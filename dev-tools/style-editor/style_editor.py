@@ -11,7 +11,10 @@ from common.contracts.models import ImageOverlay, TextElement, VisualStyle
 from common.contracts.models.rendering.image_overlay import STICKERS_DIR
 from common.providers.distribution_channel.pinterest import PinterestChannel
 
-from common.resources.rendering.styles import BRAND_TEXT, STYLES
+from common.resources.rendering.styles import STYLES
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from settings import load_dev_settings
 
 SHAPES = ["rectangle", "ribbon", "pill", "sticker"]
 
@@ -277,7 +280,8 @@ with col2:
 # Preview in sidebar (naturally sticky)
 st.sidebar.header("Preview")
 try:
-    preview = channel.render_content(source_img, text_data, modified_style, BRAND_TEXT)
+    _settings = load_dev_settings()
+    preview = channel.render_content(source_img, text_data, modified_style, _settings.brand_text)
     st.sidebar.image(preview, width=420)
 except Exception as e:
     st.sidebar.error(f"Error: {e}")

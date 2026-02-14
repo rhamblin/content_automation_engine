@@ -2,7 +2,6 @@
 
 from common.contracts.models import ImageOverlay, TextElement, VisualStyle
 
-BRAND_TEXT = "chefexotic.com"
 
 STYLES: dict[str, VisualStyle] = {
     # RIBBON BOX - White box with red ribbon prefix, large serif title
