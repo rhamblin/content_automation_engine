@@ -9,6 +9,7 @@ from common.contracts.database_models.enums import PublicationStatus, RenderStat
 from common.contracts.messages import ContentGenerationRequested
 from common.providers import registry
 from common.repositories.cross_tenant import ChannelRepository
+from common.utils.string_utils import to_camel_case
 from common.repositories.tenant_scoped import (
     ContentRepository,
     IntegrationProfileRepository,
@@ -137,10 +138,12 @@ class ChannelWorker:
                     )
 
                     try:
+                        tags = [to_camel_case(t) for t in [niche.title, keyword.term]]
                         result = distribution_channel.publish(
                             title=content.title,
                             description=content.description,
                             content=render.output_image_uri,
+                            tags=tags,
                         )
 
                         post_id = result.get("post_id")

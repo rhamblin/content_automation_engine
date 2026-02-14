@@ -294,8 +294,8 @@ STRICT OUTPUT RULES:
             RuntimeError: When Pinterest API returns an error response.
             ValueError: When response is missing required fields.
         """
-        hashtags = kwargs.get("hashtags", [])
-        self.logger.info(f"Publishing to Pinterest: {title} - {hashtags}")
+        tags = kwargs.get("tags", [])
+        self.logger.info(f"Publishing to Pinterest: {title} - {tags}")
 
         return {
             "post_id": "mock_pin_id_123456",
