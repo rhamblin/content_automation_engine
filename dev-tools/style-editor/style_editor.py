@@ -88,18 +88,19 @@ with col1:
             height = c3.slider("Height %", 0.05, 0.5, defaults.height_pct, key=f"ov_{idx}_h")
             y_pos = c4.number_input("Y Position", -500, 1500, defaults.y_position, key=f"ov_{idx}_y")
 
-            width, border_color, border_width, angle = defaults.width_pct, "#000000", 0, 0
+            width, border_color, border_width, x_pos, angle = defaults.width_pct, "#000000", 0, 0, 0
             if pos in ["center", "box"]:
-                c5, c6, c7 = st.columns(3)
+                c5, c6, c7, c8 = st.columns(4)
                 border_color = c5.color_picker("Border Color", defaults.border_color, key=f"ov_{idx}_bc")
                 border_width = c6.slider("Border W", 0, 10, defaults.border_width, key=f"ov_{idx}_bw")
-                angle = c7.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
+                x_pos = c7.number_input("X Position", -500, 500, defaults.x_position, key=f"ov_{idx}_x")
+                angle = c8.number_input("Angle", -180, 180, defaults.angle, key=f"ov_{idx}_ang")
             if pos == "box":
                 width = st.slider("Width %", 0.3, 1.0, defaults.width_pct, key=f"ov_{idx}_w")
 
             return ImageOverlay(position=pos, color=color, opacity=opacity, height_pct=height,
                                 y_position=y_pos, width_pct=width, border_color=border_color,
-                                border_width=border_width, angle=angle)
+                                border_width=border_width, x_position=x_pos, angle=angle)
 
     # Dynamic overlay slots
     base_overlays = base_style.overlays if base_style.overlays else []
@@ -189,6 +190,8 @@ with col2:
             parts.append(f"y_position={ov.y_position}")
             if ov.border_width:
                 parts.extend([f'border_color="{ov.border_color}"', f"border_width={ov.border_width}"])
+            if ov.x_position:
+                parts.append(f"x_position={ov.x_position}")
             if ov.angle:
                 parts.append(f"angle={ov.angle}")
         if ov.position == "box":

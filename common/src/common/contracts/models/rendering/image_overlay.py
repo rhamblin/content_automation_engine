@@ -17,6 +17,7 @@ class ImageOverlay:
     width_pct: float = 0.7  # box width (for "box" only)
     border_color: str = "#000000"
     border_width: int = 0
+    x_position: int = 0  # horizontal offset from center (positive=right, negative=left)
     angle: int = 0  # rotation in degrees (for center/box)
 
     def apply(self, img: Image.Image) -> Image.Image:
@@ -41,13 +42,14 @@ class ImageOverlay:
         elif self.position == "center":
             top_y = center_y - h // 2
             bot_y = center_y + h // 2
-            draw.rectangle([0, top_y, img.width, bot_y], fill=(*rgb, alpha))
+            x_off = self.x_position
+            draw.rectangle([0 + x_off, top_y, img.width + x_off, bot_y], fill=(*rgb, alpha))
             if self.border_width > 0:
                 border_rgb = tuple(int(self.border_color.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4))
-                draw.rectangle([0, top_y, img.width, bot_y], outline=(*border_rgb, 255), width=self.border_width)
+                draw.rectangle([0 + x_off, top_y, img.width + x_off, bot_y], outline=(*border_rgb, 255), width=self.border_width)
         elif self.position == "box":
             w = int(img.width * self.width_pct)
-            center_x = img.width // 2
+            center_x = img.width // 2 + self.x_position
             left = center_x - w // 2
             right = center_x + w // 2
             top_y = center_y - h // 2
@@ -62,6 +64,6 @@ class ImageOverlay:
         # Rotate overlay for center/box if angle specified
         if self.angle != 0 and self.position in ["center", "box"]:
             overlay_img = overlay_img.rotate(self.angle, resample=Image.Resampling.BICUBIC,
-                                              center=(img.width // 2, center_y))
+                                              center=(img.width // 2 + self.x_position, center_y))
 
         return Image.alpha_composite(img.convert("RGBA"), overlay_img).convert("RGB")
