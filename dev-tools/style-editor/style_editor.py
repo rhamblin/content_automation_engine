@@ -48,7 +48,7 @@ if "current_style" not in st.session_state:
     st.session_state.current_style = style_name
 elif st.session_state.current_style != style_name:
     # Clear all widget keys to reset to new style defaults
-    keys_to_clear = [k for k in st.session_state.keys() if k.startswith(("ov_", "title_", "prefix_", "tagline_", "accent_", "watermark_", "num_overlay"))]
+    keys_to_clear = [k for k in st.session_state.keys() if k.startswith(("ov_", "title_", "prefix_", "tagline_", "accent_", "watermark_", "num_overlay", "txt_"))]
     for k in keys_to_clear:
         del st.session_state[k]
     st.session_state.current_style = style_name
@@ -58,10 +58,10 @@ base_style = STYLES[style_name]
 
 st.sidebar.header("Text")
 text_data = {
-    "title": st.sidebar.text_input("Title", "Delicious Recipe"),
-    "prefix": st.sidebar.text_input("Prefix", "Quick & Easy"),
-    "tagline": st.sidebar.text_input("Tagline", "Perfect for dinner"),
-    "accent": st.sidebar.text_input("Accent", "homemade"),
+    "title": st.sidebar.text_input("Title", "Delicious Recipe", key="txt_title"),
+    "prefix": st.sidebar.text_input("Prefix", "Quick & Easy", key="txt_prefix"),
+    "tagline": st.sidebar.text_input("Tagline", "Perfect for dinner", key="txt_tagline"),
+    "accent": st.sidebar.text_input("Accent", "homemade", key="txt_accent"),
 }
 
 # Controls and Preview
@@ -115,7 +115,6 @@ with col1:
 
     if st.button("+ Add Overlay"):
         st.session_state.num_overlay_slots += 1
-        st.rerun()
 
     # Available fonts
     FONTS = ["Montserrat.ttf", "BebasNeue.ttf", "Oswald.ttf", "PlayfairDisplay.ttf",
