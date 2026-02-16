@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker style-editor get-pin-ids get-pin-stats plot-pin-analytics account-analytics promotion-manager publication-manager unified-dashboard title-generator amazon-affiliate amazon-get amazon-url amazon-search logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker pin-uploader board-manager style-editor get-pin-ids get-pin-stats plot-pin-analytics account-analytics promotion-manager publication-manager unified-dashboard title-generator amazon-affiliate amazon-get amazon-url amazon-search logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -84,6 +84,12 @@ wp-media-ids:
 
 pin-maker:
 	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py pin-maker/data/example.json
+
+pin-uploader:
+	. dev-tools/dev-shell.sh && cd dev-tools && python pin-uploader/pin_uploader.py pin-uploader/data/example.json
+
+board-manager:
+	. dev-tools/dev-shell.sh && cd dev-tools && python board-manager/board_manager.py board-manager/data/example.json
 
 style-editor:
 	. dev-tools/dev-shell.sh && cd dev-tools/style-editor && streamlit run style_editor.py
@@ -178,6 +184,8 @@ help:  ## Show this help message
 	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
 	@echo "  make pin-maker       - Create Pinterest pins (edit data/example.json)"
+	@echo "  make pin-uploader    - Upload pins to Pinterest draft board (edit data/example.json)"
+	@echo "  make board-manager   - Create Pinterest boards (edit data/example.json)"
 	@echo "  make style-editor   - Visual style editor (add ?channel=name in URL, default: pinterest)"
 	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
 	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"

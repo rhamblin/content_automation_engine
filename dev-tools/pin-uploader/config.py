@@ -19,8 +19,7 @@ class RawPinData:
     image_b64: str
     content_type: str
     keyword: str
-    link: str | None = None
-    target_board_id: str | None = None
+    link: str
 
 
 @dataclass(frozen=True)
@@ -90,6 +89,10 @@ def load_config(data_file: Path) -> PinUploadConfig:
     if not copy_style_prompt:
         raise ValueError(f"copy_style_prompt not configured for niche: {niche}")
 
+    brand_website = niche_data.get("brand_website", "").rstrip("/")
+    if not brand_website:
+        raise ValueError(f"brand_website not configured for niche: {niche}")
+
     # --- resolve pin images ---
     pins: list[RawPinData] = []
     for entry in pins_raw:
@@ -110,13 +113,15 @@ def load_config(data_file: Path) -> PinUploadConfig:
 
         image_b64, content_type = _encode_image(image_path)
 
+        path = entry.get("path", "")
+        link = f"{brand_website}{path}" if path else brand_website
+
         pins.append(
             RawPinData(
                 image_b64=image_b64,
                 content_type=content_type,
                 keyword=keyword,
-                link=entry.get("link"),
-                target_board_id=entry.get("target_board_id"),
+                link=link,
             )
         )
 

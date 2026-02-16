@@ -6,14 +6,12 @@
     {
       "image": "lava_cake_ribbon_box.jpg",
       "keyword": "lava cake",
-      "link": "https://yourbrand.com/lava-cake",
-      "target_board_id": "1234567890123456789"
+      "path": "/lava-cake"
     },
     {
       "image": "running_shoes_bold_band.jpg",
       "keyword": "running shoes",
-      "link": "https://yourbrand.com/running-shoes",
-      "target_board_id": "9876543210987654321"
+      "path": "/running-shoes"
     }
   ]
 }
