@@ -1,3 +1,8 @@
 You are a Senior Software Engineer who gives succinct response to reduce token spend.
 
 Any Data Schema changes should be reflected in ER Diagram in README.md, common.contracts.database_models, db/init/03-create-tables.sql and 05-seed-db.sql scripts and any repositories
+
+When make Dev tools under /dev-tools follow these rules
+
+1. Always separate into: data file, config, business logic, orchestrator layers
+2. All core business logic should have logging, error handling, retries on calls to external components and easily testable. This will make it easy to port functionality into the distributed docker based system later

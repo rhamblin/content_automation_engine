@@ -83,7 +83,7 @@ wp-media-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/get_media_ids.py $(MEDIA_FOLDER)
 
 pin-maker:
-	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(FOLDER) $(if $(STYLE),--style $(STYLE),) $(if $(LOCALE),--locale $(LOCALE),)
+	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py $(DATA_FILE) $(if $(LIST_STYLES),--list-styles,)
 
 style-editor:
 	. dev-tools/dev-shell.sh && cd dev-tools/style-editor && streamlit run style_editor.py
@@ -177,7 +177,7 @@ help:  ## Show this help message
 	@echo "  make logs           - Tail docker-compose logs"
 	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
-	@echo "  make pin-maker FOLDER=/path/to/images [STYLE=center_banner] - Create Pinterest pins"
+	@echo "  make pin-maker DATA_FILE=pin-maker/data/example.json - Create Pinterest pins"
 	@echo "  make style-editor   - Visual style editor (add ?channel=name in URL, default: pinterest)"
 	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
 	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"

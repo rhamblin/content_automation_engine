@@ -1,4 +1,4 @@
-"""Pinterest Pin Maker - Generate pins with LLM text and style selection."""
+"""Pinterest Pin Maker — orchestrator (all I/O lives here)."""
 
 import argparse
 import re
@@ -9,13 +9,17 @@ from openai import AzureOpenAI
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from common.providers.distribution_channel.pinterest import PinterestChannel
+from common.app_logger import AppLogger
+from common.providers.distribution_channel.pinterest import PinterestChannel, list_styles
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
+from common.resources.personas import get_persona
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
-from common.resources.personas import get_persona
-from common.providers.distribution_channel.pinterest import STYLES, list_styles
+
+from pin_maker_service import PinMakerService
+
+logger = AppLogger(__name__)
 
 
 def extract_keyword(filename: str) -> str:
@@ -27,26 +31,33 @@ def extract_keyword(filename: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Pinterest pins")
-    parser.add_argument("folder", type=Path, help="Folder containing images")
-    parser.add_argument("--niche", type=str, default="food", help="Content niche (default: food)")
-    parser.add_argument("--locale", type=str, default="en", choices=["en", "es", "sw"], help="Output language (default: en)")
-    parser.add_argument("--style", type=str, help="Force a specific style")
+    parser.add_argument("data_file", nargs="?", type=Path, help="JSON data file (see data/example.json)")
     parser.add_argument("--list-styles", action="store_true", help="List available styles")
     args = parser.parse_args()
 
+    # --list-styles: no API call needed
     if args.list_styles:
-        for name, style in STYLES.items():
-            print(f"  {name}: {style.description}")
+        for name, desc in PinMakerService.list_styles().items():
+            print(f"  {name}: {desc}")
         sys.exit(0)
 
-    if not args.folder.is_dir():
-        print(f"Error: {args.folder} is not a directory")
+    if not args.data_file:
+        parser.error("a data file is required (e.g. data/example.json)")
+
+    # Layer 2: load + validate request from JSON data file
+    from config import load_request
+
+    request = load_request(args.data_file)
+    input_folder = Path(request.input_folder)
+
+    if not input_folder.is_dir():
+        logger.error(f"{input_folder} is not a directory")
         sys.exit(1)
 
-    output_folder = args.folder / "output"
+    output_folder = input_folder / "output"
     output_folder.mkdir(exist_ok=True)
 
-    # Setup
+    # Wire up providers
     settings = load_dev_settings()
     client = AzureOpenAI(
         azure_endpoint=settings.azure_foundry_endpoint,
@@ -55,58 +66,47 @@ def main():
     )
     llm = AzureFoundryLLMProvider(client)
     channel = PinterestChannel()
-    persona = get_persona(args.niche)
+    persona = get_persona(request.niche)
 
-    # Process images
-    jpg_files = list(args.folder.glob("*.jpg")) + list(args.folder.glob("*.jpeg"))
-    jpg_files += list(args.folder.glob("*.JPG")) + list(args.folder.glob("*.JPEG"))
+    service = PinMakerService(llm=llm, channel=channel, persona=persona)
 
-    print(f"Found {len(jpg_files)} images")
+    # Collect image files
+    jpg_files = list(input_folder.glob("*.jpg")) + list(input_folder.glob("*.jpeg"))
+    jpg_files += list(input_folder.glob("*.JPG")) + list(input_folder.glob("*.JPEG"))
+    logger.info(f"Found {len(jpg_files)} images")
 
-    # Get all style names - each used exactly once
     style_names = list_styles()
     if len(jpg_files) > len(style_names):
-        print(f"Warning: {len(jpg_files)} images but only {len(style_names)} styles. Some styles will repeat.")
+        logger.warning(f"{len(jpg_files)} images but only {len(style_names)} styles — some will repeat")
 
+    # Process each image
+    saved, errors = 0, 0
     for idx, img_path in enumerate(jpg_files):
         keyword = extract_keyword(img_path.name)
-        print(f"\n{img_path.name} -> '{keyword}'")
+        style_name = request.style or style_names[idx % len(style_names)]
+        logger.info(f"{img_path.name} -> '{keyword}' [{style_name}]")
 
         try:
-            # Select style first (use forced style or cycle through styles)
-            if args.style:
-                style_name = args.style
-            else:
-                style_name = style_names[idx % len(style_names)]
-            style = STYLES[style_name]
-
-            # Generate content - LLM provider combines: channel + persona + style + locale
-            text_data = llm.generate(
-                niche=args.niche, keyword=keyword, channel=channel, persona=persona, style=style, locale=args.locale
-            )
-
-            print(f"  Style: {style_name} | Title: {text_data.get('title')}")
-
-            # Read image
             source_image = Image.open(img_path).convert("RGB")
-
-            # Render content via channel
-            pin_image = channel.render_content(
-                source=source_image,
-                text_data=text_data,
-                style=style,
+            result = service.make_pin(
+                source_image=source_image,
+                keyword=keyword,
+                niche=request.niche,
+                locale=request.locale,
+                style_name=style_name,
                 brand_text=settings.brand_text,
             )
 
-            # Save with style name appended
-            output_path = output_folder / f"{img_path.stem}_{style_name}.jpg"
-            pin_image.save(output_path, "JPEG", quality=95)
-            print(f"  Saved: {output_path}")
+            output_path = output_folder / f"{img_path.stem}_{result.style_name}.jpg"
+            result.image.save(output_path, "JPEG", quality=95)
+            logger.info(f"  Saved: {output_path}")
+            saved += 1
 
         except Exception as e:
-            print(f"  Error: {e}")
+            logger.error(f"  Error processing {img_path.name}: {e}")
+            errors += 1
 
-    print(f"\nDone! Output: {output_folder}")
+    logger.info(f"Done — {saved} saved, {errors} errors. Output: {output_folder}")
 
 
 if __name__ == "__main__":
