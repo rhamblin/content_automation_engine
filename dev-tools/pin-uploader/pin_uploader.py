@@ -6,15 +6,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
+from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from settings import load_dev_settings
-
 from common.providers.distribution_channel.pinterest import PinterestChannel
+from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from common.workflows.board_manager import BoardItem, BoardManagerService
-from common.workflows.pin_uploader import PinItem, PinUploadRequest, PinUploaderService
+from common.workflows.pin_uploader import PinItem, PinUploaderService, PinUploadRequest
 from common.workflows.title_generator import TitleGeneratorService
 from pinterest_auth import get_access_token
+from settings import load_dev_settings
 
 from config import load_config
 
@@ -45,11 +46,10 @@ def generate_copy(
         dict with keys: title, description, alt_text
     """
     result = title_svc.generate(
-        channel="pinterest",
         niche=niche,
         keyword=keyword,
         count=1,
-        style=copy_style_prompt,
+        copy_style_prompt=copy_style_prompt,
     )
 
     if result.error:
@@ -74,17 +74,22 @@ def main():
 
     # Layer 2: load + validate config
     config = load_config(data_file)
-    logger.info(f"Loaded {len(config.pins)} pins for niche '{config.niche}' (tenant: {config.tenant})")
+    logger.info(
+        f"Loaded {len(config.pins)} pins for niche '{config.niche}' (tenant: {config.tenant})"
+    )
 
     # Wire up providers
     settings = load_dev_settings()
-    title_svc = TitleGeneratorService(
-        endpoint=settings.azure_foundry_endpoint,
+    access_token = get_access_token(config.tenant)
+    channel = PinterestChannel(access_token=access_token)
+
+    azure_client = AzureOpenAI(
+        azure_endpoint=settings.azure_foundry_endpoint,
         api_key=settings.azure_foundry_api_key,
         api_version=settings.azure_foundry_api_version,
     )
-    access_token = get_access_token(config.tenant)
-    channel = PinterestChannel(access_token=access_token)
+    llm = AzureFoundryLLMProvider(azure_client)
+    title_svc = TitleGeneratorService(llm=llm, channel=channel)
     service = PinUploaderService(channel)
 
     # Create secret draft board via BoardManagerService
@@ -145,7 +150,7 @@ def main():
         status = f"OK {r.url}" if r.ok else f"FAILED: {r.error}"
         print(f"  {r.title} — {status}")
     print(f"{'='*50}")
-    print(f"\nReview pins on the secret board, then move to public boards when ready.")
+    print("\nReview pins on the secret board, then move to public boards when ready.")
 
 
 if __name__ == "__main__":

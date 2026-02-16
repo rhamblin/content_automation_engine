@@ -12,9 +12,15 @@ def load_request(path: Path) -> TitleGenRequest:
     """Load a JSON data file and return a validated TitleGenRequest."""
     raw = json.loads(path.read_text())
 
-    for field in ("channel", "niche", "keyword"):
+    for field in ("channel", "niche", "keywords"):
         if field not in raw:
             raise ValueError(f"data file missing required field: {field}")
+
+    keywords = raw["keywords"]
+    if isinstance(keywords, str):
+        keywords = [keywords]
+    if not keywords:
+        raise ValueError("keywords must not be empty")
 
     style = raw.get("style", "mixed")
     if style not in VALID_STYLES:
@@ -23,7 +29,7 @@ def load_request(path: Path) -> TitleGenRequest:
     return TitleGenRequest(
         channel=raw["channel"],
         niche=raw["niche"],
-        keyword=raw["keyword"],
-        count=raw.get("count", 3),
+        keywords=tuple(keywords),
+        count=raw.get("count", 1),
         style=style,
     )

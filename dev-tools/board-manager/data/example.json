@@ -1,8 +1,6 @@
 {
   "tenant": "dev-tenant",
   "boards": [
-    { "name": "Lava Cake Recipes", "privacy": "PUBLIC" },
-    { "name": "Sneaker Reviews", "privacy": "PUBLIC" },
     { "name": "Draft-Testing", "privacy": "SECRET" }
   ]
 }

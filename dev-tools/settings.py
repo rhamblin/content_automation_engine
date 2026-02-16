@@ -47,7 +47,9 @@ def load_dev_settings() -> DevToolSettings:
         ),
         wp_site_url=os.getenv("WP_SITE_URL", ""),
         wp_username=os.getenv("WP_USERNAME", ""),
-        wp_app_password=_read_secret(str(_ENV_FILE.parent / "wp-uploader/wp-app-password.txt")),
+        wp_app_password=_read_secret(
+            str(_ENV_FILE.parent / "wp-uploader/wp-app-password.txt")
+        ),
         wp_niche=os.getenv("WP_NICHE", "food"),
         wp_amazon_tag=os.getenv("WP_AMAZON_TAG", ""),
     )

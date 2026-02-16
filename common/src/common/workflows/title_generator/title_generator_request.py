@@ -9,6 +9,6 @@ class TitleGenRequest:
 
     channel: str  # required — pinterest, youtube, instagram, etc.
     niche: str  # required
-    keyword: str  # required
-    count: int = 3
+    keywords: tuple[str, ...]  # required — one or more keywords
+    count: int = 1
     style: str = "mixed"  # mixed | clickbait | professional | casual | seo

@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.workflows.board_manager import BoardManagerService
