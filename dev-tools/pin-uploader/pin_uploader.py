@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
 from common.providers.distribution_channel.pinterest import PinterestChannel
+from common.workflows.board_manager import BoardItem, BoardManagerService
 from common.workflows.pin_uploader import PinItem, PinUploadRequest, PinUploaderService
 from common.workflows.title_generator import TitleGeneratorService
 
@@ -84,12 +85,16 @@ def main():
     channel = PinterestChannel(access_token=config.access_token)
     service = PinUploaderService(channel)
 
-    # Create secret draft board
+    # Create secret draft board via BoardManagerService
     draft_name = build_draft_board_name(config.niche)
     logger.info(f"Creating secret board: {draft_name}")
-    board = channel.create_board(name=draft_name, privacy="SECRET")
-    draft_board_id = board["board_id"]
-    logger.info(f"Draft board created: {board['url']}")
+    board_svc = BoardManagerService(channel)
+    board_result = board_svc.create_board(BoardItem(name=draft_name, privacy="SECRET"))
+    if not board_result.ok:
+        logger.error(f"Failed to create draft board: {board_result.error}")
+        sys.exit(1)
+    draft_board_id = board_result.board_id
+    logger.info(f"Draft board created: {board_result.url}")
 
     # Build PinItems: generate copy per pin, append hashtags, target draft board
     pin_items: list[PinItem] = []
@@ -132,7 +137,7 @@ def main():
 
     # Summary
     print(f"\n{'='*50}")
-    print(f"Draft board: {draft_name} ({board['url']})")
+    print(f"Draft board: {draft_name} ({board_result.url})")
     print(f"Upload complete: {response.succeeded}/{response.total} succeeded")
     for r in response.results:
         status = f"OK {r.url}" if r.ok else f"FAILED: {r.error}"
