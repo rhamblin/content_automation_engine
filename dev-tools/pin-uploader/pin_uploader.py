@@ -14,6 +14,7 @@ from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.workflows.board_manager import BoardItem, BoardManagerService
 from common.workflows.pin_uploader import PinItem, PinUploadRequest, PinUploaderService
 from common.workflows.title_generator import TitleGeneratorService
+from pinterest_auth import get_access_token
 
 from config import load_config
 
@@ -82,7 +83,8 @@ def main():
         api_key=settings.azure_foundry_api_key,
         api_version=settings.azure_foundry_api_version,
     )
-    channel = PinterestChannel(access_token=config.access_token)
+    access_token = get_access_token(config.tenant)
+    channel = PinterestChannel(access_token=access_token)
     service = PinUploaderService(channel)
 
     # Create secret draft board via BoardManagerService

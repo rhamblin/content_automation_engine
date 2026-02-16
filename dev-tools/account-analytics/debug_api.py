@@ -7,8 +7,8 @@ from pathlib import Path
 
 import requests
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "get-pin-ids"))
-from auth import PINTEREST_API_URL, get_access_token
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 
 access_token = get_access_token()
 headers = {"Authorization": f"Bearer {access_token}"}

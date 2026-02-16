@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import requests
 
-from auth import PINTEREST_API_URL, get_access_token
+from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 
 
 def get_pin_analytics(access_token: str, pin_id: str) -> dict | None:

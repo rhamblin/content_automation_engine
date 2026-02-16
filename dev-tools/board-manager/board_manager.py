@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.workflows.board_manager import BoardManagerService
+from pinterest_auth import get_access_token
 
 from config import load_config
 
@@ -24,7 +25,8 @@ def main():
     logger.info(f"Creating {len(config.boards)} boards (tenant: {config.tenant})")
 
     # Wire up
-    channel = PinterestChannel(access_token=config.access_token)
+    access_token = get_access_token(config.tenant)
+    channel = PinterestChannel(access_token=access_token)
     service = BoardManagerService(channel)
     response = service.create_boards(config.boards)
 

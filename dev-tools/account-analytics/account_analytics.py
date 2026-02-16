@@ -9,8 +9,8 @@ from pathlib import Path
 import plotly.graph_objects as go
 import requests
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "get-pin-ids"))
-from auth import PINTEREST_API_URL, get_access_token
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

@@ -30,7 +30,6 @@ class PinUploadConfig:
     niche: str
     pins: list[RawPinData]
     copy_style_prompt: str
-    access_token: str
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -67,16 +66,6 @@ def load_config(data_file: Path) -> PinUploadConfig:
     input_folder = Path(raw.get("input_folder", ""))
     if not input_folder.is_dir():
         raise ValueError(f"input_folder does not exist: {input_folder}")
-
-    # --- resolve credentials ---
-    creds_path = CONFIG_ROOT / tenant / "credentials" / "pinterest.json"
-    if not creds_path.exists():
-        raise ValueError(f"credentials not found: {creds_path}")
-
-    creds = json.loads(creds_path.read_text())
-    access_token = creds.get("access_token", "")
-    if not access_token or access_token == "REPLACE_ME":
-        raise ValueError("pinterest access_token not configured in credentials")
 
     # --- resolve niche config + copy_style_prompt ---
     niche_dir = CONFIG_ROOT / tenant / "niches" / niche
@@ -130,5 +119,4 @@ def load_config(data_file: Path) -> PinUploadConfig:
         niche=niche,
         pins=pins,
         copy_style_prompt=copy_style_prompt,
-        access_token=access_token,
     )

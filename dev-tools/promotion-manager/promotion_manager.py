@@ -7,10 +7,10 @@ from pathlib import Path
 
 import requests
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "get-pin-ids"))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "common" / "src"))
 
-from auth import PINTEREST_API_URL, get_access_token
+from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 from common.app_logger import AppLogger
 from common.evaluators.promotion_evaluator import PromotionThresholds
 

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import requests
 
-from auth import PINTEREST_API_URL, get_access_token
+from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(exist_ok=True)
