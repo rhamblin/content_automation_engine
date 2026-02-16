@@ -4,7 +4,7 @@ from common.app_logger import AppLogger
 from common.contracts.interfaces.distribution_channel import IDistributionChannel
 from common.contracts.interfaces.llm_provider import ILLMProvider
 from common.contracts.models.persona import Persona
-from common.providers.distribution_channel.pinterest import STYLES
+from common.contracts.models.rendering.visual_style import VisualStyle
 from common.workflows.pin_maker.pin_maker_response import PinResult
 from PIL import Image
 
@@ -30,12 +30,10 @@ class PinMakerService:
         keyword: str,
         niche: str,
         locale: str,
-        style_name: str,
+        style: VisualStyle,
         brand_text: str,
     ) -> PinResult:
         """Generate text via LLM, render pin, return result."""
-        style = STYLES[style_name]
-
         text_data = self.llm.generate(
             niche=niche,
             keyword=keyword,
@@ -45,7 +43,7 @@ class PinMakerService:
             locale=locale,
         )
 
-        logger.info(f"Style: {style_name} | Title: {text_data.get('title')}")
+        logger.info(f"Style: {style.name} | Title: {text_data.get('title')}")
 
         pin_image = self.channel.render_content(
             source=source_image,
@@ -57,11 +55,6 @@ class PinMakerService:
         return PinResult(
             image=pin_image,
             keyword=keyword,
-            style_name=style_name,
+            style_name=style.name,
             title=text_data.get("title"),
         )
-
-    @staticmethod
-    def list_styles() -> dict:
-        """Return available style names and descriptions."""
-        return {name: style.description for name, style in STYLES.items()}

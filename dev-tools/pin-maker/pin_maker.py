@@ -10,7 +10,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
-from common.providers.distribution_channel.pinterest import PinterestChannel, list_styles
+from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from common.resources.personas import get_persona
 
@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
 from common.workflows.pin_maker import PinMakerService
+from config import load_request, load_styles
 
 logger = AppLogger(__name__)
 
@@ -35,18 +36,19 @@ def main():
     parser.add_argument("--list-styles", action="store_true", help="List available styles")
     args = parser.parse_args()
 
+    # Load styles from tenant config
+    styles = load_styles()
+
     # --list-styles: no API call needed
     if args.list_styles:
-        for name, desc in PinMakerService.list_styles().items():
-            print(f"  {name}: {desc}")
+        for name, style in styles.items():
+            print(f"  {name}: {style.description}")
         sys.exit(0)
 
     if not args.data_file:
         parser.error("a data file is required (e.g. data/example.json)")
 
     # Layer 2: load + validate request from JSON data file
-    from config import load_request
-
     request = load_request(args.data_file)
     input_folder = Path(request.input_folder)
 
@@ -75,7 +77,7 @@ def main():
     jpg_files += list(input_folder.glob("*.JPG")) + list(input_folder.glob("*.JPEG"))
     logger.info(f"Found {len(jpg_files)} images")
 
-    style_names = list_styles()
+    style_names = list(styles.keys())
     if len(jpg_files) > len(style_names):
         logger.warning(f"{len(jpg_files)} images but only {len(style_names)} styles — some will repeat")
 
@@ -84,6 +86,7 @@ def main():
     for idx, img_path in enumerate(jpg_files):
         keyword = extract_keyword(img_path.name)
         style_name = request.style or style_names[idx % len(style_names)]
+        style = styles[style_name]
         logger.info(f"{img_path.name} -> '{keyword}' [{style_name}]")
 
         try:
@@ -93,7 +96,7 @@ def main():
                 keyword=keyword,
                 niche=request.niche,
                 locale=request.locale,
-                style_name=style_name,
+                style=style,
                 brand_text=settings.brand_text,
             )
 

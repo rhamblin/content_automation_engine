@@ -1,28 +1,40 @@
 """Style Editor - Visual editor for pin styles. Pass ?channel=pinterest in URL."""
 
-import importlib
+import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 import streamlit as st
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from common.contracts.models import ImageOverlay, TextElement, VisualStyle
+from common.contracts.models import CanvasSpec, ImageOverlay, TextElement, VisualStyle
 from common.contracts.models.rendering.image_overlay import STICKERS_DIR
 from common.rendering import render_image
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
+STYLES_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
 
-def _load_channel(name: str):
-    """Dynamically load STYLES dict and CanvasSpec for a channel."""
-    mod = importlib.import_module(f"common.providers.distribution_channel.{name}")
-    styles = mod.STYLES
-    canvas = next(v for v in vars(mod).values()
-                  if hasattr(v, "width") and hasattr(v, "height") and hasattr(v, "format"))
-    return styles, canvas
+# Channel → default canvas (extensible)
+CHANNEL_CANVAS = {
+    "pinterest": CanvasSpec(width=1000, height=1500, format="RGB"),
+}
+
+
+def _load_styles(tenant: str, channel: str) -> dict[str, VisualStyle]:
+    """Load all style JSONs from config/tenants/{tenant}/styles/{channel}/."""
+    styles_dir = STYLES_ROOT / tenant / "styles" / channel
+    if not styles_dir.exists():
+        return {}
+    styles: dict[str, VisualStyle] = {}
+    for f in sorted(styles_dir.glob("*.json")):
+        data = json.loads(f.read_text())
+        styles[data["name"]] = VisualStyle.from_dict(data)
+    return styles
+
 
 SHAPES = ["rectangle", "ribbon", "pill", "sticker"]
 
@@ -60,7 +72,12 @@ st.markdown("""
 st.title("Style Editor")
 
 channel_name = st.query_params.get("channel", "pinterest")
-STYLES, CANVAS = _load_channel(channel_name)
+STYLES = _load_styles("dev-tenant", channel_name)
+CANVAS = CHANNEL_CANVAS.get(channel_name, CanvasSpec(width=1000, height=1500, format="RGB"))
+
+if not STYLES:
+    st.error(f"No styles found for channel '{channel_name}' in config/tenants/dev-tenant/styles/")
+    st.stop()
 
 # Sidebar - Image upload and preview (sticky)
 st.sidebar.header("Image")
@@ -252,66 +269,40 @@ modified_style = VisualStyle(
 )
 
 with col2:
-    st.subheader("Config")
+    st.subheader("Config (JSON)")
 
-    def fmt_el(name: str, el: TextElement) -> str:
-        parts = [f'font_file="{el.font_file}"', f"font_size={el.font_size}",
-                 f'color="{el.color}"', f"y_position={el.y_position}"]
-        if el.outline_width:
-            parts.append(f"outline_width={el.outline_width}")
-        if el.outline_color != "#000000":
-            parts.append(f'outline_color="{el.outline_color}"')
-        if el.alignment != "center":
-            parts.append(f'alignment="{el.alignment}"')
-        if el.angle:
-            parts.append(f"angle={el.angle}")
-        return f"        {name}=TextElement({', '.join(parts)}),"
+    def _el_to_dict(el: TextElement) -> dict:
+        """Convert TextElement to JSON-serializable dict, omitting defaults."""
+        d = asdict(el)
+        # Remove defaults to keep config compact
+        defaults = {"outline_width": 0, "outline_color": "#000000", "alignment": "center",
+                    "max_width_pct": 0.85, "max_lines": 2, "angle": 0}
+        return {k: v for k, v in d.items() if k not in defaults or v != defaults[k]}
 
-    def fmt_ov(ov: ImageOverlay) -> str:
-        if ov.shape == "sticker":
-            parts = [f'shape="sticker"', f'sticker_file="{ov.sticker_file}"',
-                     f'color="{ov.color}"', f"opacity={ov.opacity}",
-                     f"height_pct={ov.height_pct}", f"y_position={ov.y_position}"]
-            if ov.x_position:
-                parts.append(f"x_position={ov.x_position}")
-            if ov.angle:
-                parts.append(f"angle={ov.angle}")
-            if ov.flip_h:
-                parts.append("flip_h=True")
-            if ov.flip_v:
-                parts.append("flip_v=True")
-            return f"ImageOverlay({', '.join(parts)})"
+    def _ov_to_dict(ov: ImageOverlay) -> dict:
+        """Convert ImageOverlay to JSON-serializable dict, omitting defaults."""
+        d = asdict(ov)
+        defaults = {"position": "top", "color": "#000000", "opacity": 0.3, "height_pct": 0.35,
+                    "y_position": 750, "width_pct": 0.7, "border_color": "#000000", "border_width": 0,
+                    "x_position": 0, "angle": 0, "shape": "rectangle", "notch_pct": 0.03,
+                    "corner_radius": 20, "sticker_file": None, "flip_h": False, "flip_v": False}
+        return {k: v for k, v in d.items() if k not in defaults or v != defaults[k]}
 
-        parts = [f'position="{ov.position}"', f'color="{ov.color}"',
-                 f"opacity={ov.opacity}", f"height_pct={ov.height_pct}"]
-        if ov.shape != "rectangle":
-            parts.append(f'shape="{ov.shape}"')
-        if ov.position in ["center", "box"]:
-            parts.append(f"y_position={ov.y_position}")
-            if ov.border_width:
-                parts.extend([f'border_color="{ov.border_color}"', f"border_width={ov.border_width}"])
-            if ov.x_position:
-                parts.append(f"x_position={ov.x_position}")
-            if ov.angle:
-                parts.append(f"angle={ov.angle}")
-        if ov.position == "box":
-            parts.append(f"width_pct={ov.width_pct}")
-        if ov.shape == "ribbon":
-            parts.append(f"notch_pct={ov.notch_pct}")
-        if ov.shape == "pill":
-            parts.append(f"corner_radius={ov.corner_radius}")
-        return f"ImageOverlay({', '.join(parts)})"
-
-    lines = [f'    "{modified_style.name}": VisualStyle(name="{modified_style.name}", description="...",']
+    spec: dict = {}
     for k, el in new_elements.items():
         if el:
-            lines.append(fmt_el(k, el))
+            spec[k] = _el_to_dict(el)
     if new_overlays:
-        ov_strs = [fmt_ov(ov) for ov in new_overlays]
-        lines.append(f"        overlays=[{', '.join(ov_strs)}],")
-    lines.append("    ),")
+        spec["overlays"] = [_ov_to_dict(ov) for ov in new_overlays]
 
-    st.code("\n".join(lines), language="python")
+    config = {
+        "name": modified_style.name,
+        "channel": channel_name,
+        "description": modified_style.description,
+        "spec": spec,
+    }
+
+    st.code(json.dumps(config, indent=2), language="json")
 
 # Preview in sidebar (naturally sticky)
 st.sidebar.header("Preview")

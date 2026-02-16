@@ -11,7 +11,7 @@ from tenacity import (
 
 from common.app_logger import AppLogger
 from common.contracts.interfaces import IDistributionChannel
-from common.contracts.models import CanvasSpec, VisualStyle
+from common.contracts.models import CanvasSpec
 from common.rendering import render_image
 
 PINTEREST_CANVAS = CanvasSpec(width=1000, height=1500, format="RGB")
