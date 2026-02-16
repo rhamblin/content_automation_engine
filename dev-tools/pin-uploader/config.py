@@ -29,6 +29,8 @@ class PinUploadConfig:
     tenant: str
     niche: str
     pins: list[RawPinData]
+    persona_prompt: str
+    channel_prompt: str
     copy_style_prompt: str
 
 
@@ -74,7 +76,10 @@ def load_config(data_file: Path) -> PinUploadConfig:
         raise ValueError(f"niche config not found: {niche_json}")
 
     niche_data = json.loads(niche_json.read_text())
+    persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
     copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
+    channel_prompts = niche_data.get("channel_prompts", {})
+    channel_prompt = _resolve_prompt(channel_prompts.get("pinterest"), niche_dir) or ""
     if not copy_style_prompt:
         raise ValueError(f"copy_style_prompt not configured for niche: {niche}")
 
@@ -118,5 +123,7 @@ def load_config(data_file: Path) -> PinUploadConfig:
         tenant=tenant,
         niche=niche,
         pins=pins,
+        persona_prompt=persona_prompt,
+        channel_prompt=channel_prompt,
         copy_style_prompt=copy_style_prompt,
     )

@@ -14,23 +14,12 @@ from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from settings import load_dev_settings
 
-from config import load_request
+from config import load_config
 from common.workflows.title_generator import TitleGeneratorService
 
 logger = AppLogger(__name__)
 
 OUTPUT_DIR = Path(__file__).parent / "output"
-
-CHANNELS = {
-    "pinterest": lambda: PinterestChannel(),
-}
-
-
-def resolve_channel(name: str):
-    """Resolve channel string to IDistributionChannel instance."""
-    if name not in CHANNELS:
-        raise ValueError(f"Unknown channel '{name}'. Available: {list(CHANNELS.keys())}")
-    return CHANNELS[name]()
 
 
 def save_results(all_results: dict[str, "TitleGenResult"], request) -> Path:
@@ -42,14 +31,14 @@ def save_results(all_results: dict[str, "TitleGenResult"], request) -> Path:
     output = {
         "generated_at": datetime.now().isoformat(),
         "params": {
+            "tenant": request.tenant,
             "channel": request.channel,
             "niche": request.niche,
             "keywords": list(request.keywords),
-            "style": request.style,
         },
         "results": {
             keyword: [
-                {"title": o.title, "description": o.description, "reasoning": o.reasoning}
+                {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
                 for o in result.options
             ]
             for keyword, result in all_results.items()
@@ -76,10 +65,11 @@ def print_results(all_results: dict[str, "TitleGenResult"], request):
 
 def main():
     data_file = Path(__file__).parent / "data" / "example.json"
-    request = load_request(data_file)
+    config = load_config(data_file)
+    request = config.request
 
     settings = load_dev_settings()
-    channel = resolve_channel(request.channel)
+    channel = PinterestChannel(prompt_override=config.channel_prompt)
     azure_client = AzureOpenAI(
         azure_endpoint=settings.azure_foundry_endpoint,
         api_key=settings.azure_foundry_api_key,
@@ -98,7 +88,8 @@ def main():
             niche=request.niche,
             keyword=keyword,
             count=request.count,
-            copy_style_prompt=request.style,
+            copy_style_prompt=config.copy_style_prompt,
+            persona_prompt=config.persona_prompt,
         )
         if result.error:
             logger.error(f"Failed for '{keyword}': {result.error}")

@@ -39,6 +39,7 @@ def generate_copy(
     niche: str,
     keyword: str,
     copy_style_prompt: str,
+    persona_prompt: str = "",
 ) -> dict:
     """Generate title, description, alt_text via LLM.
 
@@ -50,6 +51,7 @@ def generate_copy(
         keyword=keyword,
         count=1,
         copy_style_prompt=copy_style_prompt,
+        persona_prompt=persona_prompt,
     )
 
     if result.error:
@@ -81,7 +83,7 @@ def main():
     # Wire up providers
     settings = load_dev_settings()
     access_token = get_access_token(config.tenant)
-    channel = PinterestChannel(access_token=access_token)
+    channel = PinterestChannel(prompt_override=config.channel_prompt, access_token=access_token)
 
     azure_client = AzureOpenAI(
         azure_endpoint=settings.azure_foundry_endpoint,
@@ -113,6 +115,7 @@ def main():
                 niche=config.niche,
                 keyword=raw_pin.keyword,
                 copy_style_prompt=config.copy_style_prompt,
+                persona_prompt=config.persona_prompt,
             )
             hashtags = build_hashtags(config.niche, raw_pin.keyword)
             description = f"{copy['description']} {hashtags}"

@@ -1,27 +1,46 @@
-Generate Pinterest pin copy for a recipe keyword.
-
-TONE & STYLE:
-- Warm, conversational tone - like a friend sharing their favourite find
-- Lead with sensory words (rich, crispy, golden, buttery, smoky)
+TONE & VOICE:
+- Lead with sensory words (juicy, crispy, golden, buttery, smoky, rich)
 - Focus on the experience of eating, not the process of cooking
-- Titles should trigger cravings and curiosity
-- Descriptions should paint a picture of the dish and make the reader want to save the pin
-- Keep language simple and inviting
+- Keep language simple, warm and inviting
 
 OUTPUT FORMAT:
 Return ONLY valid JSON matching this exact schema:
 {
   "title": "...",
   "description": "...",
-  "alt_text": "..."
+  "alt_text": "...",
+  "reasoning": "..."
 }
 
 FIELD RULES:
-- title: 3-8 words, no emoji, no special characters, must include the keyword naturally. Should stop the scroll and trigger a craving.
-- description: 1-3 sentences, max 500 characters. Describe the taste, texture or experience. End with a reason to save or try. Do NOT include hashtags - they will be appended automatically.
-- alt_text: 1 sentence, max 125 characters. Describe what the pin image shows for screen readers. Be literal and specific (e.g. "A slice of chocolate lava cake with molten center on a white plate"). No marketing language.
+
+- title: Max 100 characters. Format: "[Sensory Adjective] [Keyword] ([Benefit/Context])"
+  Front-load the keyword for Pinterest SEO. Include a parenthetical that adds ease, method, or occasion.
+  Examples:
+    "Juicy Exotic Baked Pork Tenderloin (Easy Oven Dinner)"
+    "Golden Crispy Jollof Rice with Goat (One-Pot Recipe)"
+    "Rich Creamy Lava Cake (No-Fail Dessert)"
+
+- description: Multi-line format with exactly this structure:
+  Line 1: Hook sentence — sensory promise + time or ease claim.
+  Line 2: Context sentence — who it's for or when to make it.
+  Line 3: Blank line.
+  Lines 4-6: Three benefit bullets, each starting with the checkmark symbol, one per line.
+  Line 7: Blank line.
+  Line 8: Call-to-action starting with "Click to get..."
+  Max 500 characters total. Do NOT include hashtags - they are appended automatically.
+  Example:
+    "This golden crispy jollof rice with goat is packed with smoky flavor and ready in one pot.\nPerfect for weekend feasts, family dinners, or meal prep.\n\n✔ One-pot recipe\n✔ Beginner-friendly\n✔ Feeds a crowd\n\nClick to get the full recipe + cooking tips."
+
+However vary the kinds of descriptions so its not always the same format
+
+- alt_text: 1 sentence, max 125 characters. Literally describe the food in the image for screen readers (e.g. "A bowl of curry noodles topped with cilantro and lime wedges"). No marketing language.
+
+- reasoning: 1 sentence explaining the SEO and engagement strategy behind the title.
 
 STRICT RULES:
 - Return ONLY valid JSON, no markdown, no explanations, no extra keys
-- NEVER use emoji or unicode symbols in any field
+- NEVER use emoji in any field
+- The only unicode symbol allowed is the checkmark character in description bullets
+- Use \n for newlines within JSON string values
 - All fields are required

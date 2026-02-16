@@ -67,8 +67,10 @@ Return ONLY valid JSON with the exact fields shown above.
         persona=None,
         style=None,
         locale: str = "en",
+        copy_style_prompt: str | None = None,
+        persona_prompt: str | None = None,
     ) -> str:
-        """Build system prompt: channel (platform) + persona (voice) + style (fields) + locale."""
+        """Build system prompt: channel (platform) + persona (voice) + style (fields) + locale + copy style."""
         locale_instruction = LOCALE_INSTRUCTIONS.get(locale, LOCALE_INSTRUCTIONS["en"])
 
         prompt = channel.system_prompt
@@ -76,7 +78,9 @@ Return ONLY valid JSON with the exact fields shown above.
         if locale_instruction:
             prompt = f"{locale_instruction}\n\n{prompt}"
 
-        if persona:
+        if persona_prompt:
+            prompt = f"{prompt}\n\n{persona_prompt}"
+        elif persona:
             prompt = f"{prompt}\n\n{persona.prompt}"
 
         if style:
@@ -90,6 +94,9 @@ Return ONLY valid JSON with the exact fields shown above.
                 ),
             )
             prompt = f"{prompt}\n\n{style_section}"
+
+        if copy_style_prompt:
+            prompt = f"{prompt}\n\n{copy_style_prompt}"
 
         return prompt
 
@@ -108,13 +115,15 @@ Return ONLY valid JSON with the exact fields shown above.
         style=None,
         locale: str = "en",
         image_url: str = "",
+        copy_style_prompt: str | None = None,
+        persona_prompt: str | None = None,
     ) -> str:
         try:
             response = self.client.chat.completions.create(
                 messages=[
                     {
                         "role": "system",
-                        "content": self._build_prompt(channel, persona, style, locale),
+                        "content": self._build_prompt(channel, persona, style, locale, copy_style_prompt, persona_prompt),
                     },
                     {
                         "role": "user",
@@ -149,6 +158,7 @@ Return ONLY valid JSON with the exact fields shown above.
         style=None,
         locale: str = "en",
         image_url: str = "",
+        **kwargs,
     ) -> dict:
         """Generate content using Azure OpenAI.
 
@@ -156,7 +166,11 @@ Return ONLY valid JSON with the exact fields shown above.
             ConnectionError: When Azure OpenAI API is unreachable.
             ValueError: When response is empty or invalid JSON.
         """
-        raw_result = self._call_llm(niche, keyword, channel, persona, style, locale, image_url)
+        raw_result = self._call_llm(
+            niche, keyword, channel, persona, style, locale, image_url,
+            copy_style_prompt=kwargs.get("copy_style_prompt"),
+            persona_prompt=kwargs.get("persona_prompt"),
+        )
         try:
             json_equiv = json.loads(raw_result)
         except json.JSONDecodeError as e:

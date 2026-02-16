@@ -24,6 +24,7 @@ class TitleGeneratorService:
         keyword: str,
         count: int = 1,
         copy_style_prompt: str = "",
+        persona_prompt: str = "",
     ) -> TitleGenResult:
         """Generate title/description/alt_text via LLM provider."""
         try:
@@ -31,7 +32,8 @@ class TitleGeneratorService:
                 niche=niche,
                 keyword=keyword,
                 channel=self.channel,
-                style=copy_style_prompt or None,
+                copy_style_prompt=copy_style_prompt or None,
+                persona_prompt=persona_prompt or None,
             )
         except (ConnectionError, ValueError) as e:
             logger.error(f"LLM error for '{keyword}': {e}")
