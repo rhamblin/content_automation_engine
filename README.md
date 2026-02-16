@@ -127,7 +127,7 @@ erDiagram
   tenants       ||--o{  reports  : receives
   tenants       ||--o{  schedules: works_based_on
   tenants       ||--o{  integration_profiles : configures
-  tenants       ||--o{  styles: customizes
+  tenants       ||--o{  visual_styles: customizes
   tenants       ||--o{  channel_credentials: authenticates_with
   niches        ||--o{  integration_profiles : targeted_by
   niches        ||--|{  keywords : defines
@@ -136,7 +136,7 @@ erDiagram
   channels      ||--o{  tenants_channels: available_to
   channels      ||--o{  integration_profiles: configured_in
   channels      ||--o{  publications: distributes
-  channels      ||--o{  styles: renders_with
+  channels      ||--o{  visual_styles: renders_with
   channels      ||--o{  channel_credentials: secured_by
   renders       ||--o{  publications: published_in
   contents      ||--o{  publications: published_in
@@ -368,7 +368,7 @@ erDiagram
     %% integration_profile_id is nullable - set for content_generation, null for tenant-level schedules
   }
 
-  styles {
+  visual_styles {
     uuid id pk
     uuid external_id
     uuid tenant_id fk

@@ -30,7 +30,7 @@ from common.repositories.tenant_scoped import (
     NicheRepository,
     IntegrationProfileRepository,
     ScheduleRepository,
-    StyleRepository,
+    VisualStyleRepository,
     ChannelCredentialRepository,
 )
 from common.contracts.database_models import Keyword, Schedule
@@ -180,15 +180,15 @@ async def load_niches(
     return niche_map
 
 
-async def load_styles(
+async def load_visual_styles(
     session: AsyncSession, tenant_id: UUID, tenant_dir: Path, channel_map: dict[str, UUID]
 ) -> None:
-    """Load styles/<channel>/*.json → upsert style rows."""
+    """Load styles/<channel>/*.json → upsert visual_styles rows."""
     styles_dir = tenant_dir / "styles"
     if not styles_dir.exists():
         return
 
-    repo = StyleRepository(session, tenant_id)
+    repo = VisualStyleRepository(session, tenant_id)
     for channel_dir in sorted(styles_dir.iterdir()):
         if not channel_dir.is_dir():
             continue
@@ -294,7 +294,7 @@ async def seed(tenants_root: Path) -> None:
             channel_map = await ensure_channels(session, tenant_dir)
             await link_tenant_channels(session, tenant_id, channel_map)
             niche_map = await load_niches(session, tenant_id, tenant_dir, channel_map)
-            await load_styles(session, tenant_id, tenant_dir, channel_map)
+            await load_visual_styles(session, tenant_id, tenant_dir, channel_map)
             await load_credentials(session, tenant_id, tenant_dir, channel_map)
             await load_schedules(session, tenant_id, tenant_dir, channel_map)
 

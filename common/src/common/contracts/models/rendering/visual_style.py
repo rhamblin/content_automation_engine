@@ -19,6 +19,28 @@ class VisualStyle:
     tagline: TextElement | None = None
     overlays: list[ImageOverlay] = field(default_factory=list)
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "VisualStyle":
+        """Deserialize from JSON config or DB visual_styles.spec dict.
+
+        Accepts either:
+          - Full config: {"name": ..., "description": ..., "spec": {"title": {...}, ...}}
+          - Spec-only: {"title": {...}, "watermark": {...}, ...}
+        """
+        spec = data.get("spec", data)
+        text_keys = ("title", "watermark", "prefix", "accent", "tagline")
+        elements = {}
+        for key in text_keys:
+            if key in spec and spec[key] is not None:
+                elements[key] = TextElement.from_dict(spec[key])
+        overlays = [ImageOverlay.from_dict(o) for o in spec.get("overlays", [])]
+        return cls(
+            name=data.get("name", ""),
+            description=data.get("description", ""),
+            overlays=overlays,
+            **elements,
+        )
+
     def elements(self) -> list[tuple[str, TextElement]]:
         """Return (key, element) pairs in render order."""
         return [

@@ -23,6 +23,10 @@ class TextElement:
     max_lines: int = 2  # shrink font until text fits in this many lines
     angle: int = 0  # rotation in degrees (counter-clockwise)
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "TextElement":
+        return cls(**data)
+
     def _get_font(self, size: int | None = None) -> ImageFont.FreeTypeFont:
         return ImageFont.truetype(str(FONTS_DIR / self.font_file), size or self.font_size)
 

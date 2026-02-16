@@ -29,6 +29,10 @@ class ImageOverlay:
     flip_h: bool = False  # flip sticker horizontally
     flip_v: bool = False  # flip sticker vertically
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "ImageOverlay":
+        return cls(**data)
+
     def _parse_rgb(self, hex_color: str) -> tuple[int, int, int]:
         return tuple(int(hex_color.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4))
 

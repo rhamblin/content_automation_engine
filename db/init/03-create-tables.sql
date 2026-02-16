@@ -275,9 +275,9 @@ CREATE UNIQUE INDEX uq_schedules_integration_profile
   ON schedules(integration_profile_id)
   WHERE integration_profile_id IS NOT NULL;
 
--- 12. Styles (tenant-scoped, per channel)
+-- 12. Visual Styles (tenant-scoped, per channel)
 
-CREATE TABLE styles (
+CREATE TABLE visual_styles (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
   tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
@@ -290,12 +290,12 @@ CREATE TABLE styles (
   created_by  UUID,
   updated_at  TIMESTAMPTZ,
   updated_by  UUID,
-  CONSTRAINT uq_styles_external_id UNIQUE (external_id),
-  CONSTRAINT uq_styles_tenant_channel_name UNIQUE (tenant_id, channel_id, name)
+  CONSTRAINT uq_visual_styles_external_id UNIQUE (external_id),
+  CONSTRAINT uq_visual_styles_tenant_channel_name UNIQUE (tenant_id, channel_id, name)
 );
 
-CREATE INDEX idx_styles_tenant_id ON styles(tenant_id);
-CREATE INDEX idx_styles_channel_id ON styles(channel_id);
+CREATE INDEX idx_visual_styles_tenant_id ON visual_styles(tenant_id);
+CREATE INDEX idx_visual_styles_channel_id ON visual_styles(channel_id);
 
 -- 13. Channel Credentials (tenant-scoped)
 

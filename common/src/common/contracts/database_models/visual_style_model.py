@@ -12,11 +12,11 @@ from sqlalchemy.sql import func
 from .base import Base
 
 
-class Style(Base):
-    __tablename__ = "styles"
+class VisualStyleModel(Base):
+    __tablename__ = "visual_styles"
     __table_args__ = (
-        UniqueConstraint("external_id", name="uq_styles_external_id"),
-        UniqueConstraint("tenant_id", "channel_id", "name", name="uq_styles_tenant_channel_name"),
+        UniqueConstraint("external_id", name="uq_visual_styles_external_id"),
+        UniqueConstraint("tenant_id", "channel_id", "name", name="uq_visual_styles_tenant_channel_name"),
     )
 
     external_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
