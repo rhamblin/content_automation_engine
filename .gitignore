@@ -1,5 +1,6 @@
 secrets/
 config.env
+config/tenants/*/credentials/
 dev-tools/.env
 dev-tools/wp-uploader/input/
 dev-tools/wp-uploader/wp-app-password.txt

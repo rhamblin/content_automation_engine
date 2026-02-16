@@ -24,6 +24,40 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         await self._session.refresh(niche)
         return niche
 
+    async def upsert(
+        self,
+        title: str,
+        brand_name: str | None = None,
+        brand_website: str | None = None,
+        brand_watermark: str | None = None,
+        persona_name: str | None = None,
+        persona_prompt: str | None = None,
+    ) -> Niche:
+        """Insert or update a niche by (tenant, title)."""
+        existing = await self.get_by_title(title)
+        if existing:
+            existing.brand_name = brand_name
+            existing.brand_website = brand_website
+            existing.brand_watermark = brand_watermark
+            existing.persona_name = persona_name
+            existing.persona_prompt = persona_prompt
+            existing.is_active = True
+            await self._session.flush()
+            return existing
+        niche = Niche(
+            tenant_id=self._tenant_id,
+            title=title,
+            brand_name=brand_name,
+            brand_website=brand_website,
+            brand_watermark=brand_watermark,
+            persona_name=persona_name,
+            persona_prompt=persona_prompt,
+        )
+        self._session.add(niche)
+        await self._session.flush()
+        await self._session.refresh(niche)
+        return niche
+
     async def get_by_id_with_keywords(
         self, id: UUID, include_only_active: bool = True
     ) -> Niche:

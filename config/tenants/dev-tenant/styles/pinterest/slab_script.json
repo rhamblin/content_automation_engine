@@ -1,0 +1,43 @@
+{
+  "name": "slab_script",
+  "channel": "pinterest",
+  "description": "Full-width cream band with bold brown slab-serif title and a warm script accent line below.",
+  "spec": {
+    "title": {
+      "font_file": "BebasNeue.ttf",
+      "font_size": 110,
+      "color": "#5C3A1E",
+      "y_position": 620,
+      "outline_width": 0,
+      "max_lines": 1
+    },
+    "accent": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 72,
+      "color": "#C2185B",
+      "y_position": 740,
+      "outline_width": 1,
+      "outline_color": "#FFFFFF"
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#FFFFFF",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
+    },
+    "overlays": [
+      {
+        "position": "center",
+        "color": "#FFFFFF",
+        "opacity": 0.70,
+        "height_pct": 0.22,
+        "y_position": 710,
+        "border_color": "#5C3A1E",
+        "border_width": 3
+      }
+    ]
+  }
+}

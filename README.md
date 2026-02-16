@@ -127,6 +127,8 @@ erDiagram
   tenants       ||--o{  reports  : receives
   tenants       ||--o{  schedules: works_based_on
   tenants       ||--o{  integration_profiles : configures
+  tenants       ||--o{  styles: customizes
+  tenants       ||--o{  channel_credentials: authenticates_with
   niches        ||--o{  integration_profiles : targeted_by
   niches        ||--|{  keywords : defines
   keywords      ||--o{  contents : produces
@@ -134,6 +136,8 @@ erDiagram
   channels      ||--o{  tenants_channels: available_to
   channels      ||--o{  integration_profiles: configured_in
   channels      ||--o{  publications: distributes
+  channels      ||--o{  styles: renders_with
+  channels      ||--o{  channel_credentials: secured_by
   renders       ||--o{  publications: published_in
   contents      ||--o{  publications: published_in
   publications  ||--o{  promotions: promoted_via
@@ -242,6 +246,11 @@ erDiagram
     uuid external_id
     uuid tenant_id fk
     text title
+    text brand_name
+    text brand_website
+    text brand_watermark
+    text persona_name
+    text persona_prompt
     boolean is_active
     timestamp created_at
     uuid  created_by
@@ -355,6 +364,37 @@ erDiagram
     %% Partial unique: (integration_profile_id) WHERE integration_profile_id IS NOT NULL
     %% Message Type is an ENUM
     %% integration_profile_id is nullable - set for content_generation, null for tenant-level schedules
+  }
+
+  styles {
+    uuid id pk
+    uuid external_id
+    uuid tenant_id fk
+    uuid channel_id fk
+    text name
+    text description
+    jsonb spec
+    boolean is_active
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
+    %% Unique constraints: (external_id), (tenant_id, channel_id, name)
+    %% spec contains VisualStyle JSON (text elements, overlays)
+  }
+
+  channel_credentials {
+    uuid id pk
+    uuid external_id
+    uuid tenant_id fk
+    uuid channel_id fk
+    jsonb credentials
+    timestamp created_at
+    uuid  created_by
+    timestamp updated_at
+    uuid  updated_by
+    %% Unique constraints: (external_id), (tenant_id, channel_id)
+    %% credentials contains channel-specific auth (API keys, tokens)
   }
 
 ```

@@ -26,6 +26,8 @@ from .publication import Publication
 from .promotion import Promotion
 from .publication_metric import PublicationMetric
 from .schedule import Schedule
+from .style import Style
+from .channel_credential import ChannelCredential
 
 __all__ = [
     "Base",
@@ -58,4 +60,6 @@ __all__ = [
     "Promotion",
     "PublicationMetric",
     "Schedule",
+    "Style",
+    "ChannelCredential",
 ]

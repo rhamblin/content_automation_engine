@@ -1,0 +1,55 @@
+{
+  "name": "ribbon_box",
+  "channel": "pinterest",
+  "description": "White card with red ribbon banner above a bold serif title and tagline.",
+  "spec": {
+    "prefix": {
+      "font_file": "Montserrat.ttf",
+      "font_size": 36,
+      "color": "#FFFFFF",
+      "outline_color": "#FFFFFF",
+      "y_position": 505,
+      "outline_width": 1
+    },
+    "title": {
+      "font_file": "PlayfairDisplay.ttf",
+      "font_size": 120,
+      "color": "#1a1a1a",
+      "y_position": 600,
+      "outline_width": 0,
+      "max_width_pct": 0.70,
+      "max_lines": 2
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#FFFFFF",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
+    },
+    "overlays": [
+      {
+        "position": "box",
+        "color": "#FFFFFF",
+        "opacity": 0.76,
+        "height_pct": 0.35,
+        "y_position": 700,
+        "width_pct": 0.82,
+        "border_color": "#cccccc",
+        "border_width": 2
+      },
+      {
+        "position": "box",
+        "color": "#d63031",
+        "opacity": 0.77,
+        "height_pct": 0.04,
+        "y_position": 530,
+        "width_pct": 0.45,
+        "shape": "ribbon",
+        "notch_pct": 0.04
+      }
+    ]
+  }
+}

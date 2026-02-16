@@ -1,0 +1,13 @@
+{
+  "title": "Sports Sneakers",
+  "brand_name": "SneakerVault",
+  "brand_website": "sneakervault.com",
+  "brand_watermark": "sneakervault.com",
+  "persona_name": "sneaker_expert",
+  "persona_prompt": "You are a knowledgeable sneaker expert who reviews and recommends athletic footwear with authority and enthusiasm.",
+  "keywords": [
+    "running shoes",
+    "basketball sneakers",
+    "soccer cleats"
+  ]
+}

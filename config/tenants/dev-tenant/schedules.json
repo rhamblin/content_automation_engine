@@ -1,0 +1,22 @@
+[
+  {
+    "message_type": "content_generation_requested",
+    "cron_expression": "2 * * * *",
+    "requires_integration_profile": true
+  },
+  {
+    "message_type": "promotion_orchestrator_requested",
+    "cron_expression": "* * * * *",
+    "requires_integration_profile": false
+  },
+  {
+    "message_type": "collect_analytics_requested",
+    "cron_expression": "* * * * *",
+    "requires_integration_profile": false
+  },
+  {
+    "message_type": "activity_report_requested",
+    "cron_expression": "* * * * *",
+    "requires_integration_profile": false
+  }
+]

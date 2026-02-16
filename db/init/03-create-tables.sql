@@ -91,15 +91,20 @@ CREATE INDEX idx_reports_tenant_id ON reports(tenant_id);
 -- 4. Niches and Keywords
 
 CREATE TABLE niches (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
-  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
-  title       TEXT        NOT NULL,
-  is_active   BOOLEAN     NOT NULL DEFAULT true,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_by  UUID,
-  updated_at  TIMESTAMPTZ,
-  updated_by  UUID,
+  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id     UUID        NOT NULL DEFAULT gen_random_uuid(),
+  tenant_id       UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  title           TEXT        NOT NULL,
+  brand_name      TEXT,
+  brand_website   TEXT,
+  brand_watermark TEXT,
+  persona_name    TEXT,
+  persona_prompt  TEXT,
+  is_active       BOOLEAN     NOT NULL DEFAULT true,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by      UUID,
+  updated_at      TIMESTAMPTZ,
+  updated_by      UUID,
   CONSTRAINT uq_niches_external_id UNIQUE (external_id),
   CONSTRAINT uq_niches_tenant_title UNIQUE (tenant_id, title)
 );
@@ -267,3 +272,44 @@ CREATE UNIQUE INDEX uq_schedules_tenant_message_type
 CREATE UNIQUE INDEX uq_schedules_integration_profile
   ON schedules(integration_profile_id)
   WHERE integration_profile_id IS NOT NULL;
+
+-- 12. Styles (tenant-scoped, per channel)
+
+CREATE TABLE styles (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  channel_id  UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
+  name        TEXT        NOT NULL,
+  description TEXT,
+  spec        JSONB       NOT NULL,
+  is_active   BOOLEAN     NOT NULL DEFAULT true,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by  UUID,
+  updated_at  TIMESTAMPTZ,
+  updated_by  UUID,
+  CONSTRAINT uq_styles_external_id UNIQUE (external_id),
+  CONSTRAINT uq_styles_tenant_channel_name UNIQUE (tenant_id, channel_id, name)
+);
+
+CREATE INDEX idx_styles_tenant_id ON styles(tenant_id);
+CREATE INDEX idx_styles_channel_id ON styles(channel_id);
+
+-- 13. Channel Credentials (tenant-scoped)
+
+CREATE TABLE channel_credentials (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
+  tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
+  channel_id  UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
+  credentials JSONB       NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by  UUID,
+  updated_at  TIMESTAMPTZ,
+  updated_by  UUID,
+  CONSTRAINT uq_channel_credentials_external_id UNIQUE (external_id),
+  CONSTRAINT uq_channel_credentials_tenant_channel UNIQUE (tenant_id, channel_id)
+);
+
+CREATE INDEX idx_channel_credentials_tenant_id ON channel_credentials(tenant_id);
+CREATE INDEX idx_channel_credentials_channel_id ON channel_credentials(channel_id);

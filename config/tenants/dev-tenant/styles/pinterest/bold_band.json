@@ -1,0 +1,49 @@
+{
+  "name": "bold_band",
+  "channel": "pinterest",
+  "description": "Full-width white band with gold border lines, massive bold title in the center.",
+  "spec": {
+    "prefix": {
+      "font_file": "Montserrat.ttf",
+      "font_size": 38,
+      "color": "#3D4A1A",
+      "y_position": 640,
+      "outline_width": 1
+    },
+    "title": {
+      "font_file": "BebasNeue.ttf",
+      "font_size": 140,
+      "color": "#1a1a1a",
+      "y_position": 700,
+      "outline_width": 0,
+      "max_lines": 1
+    },
+    "tagline": {
+      "font_file": "Montserrat.ttf",
+      "font_size": 36,
+      "color": "#3D4A1A",
+      "y_position": 850,
+      "outline_width": 1
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#FFFFFF",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
+    },
+    "overlays": [
+      {
+        "position": "center",
+        "color": "#FFFFFF",
+        "opacity": 0.95,
+        "height_pct": 0.24,
+        "y_position": 750,
+        "border_color": "#9B8C4E",
+        "border_width": 4
+      }
+    ]
+  }
+}

@@ -27,6 +27,20 @@ services:
       - development
 
   # --------------------
+  # Seed worker (run-once)
+  # --------------------
+  seed-worker:
+    build:
+      context: .
+      dockerfile: db/seed-worker/Dockerfile
+    env_file:
+      - config/local/variables.env
+    depends_on:
+      - db
+    networks: [database]
+    restart: "no"
+
+  # --------------------
   # Services
   # --------------------
   template-service:
