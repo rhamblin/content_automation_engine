@@ -35,6 +35,14 @@ from common.contracts.database_models import Keyword, Schedule
 
 logger = AppLogger("seed-worker")
 
+
+def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
+    """If value points to a file relative to base_dir, return its contents."""
+    if value and (base_dir / value).is_file():
+        return (base_dir / value).read_text()
+    return value
+
+
 # ── Loaders ──────────────────────────────────────────────────────────────────
 
 
@@ -112,6 +120,17 @@ async def load_niches(
     for f in sorted(niches_dir.glob("*.json")):
         data = json.loads(f.read_text())
         title = data["title"]
+        base_dir = f.parent
+
+        # Resolve file-ref prompts to full text
+        persona_prompt = _resolve_prompt(data.get("persona_prompt"), base_dir)
+
+        channel_prompts_raw = data.get("channel_prompts") or {}
+        channel_prompts: dict[str, str] = {}
+        for ch, ref in channel_prompts_raw.items():
+            resolved = _resolve_prompt(ref, base_dir)
+            if resolved:
+                channel_prompts[ch] = resolved
 
         niche = await niche_repo.upsert(
             title=title,
@@ -119,7 +138,8 @@ async def load_niches(
             brand_website=data.get("brand_website"),
             brand_watermark=data.get("brand_watermark"),
             persona_name=data.get("persona_name"),
-            persona_prompt=data.get("persona_prompt"),
+            persona_prompt=persona_prompt,
+            channel_prompts=channel_prompts or None,
         )
         niche_map[title] = niche.external_id
         logger.info(f"Niche '{title}': {niche.external_id}")

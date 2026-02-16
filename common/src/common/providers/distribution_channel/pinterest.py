@@ -197,9 +197,10 @@ STRICT OUTPUT RULES:
 - Keep titles short (2-4 words) so they fit on one line at large font sizes
 """
 
-    def __init__(self):
+    def __init__(self, prompt_override: str = ""):
         """Initialize Pinterest channel."""
         self.logger = AppLogger(__name__)
+        self.prompt_override = prompt_override
 
     @property
     def provider_name(self) -> str:
@@ -207,7 +208,7 @@ STRICT OUTPUT RULES:
 
     @property
     def system_prompt(self) -> str:
-        return self.DEFAULT_PROMPT
+        return self.prompt_override if self.prompt_override else self.DEFAULT_PROMPT
 
     @property
     def canvas(self) -> CanvasSpec:

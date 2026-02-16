@@ -96,6 +96,7 @@ Output: Return ONLY valid JSON in the schema above.
         app_password: str,
         llm: ILLMProvider,
         amazon_tag: str = "",
+        prompt_override: str = "",
     ):
         self.logger = AppLogger(__name__)
         self.site_url = site_url.rstrip("/")
@@ -104,6 +105,7 @@ Output: Return ONLY valid JSON in the schema above.
         self.api_url = f"{self.site_url}/wp-json/wp/v2/posts"
         self.llm = llm
         self.amazon_tag = amazon_tag
+        self.prompt_override = prompt_override
 
     @property
     def provider_name(self) -> str:
@@ -119,7 +121,8 @@ Output: Return ONLY valid JSON in the schema above.
 
     @property
     def system_prompt(self) -> str:
-        return self.DEFAULT_PROMPT.replace("{amazon_tag}", self.amazon_tag)
+        base = self.prompt_override if self.prompt_override else self.DEFAULT_PROMPT
+        return base.replace("{amazon_tag}", self.amazon_tag)
 
     def render_content(self, source: Any, text_data: dict, style=None) -> dict:
         """Render WordPress content via LLM provider.

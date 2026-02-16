@@ -251,6 +251,7 @@ erDiagram
     text brand_watermark
     text persona_name
     text persona_prompt
+    jsonb channel_prompts
     boolean is_active
     timestamp created_at
     uuid  created_by

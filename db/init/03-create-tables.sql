@@ -100,6 +100,7 @@ CREATE TABLE niches (
   brand_watermark TEXT,
   persona_name    TEXT,
   persona_prompt  TEXT,
+  channel_prompts JSONB,
   is_active       BOOLEAN     NOT NULL DEFAULT true,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by      UUID,
