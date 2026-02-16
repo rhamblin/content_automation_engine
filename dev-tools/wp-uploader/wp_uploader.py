@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
 from config import load_request
-from wp_uploader_service import WpUploaderService
+from common.workflows.wp_uploader import WpUploaderService
 
 logger = AppLogger(__name__)
 

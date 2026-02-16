@@ -4,7 +4,7 @@ from common.app_logger import AppLogger
 from common.evaluators import PublicationEvaluator
 from common.evaluators.publication_evaluator import PublicationThresholds
 
-from models import PinEvaluation
+from common.workflows.publication_manager.publication_manager_response import PinEvaluation
 
 logger = AppLogger(__name__)
 

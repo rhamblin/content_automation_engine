@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from models import WpUploaderRequest
+from common.workflows.wp_uploader import WpUploaderRequest
 
 VALID_STATUSES = {"draft", "publish"}
 

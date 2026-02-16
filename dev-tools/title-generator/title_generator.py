@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
 from config import load_request
-from title_generator_service import TitleGeneratorService
+from common.workflows.title_generator import TitleGeneratorService
 
 logger = AppLogger(__name__)
 

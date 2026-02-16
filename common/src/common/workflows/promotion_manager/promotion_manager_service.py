@@ -4,7 +4,10 @@ from common.app_logger import AppLogger
 from common.evaluators import PromotionEvaluator
 from common.evaluators.promotion_evaluator import PromotionThresholds
 
-from models import CampaignEvaluation, CampaignInfo
+from common.workflows.promotion_manager.promotion_manager_response import (
+    CampaignEvaluation,
+    CampaignInfo,
+)
 
 logger = AppLogger(__name__)
 

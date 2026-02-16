@@ -3,7 +3,7 @@
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.wordpress import WordPressChannel
 
-from models import WpUploadResult
+from common.workflows.wp_uploader.wp_uploader_response import WpUploadResult
 
 logger = AppLogger(__name__)
 

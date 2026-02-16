@@ -15,7 +15,7 @@ from common.app_logger import AppLogger
 from common.evaluators.promotion_evaluator import PromotionThresholds
 
 from config import load_request
-from promotion_manager_service import PromotionManagerService
+from common.workflows.promotion_manager import PromotionManagerService
 
 logger = AppLogger(__name__)
 

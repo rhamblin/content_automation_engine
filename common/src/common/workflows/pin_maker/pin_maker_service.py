@@ -5,7 +5,7 @@ from common.contracts.interfaces.distribution_channel import IDistributionChanne
 from common.contracts.interfaces.llm_provider import ILLMProvider
 from common.contracts.models.persona import Persona
 from common.providers.distribution_channel.pinterest import STYLES
-from models import PinResult
+from common.workflows.pin_maker.pin_maker_response import PinResult
 from PIL import Image
 
 logger = AppLogger(__name__)

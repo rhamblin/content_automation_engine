@@ -17,7 +17,7 @@ from common.resources.personas import get_persona
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
-from pin_maker_service import PinMakerService
+from common.workflows.pin_maker import PinMakerService
 
 logger = AppLogger(__name__)
 

@@ -6,3 +6,4 @@ When make Dev tools under /dev-tools follow these rules
 
 1. Always separate into: data file, config, business logic, orchestrator layers
 2. All core business logic should have logging, error handling, retries on calls to external components and easily testable. This will make it easy to port functionality into the distributed docker based system later
+3. Service logic (business logic + request/response models) must live in `common/src/common/workflows/<tool_name>/`. Dev-tools only contain thin CLI orchestrators (data file, config, orchestrator) that import from `common.workflows.<tool_name>`. This lets Docker services reuse the same logic without duplicating code

@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from models import TitleGenRequest
+from common.workflows.title_generator import TitleGenRequest
 
 VALID_STYLES = {"mixed", "clickbait", "professional", "casual", "seo"}
 

@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from models import PublicationRequest
+from common.workflows.publication_manager import PublicationRequest
 
 VALID_COMMANDS = {"evaluate"}
 

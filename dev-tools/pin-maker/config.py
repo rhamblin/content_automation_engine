@@ -5,7 +5,7 @@ from pathlib import Path
 
 from common.providers.distribution_channel.pinterest import STYLES
 
-from models import PinMakerRequest
+from common.workflows.pin_maker import PinMakerRequest
 
 VALID_LOCALES = {"en", "es", "sw"}
 

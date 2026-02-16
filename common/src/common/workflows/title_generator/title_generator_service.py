@@ -5,7 +5,7 @@ import json
 import requests
 from common.app_logger import AppLogger
 
-from models import TitleGenResult, TitleOption
+from common.workflows.title_generator.title_generator_response import TitleGenResult, TitleOption
 
 logger = AppLogger(__name__)
 

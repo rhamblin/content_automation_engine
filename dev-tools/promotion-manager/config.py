@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from models import PromotionRequest
+from common.workflows.promotion_manager import PromotionRequest
 
 VALID_COMMANDS = {"list", "evaluate", "pause", "start", "budget"}
 VALID_STATUSES = {"all", "active", "paused", "archived"}

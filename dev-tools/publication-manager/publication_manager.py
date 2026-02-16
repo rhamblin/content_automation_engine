@@ -16,7 +16,7 @@ from common.app_logger import AppLogger
 from common.evaluators.publication_evaluator import PublicationThresholds
 
 from config import load_request
-from publication_manager_service import PublicationManagerService
+from common.workflows.publication_manager import PublicationManagerService
 
 logger = AppLogger(__name__)
 
