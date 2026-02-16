@@ -1,6 +1,0 @@
-{
-  "tenant": "dev-tenant",
-  "boards": [
-    { "name": "Draft-Testing", "privacy": "SECRET" }
-  ]
-}

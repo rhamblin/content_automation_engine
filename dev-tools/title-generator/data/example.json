@@ -1,8 +1,9 @@
 {
+  "tenant": "dev-tenant",
   "channel": "pinterest",
   "niche": "recipes",
   "keywords": [
-    "Jolly rice with goat",
+    "Jollof rice with goat",
     "Garlic lemon shrimp",
     "Lemon herb baked chicken",
     "Cozy noodle bowl",
@@ -17,6 +18,5 @@
     "Rum pudding",
     "Chia pudding"
   ],
-  "count": 1w,
-  "style": "mixed"
+  "count": 1
 }
