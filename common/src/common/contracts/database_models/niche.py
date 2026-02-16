@@ -27,6 +27,7 @@ class Niche(Base):
     brand_watermark: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     persona_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     persona_prompt: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    copy_style_prompt: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     channel_prompts: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

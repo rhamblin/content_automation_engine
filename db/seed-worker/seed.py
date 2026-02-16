@@ -107,7 +107,7 @@ async def load_niches(
     tenant_dir: Path,
     channel_map: dict[str, UUID],
 ) -> dict[str, UUID]:
-    """Load niches/*.json → upsert niches + keywords + integration profiles.
+    """Load niches/<name>/<name>.json → upsert niches + keywords + integration profiles.
     Returns mapping of niche title → external_id."""
     niches_dir = tenant_dir / "niches"
     if not niches_dir.exists():
@@ -117,13 +117,21 @@ async def load_niches(
     profile_repo = IntegrationProfileRepository(session, tenant_id)
     niche_map: dict[str, UUID] = {}
 
-    for f in sorted(niches_dir.glob("*.json")):
-        data = json.loads(f.read_text())
+    for niche_dir in sorted(niches_dir.iterdir()):
+        if not niche_dir.is_dir():
+            continue
+        json_file = niche_dir / f"{niche_dir.name}.json"
+        if not json_file.exists():
+            logger.warning(f"No {niche_dir.name}.json in {niche_dir}, skipping")
+            continue
+
+        data = json.loads(json_file.read_text())
         title = data["title"]
-        base_dir = f.parent
+        base_dir = niche_dir
 
         # Resolve file-ref prompts to full text
         persona_prompt = _resolve_prompt(data.get("persona_prompt"), base_dir)
+        copy_style_prompt = _resolve_prompt(data.get("copy_style_prompt"), base_dir)
 
         channel_prompts_raw = data.get("channel_prompts") or {}
         channel_prompts: dict[str, str] = {}
@@ -139,6 +147,7 @@ async def load_niches(
             brand_watermark=data.get("brand_watermark"),
             persona_name=data.get("persona_name"),
             persona_prompt=persona_prompt,
+            copy_style_prompt=copy_style_prompt,
             channel_prompts=channel_prompts or None,
         )
         niche_map[title] = niche.external_id
