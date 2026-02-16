@@ -1,14 +1,12 @@
 """Pin-maker business logic — no file I/O."""
 
-from PIL import Image
-
 from common.app_logger import AppLogger
 from common.contracts.interfaces.distribution_channel import IDistributionChannel
 from common.contracts.interfaces.llm_provider import ILLMProvider
 from common.contracts.models.persona import Persona
 from common.providers.distribution_channel.pinterest import STYLES
-
-from .models import PinResult
+from models import PinResult
+from PIL import Image
 
 logger = AppLogger(__name__)
 

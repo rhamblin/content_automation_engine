@@ -1,0 +1,15 @@
+{
+  "command": "evaluate",
+  "days": 7,
+  "target_cpc": 2.0,
+  "high_ctr": 2.0,
+  "low_ctr": 0.5,
+  "min_impressions": 1000,
+  "budget_increase": 25,
+  "execute": false,
+  "actionable": false,
+  "output_json": false,
+  "campaign_id": null,
+  "budget_amount": null,
+  "status_filter": "all"
+}
