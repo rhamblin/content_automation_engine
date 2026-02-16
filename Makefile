@@ -44,13 +44,12 @@ infra:
 	  -f config/local/docker-compose.override.yaml \
 	  up --build -d --no-deps azurite
 
-seed-images:
-	docker run --rm \
-	-v $(PWD)/config/local/seed-images:/seed \
-	--network content_automation_engine_backend \
-	-e AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;" \
-	mcr.microsoft.com/azure-cli \
-	sh -c "az storage container create -n images && az storage blob upload-batch -s /seed -d images"
+seed-images:  ## Run seed-worker (DB seeding + seed image upload)
+	docker compose \
+	  --env-file ./config/local/variables.env \
+	  -f docker-compose.yaml \
+	  -f config/local/docker-compose.override.yaml \
+	  up --build --no-deps seed-worker
 
 services:
 	docker compose \
@@ -61,7 +60,7 @@ services:
 	  management-api scheduler channel-worker \
 	  analytics-collector activity-reporter promotion-orchestrator
 
-local: infra seed-images services frontendw
+local: infra services frontend seed-images
 
 cleanup:
 	docker compose \
@@ -176,9 +175,9 @@ help:  ## Show this help message
 	@echo ""
 	@echo "Docker Compose:"
 	@echo "  make infra          - Start db, redis, azurite"
-	@echo "  make seed-images    - Seed images to blob storage"
+	@echo "  make seed-images    - Run seed-worker (DB + blob images)"
 	@echo "  make services       - Start application services"
-	@echo "  make local          - Run infra → seed-images → services"
+	@echo "  make local          - Run infra → services → frontend → seed-images"
 	@echo "  make cleanup        - Stop and remove all containers"
 	@echo "  make logs           - Tail docker-compose logs"
 	@echo "  make wp-upload      - Generate and upload content to WordPress"

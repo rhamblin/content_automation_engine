@@ -21,6 +21,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # Ensure common package is importable
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "common" / "src"))
 
+from azure.storage.blob import BlobServiceClient
+
 from common.app_logger import AppLogger
 from common.providers.database.sqlalchemy import SQLAlchemyDatabaseProvider
 from common.repositories.cross_tenant import TenantRepository, ChannelRepository
@@ -32,6 +34,7 @@ from common.repositories.tenant_scoped import (
     ChannelCredentialRepository,
 )
 from common.contracts.database_models import Keyword, Schedule
+from common.workflows.seed_images import SeedImageService
 
 logger = AppLogger("seed-worker")
 
@@ -257,6 +260,14 @@ async def load_schedules(
         logger.info(f"Schedule '{message_type}': {entry['cron_expression']}")
 
 
+def _load_niche_title(niche_dir: Path) -> str | None:
+    """Read niche title from its JSON config."""
+    json_file = niche_dir / f"{niche_dir.name}.json"
+    if not json_file.exists():
+        return None
+    return json.loads(json_file.read_text()).get("title")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -265,6 +276,9 @@ async def seed(tenants_root: Path) -> None:
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         raise RuntimeError("DATABASE_URL environment variable is required")
+
+    blob_conn = os.environ.get("AZURE_BLOB_STORAGE_CONNECTION_STRING")
+    blob_client = BlobServiceClient.from_connection_string(blob_conn) if blob_conn else None
 
     database = SQLAlchemyDatabaseProvider(db_url)
 
@@ -279,13 +293,31 @@ async def seed(tenants_root: Path) -> None:
             tenant_id = await load_tenant(session, tenant_dir)
             channel_map = await ensure_channels(session, tenant_dir)
             await link_tenant_channels(session, tenant_id, channel_map)
-            await load_niches(session, tenant_id, tenant_dir, channel_map)
+            niche_map = await load_niches(session, tenant_id, tenant_dir, channel_map)
             await load_styles(session, tenant_id, tenant_dir, channel_map)
             await load_credentials(session, tenant_id, tenant_dir, channel_map)
             await load_schedules(session, tenant_id, tenant_dir, channel_map)
 
             await session.commit()
             logger.info(f"Tenant '{tenant_dir.name}' seeded successfully")
+
+            # Upload seed images (after commit so keywords exist)
+            if blob_client and niche_map:
+                image_service = SeedImageService(blob_client, session)
+                niches_dir = tenant_dir / "niches"
+                for niche_dir in sorted(niches_dir.iterdir()):
+                    if not niche_dir.is_dir():
+                        continue
+                    niche_title = _load_niche_title(niche_dir)
+                    niche_id = niche_map.get(niche_title) if niche_title else None
+                    if niche_id:
+                        count = await image_service.upload_niche_seed_images(
+                            tenant_id, niche_id, niche_dir
+                        )
+                        if count:
+                            logger.info(f"Uploaded {count} seed images for '{niche_title}'")
+            elif not blob_conn:
+                logger.warning("AZURE_BLOB_STORAGE_CONNECTION_STRING not set, skipping seed images")
 
     await database.close_connection()
 

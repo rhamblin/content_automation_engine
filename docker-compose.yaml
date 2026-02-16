@@ -37,7 +37,7 @@ services:
       - config/local/variables.env
     depends_on:
       - db
-    networks: [database]
+    networks: [database, backend]
     restart: "no"
 
   # --------------------
