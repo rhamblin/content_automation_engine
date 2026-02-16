@@ -70,7 +70,7 @@ class TitleGeneratorService:
 
     @staticmethod
     def _build_prompt(channel: str, niche: str, keyword: str, count: int, style: str) -> str:
-        guidance = STYLE_GUIDANCE.get(style, STYLE_GUIDANCE["mixed"])
+        guidance = STYLE_GUIDANCE.get(style) or style or STYLE_GUIDANCE["mixed"]
         return f"""Generate {count} unique title and description combinations for the following:
 
 Channel/Platform: {channel}
@@ -109,6 +109,7 @@ Only return the JSON array, no other text."""
                 title=item.get("title", ""),
                 description=item.get("description", ""),
                 reasoning=item.get("reasoning", ""),
+                alt_text=item.get("alt_text", ""),
             )
             for item in items
         ]

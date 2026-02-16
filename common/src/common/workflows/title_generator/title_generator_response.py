@@ -10,6 +10,7 @@ class TitleOption:
     title: str
     description: str
     reasoning: str = ""
+    alt_text: str = ""
 
 
 @dataclass

@@ -1,0 +1,19 @@
+{
+  "tenant": "dev-tenant",
+  "input_folder": "/path/to/rendered-pins",
+  "niche": "recipes",
+  "pins": [
+    {
+      "image": "lava_cake_ribbon_box.jpg",
+      "keyword": "lava cake",
+      "link": "https://yourbrand.com/lava-cake",
+      "target_board_id": "1234567890123456789"
+    },
+    {
+      "image": "running_shoes_bold_band.jpg",
+      "keyword": "running shoes",
+      "link": "https://yourbrand.com/running-shoes",
+      "target_board_id": "9876543210987654321"
+    }
+  ]
+}
