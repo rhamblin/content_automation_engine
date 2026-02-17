@@ -4,7 +4,7 @@ from typing import Any
 
 from PIL import Image, ImageDraw
 
-from common.contracts.models import CanvasSpec, VisualStyle
+from common.contracts.models import CanvasSpec, Layout, VisualStyle
 
 
 def smart_crop_resize(
@@ -27,6 +27,89 @@ def smart_crop_resize(
     return img.resize((target_w, target_h), Image.Resampling.LANCZOS)
 
 
+def _crop_with_focus(
+    img: Image.Image, target_w: int, target_h: int, focus: str = "center"
+) -> Image.Image:
+    """Resize and crop with vertical focus control."""
+    orig_w, orig_h = img.size
+    target_ratio = target_w / target_h
+    orig_ratio = orig_w / orig_h
+
+    if orig_ratio > target_ratio:
+        new_w = int(orig_h * target_ratio)
+        left = (orig_w - new_w) // 2
+        img = img.crop((left, 0, left + new_w, orig_h))
+    else:
+        new_h = int(orig_w / target_ratio)
+        if focus == "top":
+            top = 0
+        elif focus == "bottom":
+            top = orig_h - new_h
+        else:
+            top = (orig_h - new_h) // 2
+        img = img.crop((0, top, orig_w, top + new_h))
+
+    return img.resize((target_w, target_h), Image.Resampling.LANCZOS)
+
+
+def compose_canvas(
+    source: Image.Image, canvas: CanvasSpec, layout: Layout
+) -> Image.Image:
+    """Build the background canvas from source image according to layout type."""
+    w, h = canvas.width, canvas.height
+
+    if layout.type == "single":
+        return smart_crop_resize(source, w, h)
+
+    if layout.type == "split_duplicate":
+        top_h = int(h * layout.split_pct)
+        bot_h = h - top_h - layout.gap
+        top_img = _crop_with_focus(source, w, top_h, layout.crop_focus_top)
+        bot_img = _crop_with_focus(source, w, bot_h, layout.crop_focus_bottom)
+        composed = Image.new("RGB", (w, h), layout.color)
+        composed.paste(top_img, (0, 0))
+        composed.paste(bot_img, (0, top_h + layout.gap))
+        return composed
+
+    if layout.type == "split_horizontal":
+        left_w = int(w * layout.split_pct)
+        right_w = w - left_w - layout.gap
+        left_img = _crop_with_focus(source, left_w, h, layout.crop_focus_top)
+        right_img = _crop_with_focus(source, right_w, h, layout.crop_focus_bottom)
+        composed = Image.new("RGB", (w, h), layout.color)
+        composed.paste(left_img, (0, 0))
+        composed.paste(right_img, (left_w + layout.gap, 0))
+        return composed
+
+    if layout.type == "grid_2x2":
+        cell_w = (w - layout.gap) // 2
+        cell_h = (h - layout.gap) // 2
+        cell = smart_crop_resize(source, cell_w, cell_h)
+        composed = Image.new("RGB", (w, h), layout.color)
+        composed.paste(cell, (0, 0))
+        composed.paste(cell, (cell_w + layout.gap, 0))
+        composed.paste(cell, (0, cell_h + layout.gap))
+        composed.paste(cell, (cell_w + layout.gap, cell_h + layout.gap))
+        return composed
+
+    if layout.type == "image_over_color":
+        img_h = int(h * layout.split_pct)
+        top_img = _crop_with_focus(source, w, img_h, layout.crop_focus_top)
+        composed = Image.new("RGB", (w, h), layout.color)
+        composed.paste(top_img, (0, 0))
+        return composed
+
+    if layout.type == "color_over_image":
+        img_h = int(h * (1.0 - layout.split_pct))
+        bot_img = _crop_with_focus(source, w, img_h, layout.crop_focus_bottom)
+        composed = Image.new("RGB", (w, h), layout.color)
+        composed.paste(bot_img, (0, h - img_h))
+        return composed
+
+    # Fallback to single
+    return smart_crop_resize(source, w, h)
+
+
 def render_image(
     source: Image.Image,
     canvas: CanvasSpec,
@@ -36,7 +119,7 @@ def render_image(
 ) -> Image.Image:
     """Render an image using the shared pipeline.
 
-    Pipeline: crop/resize → overlays → RGBA → draw text → convert to canvas format.
+    Pipeline: compose canvas → overlays → RGBA → draw text → convert to canvas format.
 
     Args:
         source: Source PIL Image.
@@ -48,7 +131,8 @@ def render_image(
     Returns:
         Final rendered PIL Image.
     """
-    img = smart_crop_resize(source, canvas.width, canvas.height)
+    layout = style.layout if style and hasattr(style, "layout") else Layout()
+    img = compose_canvas(source, canvas, layout)
 
     if style and style.overlays:
         for overlay in style.overlays:

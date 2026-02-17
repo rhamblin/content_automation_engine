@@ -1,0 +1,40 @@
+{
+  "name": "split_reveal",
+  "channel": "pinterest",
+  "description": "Split duplicate layout — same photo top and bottom with a bold green banner and title in the center.",
+  "spec": {
+    "layout": {
+      "type": "split_duplicate",
+      "split_pct": 0.45,
+      "gap": 160,
+      "color": "#2D6A4F",
+      "crop_focus_top": "center",
+      "crop_focus_bottom": "center"
+    },
+    "title": {
+      "font_file": "BebasNeue.ttf",
+      "font_size": 110,
+      "color": "#FFFFFF",
+      "y_position": 700,
+      "outline_width": 0,
+      "max_lines": 2
+    },
+    "watermark": {
+      "font_file": "Montserrat.ttf",
+      "font_size": 22,
+      "color": "#FFFFFF",
+      "y_position": -50,
+      "alignment": "center",
+      "outline_width": 0
+    },
+    "overlays": [
+      {
+        "position": "center",
+        "color": "#2D6A4F",
+        "opacity": 1.0,
+        "height_pct": 0.12,
+        "y_position": 750
+      }
+    ]
+  }
+}

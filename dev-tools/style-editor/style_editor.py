@@ -9,19 +9,35 @@ import streamlit as st
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from common.contracts.models import CanvasSpec, ImageOverlay, TextElement, VisualStyle
+from common.contracts.models import CanvasSpec, ImageOverlay, Layout, TextElement, VisualStyle
 from common.contracts.models.rendering.image_overlay import STICKERS_DIR
 from common.rendering import render_image
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
+DATA_DIR = Path(__file__).parent / "data"
 STYLES_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
 
 # Channel → default canvas (extensible)
 CHANNEL_CANVAS = {
     "pinterest": CanvasSpec(width=1000, height=1500, format="RGB"),
 }
+
+
+def _load_data() -> dict:
+    """Load editor data file (tenant selection)."""
+    data_file = DATA_DIR / "example.json"
+    if data_file.exists():
+        return json.loads(data_file.read_text())
+    return {"tenant": "dev-tenant"}
+
+
+def _list_tenants() -> list[str]:
+    """List available tenant directories."""
+    if not STYLES_ROOT.exists():
+        return []
+    return sorted(d.name for d in STYLES_ROOT.iterdir() if d.is_dir())
 
 
 def _load_styles(tenant: str, channel: str) -> dict[str, VisualStyle]:
@@ -71,12 +87,24 @@ st.markdown("""
 
 st.title("Style Editor")
 
+_data = _load_data()
+_tenants = _list_tenants()
+_default_tenant = _data.get("tenant", "dev-tenant")
+
 channel_name = st.query_params.get("channel", "pinterest")
-STYLES = _load_styles("dev-tenant", channel_name)
+
+st.sidebar.header("Tenant")
+tenant_name = st.sidebar.selectbox(
+    "Tenant", _tenants,
+    index=_tenants.index(_default_tenant) if _default_tenant in _tenants else 0,
+    key="tenant_sel",
+)
+
+STYLES = _load_styles(tenant_name, channel_name)
 CANVAS = CHANNEL_CANVAS.get(channel_name, CanvasSpec(width=1000, height=1500, format="RGB"))
 
 if not STYLES:
-    st.error(f"No styles found for channel '{channel_name}' in config/tenants/dev-tenant/styles/")
+    st.error(f"No styles found for channel '{channel_name}' in config/tenants/{tenant_name}/styles/")
     st.stop()
 
 # Sidebar - Image upload and preview (sticky)
@@ -92,7 +120,7 @@ if "current_style" not in st.session_state:
     st.session_state.current_style = style_name
 elif st.session_state.current_style != style_name:
     # Clear all widget keys to reset to new style defaults
-    keys_to_clear = [k for k in st.session_state.keys() if k.startswith(("ov_", "title_", "prefix_", "tagline_", "accent_", "watermark_", "num_overlay", "txt_"))]
+    keys_to_clear = [k for k in st.session_state.keys() if k.startswith(("lay_", "ov_", "title_", "prefix_", "tagline_", "accent_", "watermark_", "num_overlay", "txt_"))]
     for k in keys_to_clear:
         del st.session_state[k]
     st.session_state.current_style = style_name
@@ -112,6 +140,33 @@ text_data = {
 col1, col2 = st.columns([1, 1])
 
 with col1:
+    # Layout
+    st.subheader("Layout")
+    LAYOUT_TYPES = ["single", "split_duplicate", "split_horizontal", "grid_2x2", "image_over_color", "color_over_image"]
+    FOCUS_OPTIONS = ["top", "center", "bottom"]
+    base_layout = base_style.layout
+
+    lay_type = st.selectbox("Layout type", LAYOUT_TYPES,
+                            **_kw("lay_type", index=LAYOUT_TYPES.index(base_layout.type) if base_layout.type in LAYOUT_TYPES else 0))
+
+    if lay_type != "single":
+        lc1, lc2, lc3 = st.columns(3)
+        lay_split = lc1.slider("Split %", 0.1, 0.9, **_kw("lay_split", value=base_layout.split_pct))
+        lay_gap = lc2.number_input("Gap px", 0, 400, **_kw("lay_gap", value=base_layout.gap))
+        lay_color = lc3.color_picker("Fill color", **_kw("lay_color", value=to_hex(base_layout.color)))
+        lc4, lc5 = st.columns(2)
+        lay_focus_top = lc4.selectbox("Crop focus top/left", FOCUS_OPTIONS,
+                                      **_kw("lay_ftop", index=FOCUS_OPTIONS.index(base_layout.crop_focus_top) if base_layout.crop_focus_top in FOCUS_OPTIONS else 1))
+        lay_focus_bot = lc5.selectbox("Crop focus bottom/right", FOCUS_OPTIONS,
+                                      **_kw("lay_fbot", index=FOCUS_OPTIONS.index(base_layout.crop_focus_bottom) if base_layout.crop_focus_bottom in FOCUS_OPTIONS else 1))
+        new_layout = Layout(type=lay_type, split_pct=lay_split, gap=lay_gap, color=lay_color,
+                            crop_focus_top=lay_focus_top, crop_focus_bottom=lay_focus_bot)
+    else:
+        # Clean up conditional keys
+        for k in ("lay_split", "lay_gap", "lay_color", "lay_ftop", "lay_fbot"):
+            st.session_state.pop(k, None)
+        new_layout = Layout()
+
     # Overlays (multiple)
     st.subheader("Overlays")
 
@@ -265,7 +320,7 @@ with col1:
 # Build modified style
 modified_style = VisualStyle(
     name=base_style.name, description=base_style.description,
-    overlays=new_overlays, **new_elements
+    layout=new_layout, overlays=new_overlays, **new_elements
 )
 
 with col2:
@@ -288,7 +343,16 @@ with col2:
                     "corner_radius": 20, "sticker_file": None, "flip_h": False, "flip_v": False}
         return {k: v for k, v in d.items() if k not in defaults or v != defaults[k]}
 
+    def _layout_to_dict(lay: Layout) -> dict:
+        """Convert Layout to JSON-serializable dict, omitting defaults."""
+        d = asdict(lay)
+        defaults = {"type": "single", "split_pct": 0.5, "gap": 0, "color": "#000000",
+                    "crop_focus_top": "center", "crop_focus_bottom": "center"}
+        return {k: v for k, v in d.items() if k not in defaults or v != defaults[k]}
+
     spec: dict = {}
+    if new_layout.type != "single":
+        spec["layout"] = _layout_to_dict(new_layout)
     for k, el in new_elements.items():
         if el:
             spec[k] = _el_to_dict(el)

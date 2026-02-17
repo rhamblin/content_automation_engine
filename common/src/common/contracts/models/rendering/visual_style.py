@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 
 from .image_overlay import ImageOverlay
+from .layout import Layout
 from .text_element import TextElement
 
 
@@ -17,6 +18,7 @@ class VisualStyle:
     prefix: TextElement | None = None
     accent: TextElement | None = None
     tagline: TextElement | None = None
+    layout: Layout = field(default_factory=Layout)
     overlays: list[ImageOverlay] = field(default_factory=list)
 
     @classmethod
@@ -34,9 +36,11 @@ class VisualStyle:
             if key in spec and spec[key] is not None:
                 elements[key] = TextElement.from_dict(spec[key])
         overlays = [ImageOverlay.from_dict(o) for o in spec.get("overlays", [])]
+        layout = Layout.from_dict(spec.get("layout"))
         return cls(
             name=data.get("name", ""),
             description=data.get("description", ""),
+            layout=layout,
             overlays=overlays,
             **elements,
         )
