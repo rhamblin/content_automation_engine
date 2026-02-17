@@ -10,4 +10,4 @@ class PinMakerRequest:
     input_folder: str  # required
     niche: str = "food"
     locale: str = "en"  # en | es | sw
-    style: str | None = None  # None = cycle all styles
+    styles: list[str] | None = None  # None = use all available styles

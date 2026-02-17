@@ -1,0 +1,34 @@
+{
+  "name": "bold_overlay",
+  "channel": "pinterest",
+  "description": "Full-bleed image with large chunky white title and heavy black outline at top, gold tagline near bottom.",
+  "spec": {
+    "title": {
+      "font_file": "NexaRust.otf",
+      "font_size": 130,
+      "color": "#FFFFFF",
+      "y_position": 280,
+      "outline_width": 6,
+      "outline_color": "#000000",
+      "alignment": "left",
+      "max_lines": 4
+    },
+    "tagline": {
+      "font_file": "Bangers.ttf",
+      "font_size": 44,
+      "color": "#FFD700",
+      "y_position": -180,
+      "outline_width": 3,
+      "outline_color": "#000000"
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#FFFFFF",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
+    }
+  }
+}

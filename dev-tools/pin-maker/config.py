@@ -34,16 +34,20 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
     if locale not in VALID_LOCALES:
         raise ValueError(f"invalid locale '{locale}', must be one of {VALID_LOCALES}")
 
-    styles = _load_styles(tenant, channel)
-    style = raw.get("style")
-    if style is not None and style not in styles:
-        raise ValueError(f"unknown style '{style}', available: {list(styles.keys())}")
+    all_styles = _load_styles(tenant, channel)
+    raw_styles = raw.get("styles", raw.get("style"))  # back-compat: accept old "style" key
+    if isinstance(raw_styles, str):
+        raw_styles = [raw_styles]
+    if raw_styles is not None:
+        for s in raw_styles:
+            if s not in all_styles:
+                raise ValueError(f"unknown style '{s}', available: {list(all_styles.keys())}")
 
     return PinMakerRequest(
         input_folder=raw["input_folder"],
         niche=raw.get("niche", "food"),
         locale=locale,
-        style=style,
+        styles=raw_styles,
     )
 
 

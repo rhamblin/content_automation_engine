@@ -1,0 +1,43 @@
+{
+  "name": "script_box",
+  "channel": "pinterest",
+  "description": "Clean white box with black border in upper third, script prefix above bold condensed title.",
+  "spec": {
+    "prefix": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 52,
+      "color": "#1a1a1a",
+      "y_position": 270,
+      "outline_width": 0
+    },
+    "title": {
+      "font_file": "BebasNeue.ttf",
+      "font_size": 120,
+      "color": "#1a1a1a",
+      "y_position": 350,
+      "outline_width": 0,
+      "max_lines": 2
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#FFFFFF",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
+    },
+    "overlays": [
+      {
+        "position": "box",
+        "color": "#FFFFFF",
+        "opacity": 0.95,
+        "height_pct": 0.25,
+        "y_position": 340,
+        "width_pct": 0.82,
+        "border_color": "#1a1a1a",
+        "border_width": 3
+      }
+    ]
+  }
+}

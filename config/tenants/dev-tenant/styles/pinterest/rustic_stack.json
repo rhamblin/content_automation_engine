@@ -1,0 +1,55 @@
+{
+  "name": "rustic_stack",
+  "channel": "pinterest",
+  "description": "Rustic western-style cream title at top with heavy outline, clean tagline and script accent at bottom.",
+  "spec": {
+    "title": {
+      "font_file": "NexaRust.otf",
+      "font_size": 120,
+      "color": "#F0DFBF",
+      "y_position": 250,
+      "outline_width": 5,
+      "outline_color": "#1a1a1a",
+      "max_lines": 3
+    },
+    "tagline": {
+      "font_file": "Montserrat.ttf",
+      "font_size": 40,
+      "color": "#F0DFBF",
+      "y_position": -200,
+      "outline_width": 3,
+      "outline_color": "#1a1a1a"
+    },
+    "accent": {
+      "font_file": "GreatVibes.ttf",
+      "font_size": 52,
+      "color": "#F0DFBF",
+      "y_position": -100,
+      "outline_width": 2,
+      "outline_color": "#1a1a1a"
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#FFFFFF",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
+    },
+    "overlays": [
+      {
+        "position": "top",
+        "color": "#000000",
+        "opacity": 0.3,
+        "height_pct": 0.35
+      },
+      {
+        "position": "bottom",
+        "color": "#000000",
+        "opacity": 0.35,
+        "height_pct": 0.25
+      }
+    ]
+  }
+}

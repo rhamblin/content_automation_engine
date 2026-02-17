@@ -77,7 +77,7 @@ def main():
     jpg_files += list(input_folder.glob("*.JPG")) + list(input_folder.glob("*.JPEG"))
     logger.info(f"Found {len(jpg_files)} images")
 
-    style_names = list(styles.keys())
+    style_names = request.styles or list(styles.keys())
     if len(jpg_files) > len(style_names):
         logger.warning(f"{len(jpg_files)} images but only {len(style_names)} styles — some will repeat")
 
@@ -85,7 +85,7 @@ def main():
     saved, errors = 0, 0
     for idx, img_path in enumerate(jpg_files):
         keyword = extract_keyword(img_path.name)
-        style_name = request.style or style_names[idx % len(style_names)]
+        style_name = style_names[idx % len(style_names)]
         style = styles[style_name]
         logger.info(f"{img_path.name} -> '{keyword}' [{style_name}]")
 

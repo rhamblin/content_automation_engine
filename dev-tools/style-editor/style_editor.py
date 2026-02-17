@@ -109,8 +109,14 @@ if not STYLES:
 
 # Sidebar - Image upload and preview (sticky)
 st.sidebar.header("Image")
+DEFAULT_IMAGE = Path(__file__).parent / "default_image.jpg"
 uploaded = st.sidebar.file_uploader("Upload", type=["jpg", "jpeg", "png"])
-source_img = Image.open(uploaded).convert("RGB") if uploaded else Image.new("RGB", (1000, 1500), "#8B4513")
+if uploaded:
+    source_img = Image.open(uploaded).convert("RGB")
+elif DEFAULT_IMAGE.exists():
+    source_img = Image.open(DEFAULT_IMAGE).convert("RGB")
+else:
+    source_img = Image.new("RGB", (1000, 1500), "#8B4513")
 
 st.sidebar.header("Style")
 style_name = st.sidebar.selectbox("Base style", list(STYLES.keys()))
