@@ -107,17 +107,6 @@ if not STYLES:
     st.error(f"No styles found for channel '{channel_name}' in config/tenants/{tenant_name}/styles/")
     st.stop()
 
-# Sidebar - Image upload and preview (sticky)
-st.sidebar.header("Image")
-DEFAULT_IMAGE = Path(__file__).parent / "default_image.jpg"
-uploaded = st.sidebar.file_uploader("Upload", type=["jpg", "jpeg", "png"])
-if uploaded:
-    source_img = Image.open(uploaded).convert("RGB")
-elif DEFAULT_IMAGE.exists():
-    source_img = Image.open(DEFAULT_IMAGE).convert("RGB")
-else:
-    source_img = Image.new("RGB", (1000, 1500), "#8B4513")
-
 st.sidebar.header("Style")
 style_name = st.sidebar.selectbox("Base style", list(STYLES.keys()))
 
@@ -134,6 +123,9 @@ elif st.session_state.current_style != style_name:
 
 base_style = STYLES[style_name]
 
+# Preview placeholder - rendered after main content builds modified_style
+_preview_container = st.sidebar.container()
+
 st.sidebar.header("Text")
 text_data = {
     "title": st.sidebar.text_input("Title", "Delicious Recipe", key="txt_title"),
@@ -141,6 +133,16 @@ text_data = {
     "tagline": st.sidebar.text_input("Tagline", "Perfect for dinner", key="txt_tagline"),
     "accent": st.sidebar.text_input("Accent", "homemade", key="txt_accent"),
 }
+
+st.sidebar.header("Image")
+DEFAULT_IMAGE = Path(__file__).parent / "default_image.jpg"
+uploaded = st.sidebar.file_uploader("Upload", type=["jpg", "jpeg", "png"])
+if uploaded:
+    source_img = Image.open(uploaded).convert("RGB")
+elif DEFAULT_IMAGE.exists():
+    source_img = Image.open(DEFAULT_IMAGE).convert("RGB")
+else:
+    source_img = Image.new("RGB", (1000, 1500), "#8B4513")
 
 # Controls and Preview
 col1, col2 = st.columns([1, 1])
@@ -374,11 +376,12 @@ with col2:
 
     st.code(json.dumps(config, indent=2), language="json")
 
-# Preview in sidebar (naturally sticky)
-st.sidebar.header("Preview")
-try:
-    _settings = load_dev_settings()
-    preview = render_image(source_img, CANVAS, modified_style, text_data, _settings.brand_text)
-    st.sidebar.image(preview, width=420)
-except Exception as e:
-    st.sidebar.error(f"Error: {e}")
+# Preview in sidebar (rendered into reserved container)
+with _preview_container:
+    st.header("Preview")
+    try:
+        _settings = load_dev_settings()
+        preview = render_image(source_img, CANVAS, modified_style, text_data, _settings.brand_text)
+        st.image(preview, width=420)
+    except Exception as e:
+        st.error(f"Error: {e}")
