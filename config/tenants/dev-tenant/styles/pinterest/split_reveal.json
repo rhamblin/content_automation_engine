@@ -20,12 +20,13 @@
       "max_lines": 2
     },
     "watermark": {
-      "font_file": "Montserrat.ttf",
-      "font_size": 22,
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
       "color": "#FFFFFF",
-      "y_position": -50,
-      "alignment": "center",
-      "outline_width": 0
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 2,
+      "outline_color": "#5C3A1E"
     },
     "overlays": [
       {

@@ -1,0 +1,29 @@
+{
+  "title": "Recipes",
+  "brand_name": "ChefExotic",
+  "brand_website": "https://chefexotic.com",
+  "brand_watermark": "chefexotic.com",
+  "persona_name": "home_cook",
+  "persona_prompt": "prompts/persona.txt",
+  "copy_style_prompt": "prompts/copy_style.txt",
+  "channel_prompts": {
+    "wordpress": "prompts/wordpress.txt",
+    "pinterest": "prompts/pinterest.txt"
+  },
+  "keywords": [
+    "Jollof rice with goat",
+    "Garlic lemon shrimp",
+    "Lemon herb baked chicken",
+    "Cozy Noodle bowl",
+    "Lobster recipe",
+    "Curry noodle bowl",
+    "Plantain bites",
+    "Pudding bowls",
+    "Coconut pancakes",
+    "Chilli shrimps cups",
+    "Jackfruit wraps",
+    "Lava cake",
+    "Rum pudding",
+    "Chia pudding"
+  ]
+}
