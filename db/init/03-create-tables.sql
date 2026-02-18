@@ -315,3 +315,18 @@ CREATE TABLE channel_credentials (
 
 CREATE INDEX idx_channel_credentials_tenant_id ON channel_credentials(tenant_id);
 CREATE INDEX idx_channel_credentials_channel_id ON channel_credentials(channel_id);
+
+-- 14. User Sessions (auth refresh tokens)
+
+CREATE TABLE user_sessions (
+  id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id       UUID        UNIQUE NOT NULL DEFAULT gen_random_uuid(),
+  user_id           UUID        NOT NULL REFERENCES users(external_id) ON DELETE CASCADE,
+  refresh_token     TEXT        NOT NULL,
+  identity_provider TEXT        NOT NULL,
+  expires_at        TIMESTAMPTZ NOT NULL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ
+);
+
+CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);

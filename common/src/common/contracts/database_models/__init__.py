@@ -28,6 +28,7 @@ from .publication_metric import PublicationMetric
 from .schedule import Schedule
 from .visual_style_model import VisualStyleModel
 from .channel_credential import ChannelCredential
+from .user_session import UserSession
 
 __all__ = [
     "Base",
@@ -62,4 +63,5 @@ __all__ = [
     "Schedule",
     "VisualStyleModel",
     "ChannelCredential",
+    "UserSession",
 ]

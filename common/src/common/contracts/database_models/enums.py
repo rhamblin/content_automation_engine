@@ -57,5 +57,6 @@ class TenantUserRole(str, Enum):
 
 class IdentityProvider(str, Enum):
     AZURE_B2C = "azure_b2c"
+    AZURE_ENTRA = "azure_entra"
     GOOGLE = "google"
     GITHUB = "github"

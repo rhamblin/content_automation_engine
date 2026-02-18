@@ -8,7 +8,7 @@ function login() {
     client_id: clientId,
     response_type: 'code',
     redirect_uri: redirectUri,
-    scope: 'openid profile email User.Read',
+    scope: 'openid profile email User.Read offline_access',
     response_mode: 'query',
   })
   window.location.href = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?${params}`

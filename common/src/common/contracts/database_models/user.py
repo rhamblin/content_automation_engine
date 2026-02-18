@@ -26,3 +26,4 @@ class User(Base):
     # Relationships
     tenants_users: Mapped[List["TenantsUsers"]] = relationship("TenantsUsers", back_populates="user", cascade="all, delete", lazy="selectin")
     users_identity_providers: Mapped[List["UsersIdentityProviders"]] = relationship("UsersIdentityProviders", back_populates="user", cascade="all, delete", lazy="selectin")
+    user_sessions: Mapped[List["UserSession"]] = relationship("UserSession", back_populates="user", cascade="all, delete", lazy="selectin")

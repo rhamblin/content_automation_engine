@@ -1,12 +1,12 @@
   const schedule_date = "25/02/2026";  // DD/MM/YYYY
   const schedule_time = "09:30 AM";    // HH:MM AM/PM
 
-  const pin = {
-    title: "Your title here",
-    description: "Your description here",
-    alt_text: "Your alt text here",
-    link: "https://example.com",
-  };
+  const pin =       {
+        "title": "Chilli shrimps cups delight",
+        "description": "Rich spicy shrimp cups burst with smoky heat and juicy bites. A quick crowd pleasing starter that comes together in minutes for weeknights or parties. Save this delicious idea for your next get together.",
+        "alt_text": "Crispy bite sized cups filled with spicy chilli shrimp topping",
+        "reasoning": "The title front loads the exact keyword for Pinterest SEO and uses crave worthy sensory language to drive saves and clicks."
+      };
 
   function fillTextarea(placeholder, value) {
     const el = document.querySelector(`textarea[placeholder="${placeholder}"]`);

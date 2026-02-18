@@ -123,6 +123,7 @@ erDiagram
   tenants       ||--o{  tenants_users : "has"
   users         ||--|{  tenants_users : belongs_to
   users         ||--o{  users_identity_providers: integrates_with
+  users         ||--o{  user_sessions: authenticates_via
   tenants       ||--o{  tenants_identity_providers : integrates_with
   tenants       ||--o{  reports  : receives
   tenants       ||--o{  schedules: works_based_on
@@ -383,6 +384,19 @@ erDiagram
     uuid  updated_by
     %% Unique constraints: (external_id), (tenant_id, channel_id, name)
     %% spec contains VisualStyle JSON (text elements, overlays)
+  }
+
+  user_sessions {
+    uuid id pk
+    uuid external_id
+    uuid user_id fk
+    text refresh_token
+    text identity_provider
+    timestamp expires_at
+    timestamp created_at
+    timestamp updated_at
+    %% Unique constraint: (external_id)
+    %% refresh_token is encrypted at rest
   }
 
   channel_credentials {

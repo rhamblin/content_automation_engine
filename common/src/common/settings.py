@@ -21,6 +21,9 @@ class Settings:
     azure_entra_tenant_id: str = ""
     frontend_url: str = "http://localhost:5173"
 
+    # Auth encryption
+    refresh_token_encryption_key: str = ""
+
     # Optional settings
     log_level: str = "INFO"
     cors_allowed_origins: str = ""
@@ -62,6 +65,9 @@ def load_settings() -> Settings:
     config["azure_entra_client_secret"] = os.getenv("AZURE_ENTRA_CLIENT_SECRET", "")
     config["azure_entra_tenant_id"] = os.getenv("AZURE_ENTRA_TENANT_ID", "")
     config["frontend_url"] = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+    # Auth encryption
+    config["refresh_token_encryption_key"] = os.getenv("REFRESH_TOKEN_ENCRYPTION_KEY", "")
 
     # Optional vars with defaults
     config["log_level"] = os.getenv("LOG_LEVEL", "INFO")

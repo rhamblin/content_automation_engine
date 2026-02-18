@@ -19,6 +19,8 @@ dependencies = [
     "requests>=2.28.0",
     # Retry logic
     "tenacity>=8.0.0",
+    # Auth
+    "PyJWT[crypto]>=2.8.0",
 ]
 
 [tool.setuptools.packages.find]
