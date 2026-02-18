@@ -118,10 +118,31 @@ Return ONLY valid JSON with the exact fields shown above.
         persona=None,
         style=None,
         locale: str = "en",
-        image_url: str = "",
+        blog_url: str = "",
         copy_style_prompt: str | None = None,
         persona_prompt: str | None = None,
+        image_base64: str | None = None,
     ) -> str:
+        user_text = (
+            f"Niche: {niche}\n"
+            f"Primary keyword: {keyword}\n"
+        )
+        if blog_url:
+            user_text += f"Blog URL: {blog_url}\n"
+
+        if image_base64:
+            user_content = [
+                {"type": "text", "text": user_text},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{image_base64}",
+                    },
+                },
+            ]
+        else:
+            user_content = user_text
+
         try:
             response = self.client.chat.completions.create(
                 messages=[
@@ -138,11 +159,7 @@ Return ONLY valid JSON with the exact fields shown above.
                     },
                     {
                         "role": "user",
-                        "content": (
-                            f"Niche: {niche}\n"
-                            f"Primary keyword: {keyword}\n"
-                            f"Image URL: {image_url}\n"
-                        ),
+                        "content": user_content,
                     },
                 ],
                 max_completion_tokens=32000,
@@ -169,7 +186,6 @@ Return ONLY valid JSON with the exact fields shown above.
         persona=None,
         style=None,
         locale: str = "en",
-        image_url: str = "",
         **kwargs,
     ) -> dict:
         """Generate content using Azure OpenAI.
@@ -185,9 +201,10 @@ Return ONLY valid JSON with the exact fields shown above.
             persona,
             style,
             locale,
-            image_url,
+            blog_url=kwargs.get("blog_url", ""),
             copy_style_prompt=kwargs.get("copy_style_prompt"),
             persona_prompt=kwargs.get("persona_prompt"),
+            image_base64=kwargs.get("image_base64"),
         )
         try:
             json_equiv = json.loads(raw_result)

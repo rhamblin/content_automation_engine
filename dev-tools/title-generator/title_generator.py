@@ -1,5 +1,6 @@
 """Title Generator — orchestrator (all I/O lives here)."""
 
+import base64
 import json
 import sys
 from datetime import datetime
@@ -22,7 +23,7 @@ logger = AppLogger(__name__)
 OUTPUT_DIR = Path(__file__).parent / "output"
 
 
-def save_results(all_results: dict[str, "TitleGenResult"], request) -> Path:
+def save_results(all_results: dict[str, "TitleGenResult"], request, keyword_blog_urls: dict[str, str]) -> Path:
     """Save results to JSON file in output directory."""
     OUTPUT_DIR.mkdir(exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -37,10 +38,13 @@ def save_results(all_results: dict[str, "TitleGenResult"], request) -> Path:
             "keywords": list(request.keywords),
         },
         "results": {
-            keyword: [
-                {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
-                for o in result.options
-            ]
+            keyword: {
+                "blog_url": keyword_blog_urls.get(keyword, ""),
+                "options": [
+                    {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
+                    for o in result.options
+                ],
+            }
             for keyword, result in all_results.items()
         },
     }
@@ -80,16 +84,34 @@ def main():
 
     logger.info(f"Generating {request.count} title(s) each for {len(request.keywords)} keywords ({request.channel})")
 
+    data_dir = Path(__file__).parent
+
     all_results: dict[str, object] = {}
     failed = []
     for keyword in request.keywords:
         logger.info(f"  → {keyword}")
+
+        # Load optional reference image for grounding
+        image_base64 = None
+        image_path = config.keyword_images.get(keyword)
+        if image_path:
+            abs_path = data_dir / image_path
+            if abs_path.is_file():
+                image_base64 = base64.b64encode(abs_path.read_bytes()).decode()
+                logger.info(f"    Attached image: {image_path}")
+            else:
+                logger.warning(f"    Image not found, skipping: {abs_path}")
+
+        blog_url = config.keyword_blog_urls.get(keyword, "")
+
         result = service.generate(
             niche=request.niche,
             keyword=keyword,
             count=request.count,
             copy_style_prompt=config.copy_style_prompt,
             persona_prompt=config.persona_prompt,
+            image_base64=image_base64,
+            blog_url=blog_url,
         )
         if result.error:
             logger.error(f"Failed for '{keyword}': {result.error}")
@@ -101,7 +123,7 @@ def main():
         logger.error("All keywords failed")
         sys.exit(1)
 
-    filepath = save_results(all_results, request)
+    filepath = save_results(all_results, request, config.keyword_blog_urls)
     logger.info(f"Saved to: {filepath}")
     print_results(all_results, request)
 

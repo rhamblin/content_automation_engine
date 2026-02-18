@@ -17,6 +17,14 @@ class TitleGenConfig:
     persona_prompt: str
     channel_prompt: str
     copy_style_prompt: str
+    keyword_images: dict[str, str] | None = None  # keyword → image_path
+    keyword_blog_urls: dict[str, str] | None = None    # keyword → url
+
+    def __post_init__(self):
+        if self.keyword_images is None:
+            object.__setattr__(self, "keyword_images", {})
+        if self.keyword_blog_urls is None:
+            object.__setattr__(self, "keyword_blog_urls", {})
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -34,11 +42,30 @@ def load_config(path: Path) -> TitleGenConfig:
         if field not in raw:
             raise ValueError(f"data file missing required field: {field}")
 
-    keywords = raw["keywords"]
-    if isinstance(keywords, str):
-        keywords = [keywords]
-    if not keywords:
+    raw_keywords = raw["keywords"]
+    if isinstance(raw_keywords, str):
+        raw_keywords = [raw_keywords]
+    if not raw_keywords:
         raise ValueError("keywords must not be empty")
+
+    # Support both plain strings and {"keyword": "...", "image_path": "...", "url": "..."} objects
+    keywords: list[str] = []
+    keyword_images: dict[str, str] = {}
+    keyword_blog_urls: dict[str, str] = {}
+    for entry in raw_keywords:
+        if isinstance(entry, str):
+            keywords.append(entry)
+        elif isinstance(entry, dict):
+            kw = entry.get("keyword", "")
+            if not kw:
+                raise ValueError("keyword object missing 'keyword' field")
+            keywords.append(kw)
+            if entry.get("image_path"):
+                keyword_images[kw] = entry["image_path"]
+            if entry.get("blog_url"):
+                keyword_blog_urls[kw] = entry["blog_url"]
+        else:
+            raise ValueError(f"invalid keyword entry: {entry}")
 
     tenant = raw["tenant"]
     niche = raw["niche"]
@@ -73,4 +100,6 @@ def load_config(path: Path) -> TitleGenConfig:
         persona_prompt=persona_prompt,
         channel_prompt=channel_prompt,
         copy_style_prompt=copy_style_prompt,
+        keyword_images=keyword_images,
+        keyword_blog_urls=keyword_blog_urls,
     )

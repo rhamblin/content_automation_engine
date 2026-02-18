@@ -3,20 +3,76 @@
   "channel": "pinterest",
   "niche": "recipes",
   "keywords": [
-    "Jollof rice with goat",
-    "Garlic lemon shrimp",
-    "Lemon herb baked chicken",
-    "Cozy noodle bowl",
-    "Lobster recipe",
-    "Curry noodle bowl",
-    "Plantain bites",
-    "Pudding bowls",
-    "Coconut pancakes",
-    "Chilli shrimps cups",
-    "Jackfruit wraps",
-    "Lava cake",
-    "Rum pudding",
-    "Chia pudding"
+    {
+      "keyword": "Jollof rice with goat",
+      "image_path": "data/images/jollof.jpg",
+      "blog_url": "https://chefexotic.com/jollof-rice-with-goat"
+    },
+    {
+      "keyword": "Garlic lemon shrimp",
+      "image_path": "data/images/garlic_lemon_shrimp.jpg",
+      "blog_url": "https://chefexotic.com/garlic-lemon-shrimp"
+    },
+    {
+      "keyword": "Lemon herb baked chicken",
+      "image_path": "data/images/lemon_herb_baked_chicken.jpg",
+      "blog_url": "https://chefexotic.com/lemon-herb-baked-chicken"
+    },
+    {
+      "keyword": "Cozy noodle bowl",
+      "image_path": "data/images/cozy_noodle_bowl.jpg",
+      "blog_url": "https://chefexotic.com/cozy-noodle-bowl"
+    },
+    {
+      "keyword": "Lobster recipe",
+      "image_path": "data/images/lobster.jpg",
+      "blog_url": "https://chefexotic.com/lobster-recipe"
+    },
+    {
+      "keyword": "Curry noodle bowl",
+      "image_path": "data/images/curry_noodle_bowl.jpg",
+      "blog_url": "https://chefexotic.com/curry-noodle-bowl"
+    },
+    {
+      "keyword": "Plantain bites",
+      "image_path": "data/images/plantain_bites.jpg",
+      "blog_url": "https://chefexotic.com/plantain-bites"
+    },
+    {
+      "keyword": "Pudding bowls",
+      "image_path": "data/images/pudding_bowls.jpg",
+      "blog_url": "https://chefexotic.com/pudding-bowls"
+    },
+    {
+      "keyword": "Coconut pancakes",
+      "image_path": "data/images/coconut_pancakes.jpg",
+      "blog_url": "https://chefexotic.com/coconut-pancakes"
+    },
+    {
+      "keyword": "Chilli shrimps cups",
+      "image_path": "data/images/chilli_shrimps_cups.jpg",
+      "blog_url": "https://chefexotic.com/chilli-shrimps-cups"
+    },
+    {
+      "keyword": "Jackfruit wraps",
+      "image_path": "data/images/jackfruit_wraps.jpg",
+      "blog_url": "https://chefexotic.com/jackfruit-wraps"
+    },
+    {
+      "keyword": "Lava cake",
+      "image_path": "data/images/lava_cake.jpg",
+      "blog_url": "https://chefexotic.com/lava-cake"
+    },
+    {
+      "keyword": "Rum pudding",
+      "image_path": "data/images/rum_pudding.jpg",
+      "blog_url": "https://chefexotic.com/rum-pudding"
+    },
+    {
+      "keyword": "Chia pudding",
+      "image_path": "data/images/chia_pudding.jpg",
+      "blog_url": "https://chefexotic.com/chia-pudding"
+    }
   ],
   "count": 1
 }
