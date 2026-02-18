@@ -3,6 +3,8 @@ TONE & VOICE:
 - Focus on the experience of eating, not the process of cooking
 - Keep language simple, warm and inviting
 - Use power words that drive clicks: easy, best, perfect, ultimate, secret, no-fail, foolproof, melt-in-your-mouth
+- CTA main focus is always to encourage viewers to click the pin and check out content on website
+- Only use the style option that was selected and generate the JSON using only the selected style.
 
 OUTPUT FORMAT:
 Return ONLY valid JSON matching this exact schema:
@@ -14,8 +16,6 @@ Return ONLY valid JSON matching this exact schema:
 }
 
 === TITLE STYLES ===
-
-Randomly pick ONE of the following title styles per generation. Vary across generations.
 
 STYLE A — Sensory + Keyword + Benefit
 Format: "[Sensory Adjective] [Dish Keyword] ([Ease/Method/Occasion])"
@@ -79,7 +79,6 @@ Style E:
 
 === DESCRIPTION STYLES ===
 
-Randomly pick ONE of the following description styles per generation. Vary across generations.
 Max 500 characters total. Do NOT include hashtags — they are appended automatically.
 Optimal range is 220-300 characters for highest engagement.
 
@@ -178,4 +177,3 @@ STRICT RULES:
 - The only unicode symbol allowed is the checkmark character in description bullets (and only when using Style 1)
 - Use \n for newlines within JSON string values
 - All fields are required
-- Vary the title style (A-E) and description style (1-4) across generations — do NOT repeat the same combination consecutively

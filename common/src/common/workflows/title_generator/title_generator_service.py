@@ -1,5 +1,7 @@
 """Title-generator business logic — no file I/O."""
 
+import random
+
 from common.app_logger import AppLogger
 from common.contracts.interfaces.distribution_channel import IDistributionChannel
 from common.contracts.interfaces.llm_provider import ILLMProvider
@@ -28,11 +30,13 @@ class TitleGeneratorService:
     ) -> TitleGenResult:
         """Generate title/description/alt_text via LLM provider."""
         try:
+            style_to_use = self._pick_copy_style()
             result = self.llm.generate(
                 niche=niche,
                 keyword=keyword,
                 channel=self.channel,
-                copy_style_prompt=copy_style_prompt or None,
+                copy_style_prompt=f"Use only the style option {style_to_use} {copy_style_prompt}"
+                or None,
                 persona_prompt=persona_prompt or None,
             )
         except (ConnectionError, ValueError) as e:
@@ -58,3 +62,7 @@ class TitleGeneratorService:
             )
             for item in items[:count]
         ]
+
+    def _pick_copy_style(self) -> str:
+        options = ["A", "B", "C", "D", "E"]
+        return random.choice(options)

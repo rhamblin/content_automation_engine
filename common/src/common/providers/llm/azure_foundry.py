@@ -1,10 +1,14 @@
 import json
 
 from openai import APIError, AzureOpenAI
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from common.app_logger import AppLogger
-
 from common.contracts.interfaces import IDistributionChannel, ILLMProvider
 
 LOCALE_INSTRUCTIONS = {
@@ -123,7 +127,14 @@ Return ONLY valid JSON with the exact fields shown above.
                 messages=[
                     {
                         "role": "system",
-                        "content": self._build_prompt(channel, persona, style, locale, copy_style_prompt, persona_prompt),
+                        "content": self._build_prompt(
+                            channel,
+                            persona,
+                            style,
+                            locale,
+                            copy_style_prompt,
+                            persona_prompt,
+                        ),
                     },
                     {
                         "role": "user",
@@ -134,8 +145,9 @@ Return ONLY valid JSON with the exact fields shown above.
                         ),
                     },
                 ],
-                max_completion_tokens=50000,
-                model="gpt-5-nano",
+                max_completion_tokens=32000,
+                model="gpt-4.1",
+                temperature=0.9,
             )
         except APIError as e:
             raise ConnectionError(f"Azure OpenAI API error: {e}") from e
@@ -167,7 +179,13 @@ Return ONLY valid JSON with the exact fields shown above.
             ValueError: When response is empty or invalid JSON.
         """
         raw_result = self._call_llm(
-            niche, keyword, channel, persona, style, locale, image_url,
+            niche,
+            keyword,
+            channel,
+            persona,
+            style,
+            locale,
+            image_url,
             copy_style_prompt=kwargs.get("copy_style_prompt"),
             persona_prompt=kwargs.get("persona_prompt"),
         )
