@@ -21,7 +21,7 @@ from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from settings import load_dev_settings
+from settings import load_dev_settings, WpNicheCredential
 
 from config import load_request
 from common.workflows.wp_uploader import WpUploaderService
@@ -62,6 +62,18 @@ def _log_header(total: int) -> None:
     logger.info("\u2500" * min(cols, 60))
 
 
+def _build_wp_channel(
+    cred: WpNicheCredential, llm: AzureFoundryLLMProvider
+) -> WordPressChannel:
+    return WordPressChannel(
+        site_url=cred.site_url,
+        username=cred.username,
+        app_password=cred.app_password,
+        llm=llm,
+        amazon_tag=cred.amazon_tag,
+    )
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -76,20 +88,22 @@ def main():
 
     settings = load_dev_settings()
 
+    if not settings.wp_credentials:
+        logger.error("No WordPress niche credentials found. "
+                      "Add credentials under config/tenants/dev-tenant/niches/<name>/credentials/wordpress.json")
+        sys.exit(1)
+
     azure_client = AzureOpenAI(
         azure_endpoint=settings.azure_foundry_endpoint,
         api_key=settings.azure_foundry_api_key,
         api_version=settings.azure_foundry_api_version,
     )
     llm = AzureFoundryLLMProvider(azure_client)
-    wp = WordPressChannel(
-        site_url=settings.wp_site_url,
-        username=settings.wp_username,
-        app_password=settings.wp_app_password,
-        llm=llm,
-        amazon_tag=settings.wp_amazon_tag,
-    )
-    service = WpUploaderService(wp)
+
+    # Build a WordPressChannel per niche
+    wp_channels: dict[str, WordPressChannel] = {}
+    for niche_name, cred in settings.wp_credentials.items():
+        wp_channels[niche_name] = _build_wp_channel(cred, llm)
 
     # Read all rows
     with open(topics_path) as f:
@@ -120,6 +134,14 @@ def main():
             logger.info(f"({i+1}/{total}) {keyword}")
             logger.info(f"  {_progress_bar(i, total)}")
             logger.info(f"  {_step_indicator(0)}")
+
+            wp = wp_channels.get(niche)
+            if not wp:
+                logger.error(f"  \u2717 No WordPress credentials for niche '{niche}'. Skipping.")
+                failed += 1
+                continue
+
+            service = WpUploaderService(wp)
 
             try:
                 result = service.upload_topic(

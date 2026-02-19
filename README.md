@@ -14,6 +14,35 @@ The following applications are requirements
 
 Install Recommended Extensions when VS Code opens
 
+## Onboarding a Tenant
+
+A tenant is configured via a folder under `config/tenants/<tenant-name>/`. The seed worker reads this structure on startup. When onboarding a new tenant, create the following files and folders (remove items marked *optional* if not needed):
+
+```
+config/tenants/<tenant-name>/
+  tenant.json                          # required — { "title": "My Tenant" }
+  schedules.json                       # optional — array of schedule definitions
+  styles/                              # optional — visual styles per channel
+    <channel>/
+      <style-name>.json
+  niches/
+    <niche-name>/
+      <niche-name>.json                # required — niche config (title, keywords, prompts, etc.)
+      prompts/                         # optional — prompt text files referenced from niche JSON
+        persona.txt
+        copy_style.txt
+        ...
+      credentials/                     # required — channel credentials per niche (gitignored)
+        wordpress.json                 #   { "channel": "wordpress", "site_url": "", "username": "", "app_password": "" }
+        pinterest.json                 #   { "channel": "pinterest", "app_id": "", "app_secret": "" }
+        wp-app-password.txt            #   optional secret file — overrides app_password in JSON
+      seed-images/                     # optional — seed images uploaded to blob storage
+        <keyword>/
+          img1.png
+```
+
+**Credentials are gitignored** (`**/credentials/` and `**/wp-app-password.txt` in `.gitignore`). Populate them locally or via CI secrets.
+
 ## Onboarding a Niche and Keywords
 The Niche API can be used to add a net new Niche or to add a keyword to a niche
 
@@ -139,6 +168,7 @@ erDiagram
   channels      ||--o{  publications: distributes
   channels      ||--o{  visual_styles: renders_with
   channels      ||--o{  channel_credentials: secured_by
+  niches        ||--o{  channel_credentials: authenticates_with
   renders       ||--o{  publications: published_in
   contents      ||--o{  publications: published_in
   publications  ||--o{  promotions: promoted_via
@@ -405,12 +435,16 @@ erDiagram
     uuid external_id
     uuid tenant_id fk
     uuid channel_id fk
+    uuid niche_id fk
     jsonb credentials
     timestamp created_at
     uuid  created_by
     timestamp updated_at
     uuid  updated_by
-    %% Unique constraints: (external_id), (tenant_id, channel_id)
+    %% Unique constraint: (external_id)
+    %% Partial unique: (tenant_id, channel_id, niche_id) WHERE niche_id IS NOT NULL
+    %% Partial unique: (tenant_id, channel_id) WHERE niche_id IS NULL
+    %% niche_id is nullable — NULL means tenant-level fallback credentials
     %% credentials contains channel-specific auth (API keys, tokens)
   }
 

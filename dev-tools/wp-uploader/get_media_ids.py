@@ -98,8 +98,12 @@ def main():
 
     settings = load_dev_settings()
     niche = settings.wp_niche
+    wp_cred = settings.wp_credentials.get(niche)
+    if not wp_cred:
+        print(f"Error: No WordPress credentials for niche '{niche}'")
+        sys.exit(1)
     session = requests.Session()
-    session.auth = HTTPBasicAuth(settings.wp_username, settings.wp_app_password)
+    session.auth = HTTPBasicAuth(wp_cred.username, wp_cred.app_password)
 
     images = [f for f in image_dir.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS]
     total = len(images)
@@ -126,7 +130,7 @@ def main():
             img_path = ensure_uuid_prefix(img_path)
 
             keyword = filename_to_keyword(img_path.name)
-            media_id, wp_url = get_media_id(session, settings.wp_site_url, img_path.stem)
+            media_id, wp_url = get_media_id(session, wp_cred.site_url, img_path.stem)
 
             writer.writerow([niche, keyword, wp_url, media_id or ""])
 

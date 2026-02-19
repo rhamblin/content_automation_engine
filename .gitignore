@@ -1,10 +1,11 @@
 secrets/
 config.env
-config/tenants/*/credentials/
+**/credentials/
 **/certs/
 dev-tools/.env
 dev-tools/wp-uploader/input/
 dev-tools/wp-uploader/wp-app-password.txt
+**/wp-app-password.txt
 **/output/
 
 dev-tools/get-pin-ids/pinterest-credentials.json

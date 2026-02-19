@@ -11,3 +11,5 @@ When make Dev tools under /dev-tools follow these rules
 3. Service logic (business logic + request/response models) must live in `common/src/common/workflows/<tool_name>/`. Dev-tools only contain thin CLI orchestrators (data file, config, orchestrator) that import from `common.workflows.<tool_name>`. This lets Docker services reuse the same logic without duplicating code
 
 Always make sure Makefile commands stay up to date
+
+Any changes to the tenant config folder structure (e.g. new folders, new file types, renamed conventions) must be reflected in the "Onboarding a Tenant" section of README.md so it stays accurate for new developers

@@ -63,7 +63,7 @@ async def load_tenant(session: AsyncSession, tenant_dir: Path) -> UUID:
 
 
 async def ensure_channels(session: AsyncSession, tenant_dir: Path) -> dict[str, UUID]:
-    """Scan styles/ and credentials/ dirs to discover channels, upsert them.
+    """Scan styles/, credentials/, and niches/*/credentials/ to discover channels, upsert them.
     Returns mapping of channel identifier → external_id."""
     channel_ids: set[str] = set()
 
@@ -73,10 +73,20 @@ async def ensure_channels(session: AsyncSession, tenant_dir: Path) -> dict[str, 
             if d.is_dir():
                 channel_ids.add(d.name)
 
+    # Tenant-level credentials
     creds_dir = tenant_dir / "credentials"
     if creds_dir.exists():
         for f in creds_dir.glob("*.json"):
             channel_ids.add(f.stem)
+
+    # Niche-level credentials
+    niches_dir = tenant_dir / "niches"
+    if niches_dir.exists():
+        for niche_dir in niches_dir.iterdir():
+            niche_creds = niche_dir / "credentials"
+            if niche_creds.exists():
+                for f in niche_creds.glob("*.json"):
+                    channel_ids.add(f.stem)
 
     repo = ChannelRepository(session)
     result = {}
@@ -233,6 +243,45 @@ async def load_credentials(
         logger.info(f"Credentials for '{channel_identifier}'")
 
 
+async def load_niche_credentials(
+    session: AsyncSession,
+    tenant_id: UUID,
+    tenant_dir: Path,
+    channel_map: dict[str, UUID],
+    niche_map: dict[str, UUID],
+) -> None:
+    """Load niches/<name>/credentials/*.json → upsert niche-scoped channel_credentials."""
+    niches_dir = tenant_dir / "niches"
+    if not niches_dir.exists():
+        return
+
+    repo = ChannelCredentialRepository(session, tenant_id)
+    for niche_dir in sorted(niches_dir.iterdir()):
+        if not niche_dir.is_dir():
+            continue
+        creds_dir = niche_dir / "credentials"
+        if not creds_dir.exists():
+            continue
+
+        niche_title = _load_niche_title(niche_dir)
+        if not niche_title or niche_title not in niche_map:
+            logger.warning(f"Niche '{niche_dir.name}' not found in niche_map, skipping credentials")
+            continue
+        niche_id = niche_map[niche_title]
+
+        for f in sorted(creds_dir.glob("*.json")):
+            data = json.loads(f.read_text())
+            channel_identifier = data.get("channel", f.stem)
+            channel_id = channel_map.get(channel_identifier)
+            if not channel_id:
+                logger.warning(f"Unknown channel '{channel_identifier}' in {creds_dir}, skipping")
+                continue
+
+            cred_payload = {k: v for k, v in data.items() if k != "channel"}
+            await repo.upsert(channel_id=channel_id, credentials=cred_payload, niche_id=niche_id)
+            logger.info(f"Niche credentials for '{channel_identifier}' × '{niche_title}'")
+
+
 async def load_schedules(
     session: AsyncSession, tenant_id: UUID, tenant_dir: Path, channel_map: dict[str, UUID]
 ) -> None:
@@ -298,6 +347,7 @@ async def seed(tenants_root: Path) -> None:
             niche_map = await load_niches(session, tenant_id, tenant_dir, channel_map)
             await load_visual_styles(session, tenant_id, tenant_dir, channel_map)
             await load_credentials(session, tenant_id, tenant_dir, channel_map)
+            await load_niche_credentials(session, tenant_id, tenant_dir, channel_map, niche_map)
             await load_schedules(session, tenant_id, tenant_dir, channel_map)
 
             await session.commit()

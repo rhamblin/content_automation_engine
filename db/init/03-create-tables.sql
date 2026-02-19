@@ -298,24 +298,35 @@ CREATE TABLE visual_styles (
 CREATE INDEX idx_visual_styles_tenant_id ON visual_styles(tenant_id);
 CREATE INDEX idx_visual_styles_channel_id ON visual_styles(channel_id);
 
--- 13. Channel Credentials (tenant-scoped)
+-- 13. Channel Credentials (tenant-scoped, optionally niche-scoped)
 
 CREATE TABLE channel_credentials (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id UUID        NOT NULL DEFAULT gen_random_uuid(),
   tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   channel_id  UUID        NOT NULL REFERENCES channels(external_id) ON DELETE CASCADE,
+  niche_id    UUID        REFERENCES niches(external_id) ON DELETE CASCADE,
   credentials JSONB       NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by  UUID,
   updated_at  TIMESTAMPTZ,
   updated_by  UUID,
-  CONSTRAINT uq_channel_credentials_external_id UNIQUE (external_id),
-  CONSTRAINT uq_channel_credentials_tenant_channel UNIQUE (tenant_id, channel_id)
+  CONSTRAINT uq_channel_credentials_external_id UNIQUE (external_id)
 );
+
+-- Niche-scoped credentials: one per (tenant, channel, niche)
+CREATE UNIQUE INDEX uq_channel_credentials_tenant_channel_niche
+  ON channel_credentials(tenant_id, channel_id, niche_id)
+  WHERE niche_id IS NOT NULL;
+
+-- Tenant-level fallback credentials: one per (tenant, channel) when no niche
+CREATE UNIQUE INDEX uq_channel_credentials_tenant_channel
+  ON channel_credentials(tenant_id, channel_id)
+  WHERE niche_id IS NULL;
 
 CREATE INDEX idx_channel_credentials_tenant_id ON channel_credentials(tenant_id);
 CREATE INDEX idx_channel_credentials_channel_id ON channel_credentials(channel_id);
+CREATE INDEX idx_channel_credentials_niche_id ON channel_credentials(niche_id);
 
 -- 14. User Sessions (auth refresh tokens)
 
