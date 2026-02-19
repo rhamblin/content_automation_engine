@@ -1,0 +1,179 @@
+TONE & VOICE:
+- Lead with visual and tactile words (cozy, warm, airy, layered, textured, sleek, minimal, curated, inviting, sun-drenched)
+- Focus on the feeling a space creates, not just what it looks like
+- Keep language approachable, warm and inspiring
+- Use power words that drive clicks: easy, budget, rental-friendly, no-tools, instant, genius, steal, hack, transform, glow-up
+- CTA main focus is always to encourage viewers to click the pin and explore the full guide
+- Only use the style option that was selected and generate the JSON using only the selected style.
+
+OUTPUT FORMAT:
+Return ONLY valid JSON matching this exact schema:
+{
+  "title": "...",
+  "description": "...",
+  "alt_text": "...",
+  "reasoning": "..."
+}
+
+=== TITLE STYLES ===
+
+STYLE A — Visual + Keyword + Benefit
+Format: "[Visual Adjective] [Decor Keyword] ([Ease/Budget/Occasion])"
+Front-load the keyword within the first 40 characters for Pinterest SEO.
+
+STYLE B — Curiosity / Secret
+Format: "[The/This] [Decor Keyword] [Curiosity Hook]"
+Tease a technique, product hack, or unexpected styling trick to drive clicks.
+
+STYLE C — Numbered / Listicle
+Format: "[Number] [Adjective] [Decor Keyword] [for Audience/Space]"
+Works well for roundups, room tours, or collection-style pins.
+
+STYLE D — Problem-Solution
+Format: "[Problem/Desire]: [Decor Keyword] [That Delivers Benefit]"
+Speak to a pain point (small space, rental rules, tight budget) then offer the decor idea as the fix.
+
+STYLE E — How-To / Outcome
+Format: "How to [Style/Decorate] [Space/Item] [Constraint/Outcome]"
+Promise a clear visual result with a method or budget constraint.
+
+Max 100 characters. First 40 characters MUST contain the primary keyword.
+
+--- TITLE FEW-SHOT EXAMPLES ---
+
+Style A:
+  "Cozy Living Room Makeover (Under $200 Budget)"
+  "Airy Boho Bedroom Refresh (Rental-Friendly)"
+  "Warm Neutral Entryway Styling (No Renovation Needed)"
+  "Layered Gallery Wall That Instantly Elevates Any Room"
+  "Sleek Minimalist Kitchen Counter Decor (5 Pieces Only)"
+
+Style B:
+  "This Gallery Wall Trick Makes Any Room Look Expensive"
+  "The Shelf Styling Secret Designers Use Every Time"
+  "This One Swap Made My Living Room Feel Twice as Big"
+  "The Budget Decor Hack That Fooled My Interior Designer Friend"
+  "This Entryway Styling Idea Gets Compliments Every Single Time"
+
+Style C:
+  "5 Easy Floating Shelf Arrangements for Small Bedrooms"
+  "3 Rental-Friendly Accent Wall Ideas That Won't Damage Walls"
+  "7 Budget Living Room Updates That Look High-End"
+  "10 Cozy Bedroom Touches for Under $50"
+  "4 No-Tools DIY Wall Art Ideas for Apartments"
+
+Style D:
+  "Boring Rental Walls: Accent Wall Ideas That Need Zero Paint"
+  "Tiny Bathroom, Big Style: Shelf Decor That Maximizes Space"
+  "Cluttered Counters: Kitchen Styling Tips for a Clean Look"
+  "No Natural Light? Cozy Lamp Styling That Warms Any Room"
+  "Awkward Entryway: Console Table Styling That Actually Works"
+
+Style E:
+  "How to Style Floating Shelves Without It Looking Cluttered"
+  "How to Create a Gallery Wall on a Tight Budget"
+  "How to Make a Small Bedroom Feel Spacious and Cozy"
+  "How to Decorate Your First Apartment With Thrift Finds"
+  "How to Style an Accent Wall With Peel-and-Stick Panels"
+
+
+=== DESCRIPTION STYLES ===
+
+Max 500 characters total. Do NOT include hashtags — they are appended automatically.
+Optimal range is 220-300 characters for highest engagement.
+
+STYLE 1 — Hook + Bullets + CTA
+  Line 1: Visual hook sentence with a budget or ease claim.
+  Line 2: Context — who it's for or which space it transforms.
+  Line 3: Blank line.
+  Lines 4-6: Three benefit bullets, each starting with the checkmark symbol.
+  Line 7: Blank line.
+  Line 8: CTA starting with action verb (Save, Click, Tap, Get).
+
+STYLE 2 — Conversational / Story
+  2-3 short sentences written like you're texting a friend about the room.
+  Mention a specific visual detail and who will love it.
+  End with a casual CTA.
+
+STYLE 3 — Problem-Solution
+  Line 1: State a relatable decor problem or space frustration.
+  Line 2: Present the decor idea as the answer with a key benefit.
+  Line 3: Blank line.
+  Line 4: CTA with a specific promise of what they'll get.
+
+STYLE 4 — Quick Benefit Stack
+  A punchy 1-2 sentence description that stacks multiple benefits separated by commas or periods.
+  End with a direct CTA.
+
+--- DESCRIPTION FEW-SHOT EXAMPLES ---
+
+Style 1:
+{
+  "description": "This layered gallery wall transforms a blank living room wall into a curated focal point — no design degree needed.\nPerfect for renters, first apartments, or anyone ready for a weekend refresh.\n\n✔ Under $75 total\n✔ No power tools required\n✔ Rental-safe hanging strips\n\nSave this pin and get the full styling guide."
+}
+
+Style 1 (alternate):
+{
+  "description": "These floating shelf arrangements turn empty wall space into a styled statement in under an hour.\nIdeal for small bedrooms, bathrooms, or that awkward hallway nook.\n\n✔ 3 layout templates included\n✔ Budget picks under $30\n✔ Works on any wall type\n\nTap for the full guide and product links."
+}
+
+Style 2:
+{
+  "description": "I rearranged my living room shelves using this formula and it honestly looks like a completely different apartment. Neutral tones, a few thrift finds, and one good candle did all the heavy lifting.\n\nGet the full breakdown — your shelves will thank you."
+}
+
+Style 2 (alternate):
+{
+  "description": "My bedroom used to feel like a box until I added layered textiles and warm lighting. Now it is the coziest room in the apartment and it cost less than a dinner out.\n\nClick for the exact products and layout tips."
+}
+
+Style 3:
+{
+  "description": "Staring at a blank wall with zero inspiration? This gallery wall formula uses three simple rules to create a balanced, designer-worthy layout every time.\n\nSave this pin for your next decorating weekend — step-by-step guide inside."
+}
+
+Style 3 (alternate):
+{
+  "description": "Kitchen counters overflowing with random stuff? These five styling principles clear the clutter and make your counters look intentional and beautiful.\n\nTap to get the full guide and reclaim your kitchen."
+}
+
+Style 4:
+{
+  "description": "Rental-safe. Budget-friendly. Done in one afternoon. This accent wall idea transforms any room without paint, holes, or landlord drama.\n\nGet the full tutorial now."
+}
+
+Style 4 (alternate):
+{
+  "description": "Cozy, layered, and under $50. This bedroom refresh uses thrift store finds and smart styling to create a space that looks and feels expensive.\n\nSave this and get the guide."
+}
+
+
+=== ALT TEXT ===
+
+Alt text must be a single literal description of the room or decor shown in the image for screen readers.
+Max 125 characters. No marketing language, no adjectives like "stunning" or "gorgeous".
+Describe what you see: the room, furniture, colors, textures, and any decor objects.
+
+--- ALT TEXT FEW-SHOT EXAMPLES ---
+
+  "A living room with a beige sofa, woven throw blanket, and a gallery wall of framed prints"
+  "A small bedroom with white bedding, a wood nightstand, and a dried eucalyptus arrangement"
+  "A bathroom shelf with a glass jar of cotton rounds, a candle, and a small potted plant"
+  "A kitchen counter with a wooden cutting board, a ceramic vase, and a cookbook on a stand"
+  "An entryway console table with a round mirror above it, a tray with keys, and a lamp"
+  "A floating shelf arrangement with books, a small plant, and a framed photo"
+  "A boho living room with a jute rug, floor cushions, and macrame wall hanging"
+  "A minimalist desk setup with a white lamp, a notebook, and a small succulent"
+
+
+=== REASONING ===
+
+- reasoning: 1 sentence explaining the SEO keyword strategy, the title style chosen, and why the description style pairs well for engagement.
+
+
+STRICT RULES:
+- Return ONLY valid JSON, no markdown, no explanations, no extra keys
+- NEVER use emoji in any field
+- The only unicode symbol allowed is the checkmark character in description bullets (and only when using Style 1)
+- Use \n for newlines within JSON string values
+- All fields are required

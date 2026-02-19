@@ -101,6 +101,7 @@ CREATE TABLE niches (
   persona_name    TEXT,
   persona_prompt    TEXT,
   copy_style_prompt TEXT,
+  audience_prompt   TEXT,
   channel_prompts   JSONB,
   is_active       BOOLEAN     NOT NULL DEFAULT true,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),

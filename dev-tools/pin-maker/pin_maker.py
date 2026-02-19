@@ -12,13 +12,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
-from common.resources.personas import get_persona
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
 from common.workflows.pin_maker import PinMakerService
-from config import load_request, load_styles
+from config import load_config, load_styles
 
 logger = AppLogger(__name__)
 
@@ -48,8 +47,9 @@ def main():
     if not args.data_file:
         parser.error("a data file is required (e.g. data/example.json)")
 
-    # Layer 2: load + validate request from JSON data file
-    request = load_request(args.data_file)
+    # Layer 2: load + validate request + niche config from JSON data file
+    config = load_config(args.data_file)
+    request = config.request
     input_folder = Path(request.input_folder)
 
     if not input_folder.is_dir():
@@ -68,9 +68,8 @@ def main():
     )
     llm = AzureFoundryLLMProvider(client)
     channel = PinterestChannel()
-    persona = get_persona(request.niche)
 
-    service = PinMakerService(llm=llm, channel=channel, persona=persona)
+    service = PinMakerService(llm=llm, channel=channel)
 
     # Collect image files
     jpg_files = list(input_folder.glob("*.jpg")) + list(input_folder.glob("*.jpeg"))
@@ -98,6 +97,9 @@ def main():
                 locale=request.locale,
                 style=style,
                 brand_text=settings.brand_text,
+                persona_prompt=config.persona_prompt or None,
+                copy_style_prompt=config.copy_style_prompt or None,
+                audience_prompt=config.audience_prompt or None,
             )
 
             output_path = output_folder / f"{img_path.stem}_{result.style_name}.jpg"

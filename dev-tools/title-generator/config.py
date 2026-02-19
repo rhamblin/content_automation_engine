@@ -17,6 +17,7 @@ class TitleGenConfig:
     persona_prompt: str
     channel_prompt: str
     copy_style_prompt: str
+    audience_prompt: str
     keyword_images: dict[str, str] | None = None  # keyword → image_path
     keyword_blog_urls: dict[str, str] | None = None    # keyword → url
 
@@ -81,6 +82,7 @@ def load_config(path: Path) -> TitleGenConfig:
 
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
     copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
+    audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
     channel_prompts = niche_data.get("channel_prompts", {})
     channel_prompt = _resolve_prompt(channel_prompts.get(channel), niche_dir) or ""
 
@@ -100,6 +102,7 @@ def load_config(path: Path) -> TitleGenConfig:
         persona_prompt=persona_prompt,
         channel_prompt=channel_prompt,
         copy_style_prompt=copy_style_prompt,
+        audience_prompt=audience_prompt,
         keyword_images=keyword_images,
         keyword_blog_urls=keyword_blog_urls,
     )

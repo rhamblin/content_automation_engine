@@ -33,6 +33,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         persona_name: str | None = None,
         persona_prompt: str | None = None,
         copy_style_prompt: str | None = None,
+        audience_prompt: str | None = None,
         channel_prompts: dict | None = None,
     ) -> Niche:
         """Insert or update a niche by (tenant, title)."""
@@ -44,6 +45,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
             existing.persona_name = persona_name
             existing.persona_prompt = persona_prompt
             existing.copy_style_prompt = copy_style_prompt
+            existing.audience_prompt = audience_prompt
             existing.channel_prompts = channel_prompts
             existing.is_active = True
             await self._session.flush()
@@ -57,6 +59,7 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
             persona_name=persona_name,
             persona_prompt=persona_prompt,
             copy_style_prompt=copy_style_prompt,
+            audience_prompt=audience_prompt,
             channel_prompts=channel_prompts,
         )
         self._session.add(niche)

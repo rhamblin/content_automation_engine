@@ -1,6 +1,7 @@
-"""Config loader — reads JSON data file and validates against PinMakerRequest contract."""
+"""Config loader — reads JSON data file, resolves niche config for prompts."""
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 
 from common.contracts.models import VisualStyle
@@ -8,12 +9,29 @@ from common.workflows.pin_maker import PinMakerRequest
 
 VALID_LOCALES = {"en", "es", "sw"}
 
-STYLES_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
+CONFIG_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
+
+
+@dataclass(frozen=True)
+class PinMakerConfig:
+    """Validated config from data file + tenant niche config."""
+
+    request: PinMakerRequest
+    persona_prompt: str
+    copy_style_prompt: str
+    audience_prompt: str
+
+
+def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
+    """If value points to a file relative to base_dir, return its contents."""
+    if value and (base_dir / value).is_file():
+        return (base_dir / value).read_text()
+    return value
 
 
 def _load_styles(tenant: str, channel: str) -> dict[str, VisualStyle]:
     """Load all style JSONs from config/tenants/{tenant}/styles/{channel}/."""
-    styles_dir = STYLES_ROOT / tenant / "styles" / channel
+    styles_dir = CONFIG_ROOT / tenant / "styles" / channel
     if not styles_dir.exists():
         return {}
     styles: dict[str, VisualStyle] = {}
@@ -48,6 +66,32 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
         niche=raw.get("niche", "food"),
         locale=locale,
         styles=raw_styles,
+    )
+
+
+def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
+    """Load a JSON data file, resolve niche config, return validated config."""
+    raw = json.loads(path.read_text())
+    niche_name = raw.get("niche", "food")
+
+    niche_dir = CONFIG_ROOT / tenant / "niches" / niche_name
+    niche_json = niche_dir / f"{niche_name}.json"
+    if not niche_json.exists():
+        raise ValueError(f"niche config not found: {niche_json}")
+
+    niche_data = json.loads(niche_json.read_text())
+
+    persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
+    copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
+    audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
+
+    request = load_request(path, tenant)
+
+    return PinMakerConfig(
+        request=request,
+        persona_prompt=persona_prompt,
+        copy_style_prompt=copy_style_prompt,
+        audience_prompt=audience_prompt,
     )
 
 

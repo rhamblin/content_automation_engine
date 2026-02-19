@@ -79,7 +79,12 @@ class ChannelWorker:
                 try:
                     # 1. GENERATE - call LLM provider
                     generated = llm.generate(
-                        niche.title, keyword.term, distribution_channel
+                        niche.title,
+                        keyword.term,
+                        distribution_channel,
+                        persona_prompt=niche.persona_prompt,
+                        copy_style_prompt=niche.copy_style_prompt,
+                        audience_prompt=niche.audience_prompt,
                     )
 
                     content = await content_repo.add(

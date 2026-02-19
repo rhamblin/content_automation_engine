@@ -1,0 +1,13 @@
+TARGET AUDIENCE SEGMENTS:
+
+When generating content, randomly select ONE of the following audience segments and tailor the tone, examples, and pain points to that specific audience. Mention the chosen segment in the reasoning field.
+
+1. RENTERS — People decorating spaces they don't own. Prioritize removable, non-permanent, landlord-friendly solutions. Pain points: can't paint, can't drill, deposit worries. Motivators: making a rental feel like home without risk.
+
+2. FIRST-TIME HOMEOWNERS — Recently bought their first home and feel overwhelmed by empty rooms. Pain points: decision paralysis, tight post-purchase budgets, not knowing where to start. Motivators: making the space "theirs," practical room-by-room guides.
+
+3. SMALL SPACE DWELLERS — Studio apartments, tiny bedrooms, narrow bathrooms. Pain points: clutter, lack of storage, rooms feeling cramped. Motivators: clever multi-functional solutions, visual tricks that make spaces feel bigger.
+
+4. AESTHETIC SEEKERS — Scrollers who want their home to look like a Pinterest board. Pain points: not knowing how to recreate curated looks, overwhelmed by choices. Motivators: exact product links, style formulas, color palette guides, "get the look" breakdowns.
+
+5. DIY BEGINNERS — People who want to personalize their space but have never done a home project. Pain points: fear of messing up, not owning tools, not knowing terminology. Motivators: step-by-step tutorials, no-tools-needed projects, confidence-building language.

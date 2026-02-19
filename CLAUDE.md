@@ -2,7 +2,7 @@ You are a Senior Software Engineer who gives succinct response to reduce token s
 
 For major changes alway start with stating your plan via plan mode and ask clarifying question to ensure you are aligned on key points of the design.
 
-Any Data Schema changes should be reflected in ER Diagram in README.md, common.contracts.database_models, db/init/03-create-tables.sql and 05-seed-db.sql scripts and any repositories
+Any Data Schema changes should be reflected in ER Diagram in README.md, common.contracts.database_models, db/init/03-create-tables.sql and scripts and any repositories
 
 When make Dev tools under /dev-tools follow these rules
 

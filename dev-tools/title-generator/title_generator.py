@@ -110,6 +110,7 @@ def main():
             count=request.count,
             copy_style_prompt=config.copy_style_prompt,
             persona_prompt=config.persona_prompt,
+            audience_prompt=config.audience_prompt,
             image_base64=image_base64,
             blog_url=blog_url,
         )

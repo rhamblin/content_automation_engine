@@ -135,6 +135,7 @@ async def load_niches(
         # Resolve file-ref prompts to full text
         persona_prompt = _resolve_prompt(data.get("persona_prompt"), base_dir)
         copy_style_prompt = _resolve_prompt(data.get("copy_style_prompt"), base_dir)
+        audience_prompt = _resolve_prompt(data.get("audience_prompt"), base_dir)
 
         channel_prompts_raw = data.get("channel_prompts") or {}
         channel_prompts: dict[str, str] = {}
@@ -151,6 +152,7 @@ async def load_niches(
             persona_name=data.get("persona_name"),
             persona_prompt=persona_prompt,
             copy_style_prompt=copy_style_prompt,
+            audience_prompt=audience_prompt,
             channel_prompts=channel_prompts or None,
         )
         niche_map[title] = niche.external_id
