@@ -24,6 +24,10 @@ class Settings:
     # Auth encryption
     refresh_token_encryption_key: str = ""
 
+    # Pinterest OAuth
+    pinterest_app_id: str = ""
+    pinterest_app_secret: str = ""
+
     # Optional settings
     log_level: str = "INFO"
     cors_allowed_origins: str = ""
@@ -68,6 +72,10 @@ def load_settings() -> Settings:
 
     # Auth encryption
     config["refresh_token_encryption_key"] = os.getenv("REFRESH_TOKEN_ENCRYPTION_KEY", "")
+
+    # Pinterest OAuth
+    config["pinterest_app_id"] = os.getenv("PINTEREST_APP_ID", "")
+    config["pinterest_app_secret"] = os.getenv("PINTEREST_APP_SECRET", "")
 
     # Optional vars with defaults
     config["log_level"] = os.getenv("LOG_LEVEL", "INFO")
