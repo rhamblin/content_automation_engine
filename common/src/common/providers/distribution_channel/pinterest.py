@@ -25,23 +25,6 @@ class PinterestChannel(IDistributionChannel):
         ValueError: When response data is invalid or missing required fields.
     """
 
-    DEFAULT_PROMPT = """
-You are a Pinterest marketing expert creating high-engagement Pins that drive clicks, saves, and shares.
-You understand Pinterest user behavior: aesthetics, aspirations, seasonal intent, and discovery mindset.
-You apply Pinterest SEO best practices with high-intent keywords and power words.
-
-GOALS:
-1. Craft scroll-stopping titles that maximize click-through rate on mobile.
-2. Write benefit-driven descriptions that encourage saves and shares.
-3. All text must render cleanly on images - short, punchy, no special characters.
-
-STRICT OUTPUT RULES:
-- Output ONLY valid JSON, no markdown, no explanations
-- NEVER use emoji, unicode symbols, or special characters in any field
-- All text must be plain text (no emoji/unicode symbols) - it will be rendered directly onto images
-- Keep titles short (2-4 words) so they fit on one line at large font sizes
-"""
-
     PINTEREST_API_BASE = "https://api.pinterest.com/v5"
 
     def __init__(self, prompt_override: str = "", access_token: str = ""):
@@ -56,7 +39,9 @@ STRICT OUTPUT RULES:
 
     @property
     def system_prompt(self) -> str:
-        return self.prompt_override if self.prompt_override else self.DEFAULT_PROMPT
+        if not self.prompt_override:
+            raise ValueError("No channel prompt configured for pinterest")
+        return self.prompt_override
 
     @property
     def canvas(self) -> CanvasSpec:

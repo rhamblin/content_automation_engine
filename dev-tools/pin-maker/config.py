@@ -20,6 +20,7 @@ class PinMakerConfig:
     persona_prompt: str
     copy_style_prompt: str
     audience_prompt: str
+    channel_prompt: str
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -45,8 +46,13 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
     """Load a JSON data file and return a validated PinMakerRequest."""
     raw = json.loads(path.read_text())
 
-    if "input_folder" not in raw:
-        raise ValueError("data file missing required field: input_folder")
+    has_keywords = "keywords" in raw and raw["keywords"] is not None
+    has_folder = "input_folder" in raw and raw["input_folder"] is not None
+
+    if has_keywords and has_folder:
+        raise ValueError("Provide either 'keywords' or 'input_folder', not both")
+    if not has_keywords and not has_folder:
+        raise ValueError("Provide either 'keywords' or 'input_folder'")
 
     locale = raw.get("locale", "en")
     if locale not in VALID_LOCALES:
@@ -62,10 +68,11 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
                 raise ValueError(f"unknown style '{s}', available: {list(all_styles.keys())}")
 
     return PinMakerRequest(
-        input_folder=raw["input_folder"],
         niche=raw.get("niche", "food"),
         locale=locale,
         styles=raw_styles,
+        keywords=raw.get("keywords") if has_keywords else None,
+        input_folder=raw.get("input_folder") if has_folder else None,
     )
 
 
@@ -84,6 +91,8 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
     copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
     audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
+    channel_prompts = niche_data.get("channel_prompts", {})
+    channel_prompt = _resolve_prompt(channel_prompts.get("pinterest"), niche_dir) or ""
 
     request = load_request(path, tenant)
 
@@ -92,6 +101,7 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
         persona_prompt=persona_prompt,
         copy_style_prompt=copy_style_prompt,
         audience_prompt=audience_prompt,
+        channel_prompt=channel_prompt,
     )
 
 

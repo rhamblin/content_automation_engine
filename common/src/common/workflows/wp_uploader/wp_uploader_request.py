@@ -7,6 +7,6 @@ from dataclasses import dataclass
 class WpUploaderRequest:
     """Defines what wp-uploader accepts."""
 
-    topics_file: str  # required — path to CSV with niche,keyword,image_url,media_id
-    niche: str = "food"  # default niche (rows can override)
+    keywords: tuple[str, ...]  # required — list of keyword strings
+    niche: str  # required — set by config loader
     status: str = "draft"  # draft | publish

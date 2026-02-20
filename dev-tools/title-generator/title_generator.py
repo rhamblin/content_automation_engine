@@ -68,7 +68,7 @@ def print_results(all_results: dict[str, "TitleGenResult"], request):
 
 
 def main():
-    data_file = Path(__file__).parent / "data" / "example.json"
+    data_file = Path(__file__).parent / "data" / "input.json"
     config = load_config(data_file)
     request = config.request
 

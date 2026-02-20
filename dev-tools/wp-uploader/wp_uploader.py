@@ -1,9 +1,9 @@
 """WP Uploader — orchestrator (all I/O lives here).
 
-Reads topics from CSV, generates LLM content per row,
-publishes as draft posts with featured images and keyword tags.
+Reads keywords from data/input.json, resolves media from WP library,
+generates LLM content per keyword, publishes as draft posts with featured images and keyword tags.
 
-What it does: generate content, set feature image, create draft post.
+What it does: resolve media, generate content, set feature image, create draft post.
 What still needs manual work: verify content, set category/tags, affiliate links, publish.
 """
 
@@ -21,9 +21,9 @@ from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from settings import load_dev_settings, WpNicheCredential
+from settings import load_dev_settings
 
-from config import load_request
+from config import load_config
 from common.workflows.wp_uploader import WpUploaderService
 
 logger = AppLogger(__name__)
@@ -32,7 +32,7 @@ OUTPUT_DIR = Path(__file__).parent / "output"
 
 # ── Terminal progress helpers ────────────────────────────────────────────────
 
-STEPS = ["LLM Generate", "Publish", "Done"]
+STEPS = ["Resolve Media", "LLM Generate", "Publish", "Done"]
 
 
 def _progress_bar(current: int, total: int, width: int = 30) -> str:
@@ -58,38 +58,29 @@ def _log_header(total: int) -> None:
     cols = get_terminal_size().columns
     logger.info("\u2500" * min(cols, 60))
     logger.info("WP Uploader")
-    logger.info(f"Topics: {total} | Output: {OUTPUT_DIR}")
+    logger.info(f"Keywords: {total} | Output: {OUTPUT_DIR}")
     logger.info("\u2500" * min(cols, 60))
-
-
-def _build_wp_channel(
-    cred: WpNicheCredential, llm: AzureFoundryLLMProvider
-) -> WordPressChannel:
-    return WordPressChannel(
-        site_url=cred.site_url,
-        username=cred.username,
-        app_password=cred.app_password,
-        llm=llm,
-        amazon_tag=cred.amazon_tag,
-    )
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
 def main():
-    data_file = Path(__file__).parent / "data" / "example.json"
-    request = load_request(data_file)
+    data_file = Path(__file__).parent / "data" / "input.json"
+    config = load_config(data_file)
+    request = config.request
+    prompts = config.niche_prompts
 
-    topics_path = Path(__file__).parent / request.topics_file
-    if not topics_path.exists():
-        logger.error(f"Topics file not found: {topics_path}")
+    if not prompts.channel_prompt:
+        logger.error(f"No wordpress channel prompt configured for niche '{request.niche}'. "
+                      "Add channel_prompts.wordpress to the niche JSON.")
         sys.exit(1)
 
     settings = load_dev_settings()
 
-    if not settings.wp_credentials:
-        logger.error("No WordPress niche credentials found. "
+    wp_cred = settings.wp_credentials.get(request.niche)
+    if not wp_cred:
+        logger.error(f"No WordPress credentials for niche '{request.niche}'. "
                       "Add credentials under config/tenants/dev-tenant/niches/<name>/credentials/wordpress.json")
         sys.exit(1)
 
@@ -100,18 +91,20 @@ def main():
     )
     llm = AzureFoundryLLMProvider(azure_client)
 
-    # Build a WordPressChannel per niche
-    wp_channels: dict[str, WordPressChannel] = {}
-    for niche_name, cred in settings.wp_credentials.items():
-        wp_channels[niche_name] = _build_wp_channel(cred, llm)
+    wp_channel = WordPressChannel(
+        site_url=wp_cred.site_url,
+        username=wp_cred.username,
+        app_password=wp_cred.app_password,
+        llm=llm,
+        amazon_tag=wp_cred.amazon_tag,
+        prompt_override=prompts.channel_prompt,
+    )
 
-    # Read all rows
-    with open(topics_path) as f:
-        rows = list(csv.DictReader(f))
+    service = WpUploaderService(wp_channel)
 
-    total = len(rows)
+    total = len(request.keywords)
     if total == 0:
-        logger.warning("No topics found in CSV")
+        logger.warning("No keywords found")
         return
 
     _log_header(total)
@@ -121,41 +114,51 @@ def main():
 
     completed = 0
     failed = 0
+    skipped = 0
     start_time = time.time()
 
     with open(output_file, "w", newline="") as out:
         writer = csv.writer(out)
         writer.writerow(["niche", "keyword", "post_id", "url", "status"])
 
-        for i, row in enumerate(rows):
-            keyword = row["keyword"]
-            niche = row.get("niche", request.niche)
+        for i, keyword in enumerate(request.keywords):
             logger.info("")
             logger.info(f"({i+1}/{total}) {keyword}")
             logger.info(f"  {_progress_bar(i, total)}")
             logger.info(f"  {_step_indicator(0)}")
 
-            wp = wp_channels.get(niche)
-            if not wp:
-                logger.error(f"  \u2717 No WordPress credentials for niche '{niche}'. Skipping.")
-                failed += 1
+            # Resolve media from WP library
+            media_id, image_url = service.resolve_media(
+                keyword=keyword,
+                site_url=wp_cred.site_url,
+                username=wp_cred.username,
+                app_password=wp_cred.app_password,
+            )
+
+            if media_id is None:
+                logger.warning(f"  No media found for '{keyword}', skipping")
+                skipped += 1
                 continue
 
-            service = WpUploaderService(wp)
+            logger.info(f"  {_step_indicator(1)}")
+            logger.info(f"  Media: id={media_id}")
 
             try:
                 result = service.upload_topic(
                     keyword=keyword,
-                    niche=niche,
-                    image_url=row.get("image_url", ""),
-                    media_id=int(row["media_id"]) if row.get("media_id") else None,
+                    niche=request.niche,
+                    image_url=image_url,
+                    media_id=media_id,
                     status=request.status,
+                    persona_prompt=prompts.persona_prompt or None,
+                    copy_style_prompt=prompts.copy_style_prompt or None,
+                    audience_prompt=prompts.audience_prompt or None,
                 )
 
-                logger.info(f"  {_step_indicator(2)}")
+                logger.info(f"  {_step_indicator(3)}")
                 logger.info(f"  \u2713 Published: {result.url}")
 
-                writer.writerow([niche, keyword, result.post_id, result.url, result.status])
+                writer.writerow([request.niche, keyword, result.post_id, result.url, result.status])
                 completed += 1
 
             except Exception as e:
@@ -166,7 +169,7 @@ def main():
     logger.info("")
     logger.info(f"{_progress_bar(total, total)}")
     logger.info("\u2500" * 40)
-    logger.info(f"  Completed: {completed}  Failed: {failed}  Elapsed: {elapsed:.1f}s")
+    logger.info(f"  Completed: {completed}  Skipped: {skipped}  Failed: {failed}  Elapsed: {elapsed:.1f}s")
     logger.info(f"  Output: {output_file}")
     logger.info("\u2500" * 40)
 

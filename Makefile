@@ -82,7 +82,7 @@ wp-media-ids:
 	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/get_media_ids.py $(MEDIA_FOLDER)
 
 pin-maker:
-	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py pin-maker/data/example.json
+	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py pin-maker/data/input.json
 
 pin-uploader:
 	. dev-tools/dev-shell.sh && cd dev-tools && python pin-uploader/pin_uploader.py pin-uploader/data/example.json
@@ -182,18 +182,18 @@ help:  ## Show this help message
 	@echo "  make logs           - Tail docker-compose logs"
 	@echo "  make wp-upload      - Generate and upload content to WordPress"
 	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
-	@echo "  make pin-maker       - Create Pinterest pins (edit data/example.json)"
-	@echo "  make pin-uploader    - Upload pins to Pinterest draft board (edit data/example.json)"
-	@echo "  make board-manager   - Create Pinterest boards (edit data/example.json)"
+	@echo "  make pin-maker       - Create Pinterest pins (edit data/input.json)"
+	@echo "  make pin-uploader    - Upload pins to Pinterest draft board (edit data/input.json)"
+	@echo "  make board-manager   - Create Pinterest boards (edit data/input.json)"
 	@echo "  make style-editor   - Visual style editor (add ?channel=name in URL, default: pinterest)"
 	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
 	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"
 	@echo "  make plot-pin-analytics PIN_ID=123 - Generate 14-day analytics HTML report"
 	@echo "  make account-analytics - Generate account-wide analytics report"
-	@echo "  make promotion-manager - Evaluate and manage Pinterest campaigns (edit data/example.json)"
-	@echo "  make publication-manager - Evaluate organic pin performance (edit data/example.json)"
+	@echo "  make promotion-manager - Evaluate and manage Pinterest campaigns (edit data/input.json)"
+	@echo "  make publication-manager - Evaluate organic pin performance (edit data/input.json)"
 	@echo "  make unified-dashboard - Multi-platform analytics dashboard"
-	@echo "  make title-generator  - Generate titles (edit data/example.json)"
+	@echo "  make title-generator  - Generate titles (edit data/input.json)"
 	@echo "  make amazon-affiliate CMD='get B0BSHF7WHW' - Amazon affiliate (generic)"
 	@echo "  make amazon-get ASIN=B0BSHF7WHW - Fetch product by ASIN (JSON)"
 	@echo "  make amazon-url URL='https://www.amazon.com/dp/B0BSHF7WHW' - Fetch product by URL (JSON)"
