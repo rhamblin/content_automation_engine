@@ -1,6 +1,7 @@
 import logging
 import os
-import sys
+
+from rich.logging import RichHandler
 
 
 class AppLogger:
@@ -12,7 +13,7 @@ class AppLogger:
         log_level = os.getenv("LOG_LEVEL", "INFO").upper()
         logging.basicConfig(
             level=log_level,
-            handlers=[logging.StreamHandler(sys.stdout)],
+            handlers=[RichHandler(rich_tracebacks=True)],
         )
 
     # Delegate to internal logger

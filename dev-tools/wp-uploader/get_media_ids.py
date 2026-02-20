@@ -10,10 +10,11 @@ import re
 import sys
 import uuid
 from pathlib import Path
-from shutil import get_terminal_size
 
 import requests
 from requests.auth import HTTPBasicAuth
+from rich.console import Console
+from rich.progress import Progress
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
@@ -22,12 +23,7 @@ OUTPUT_FILE = Path(__file__).parent / "input/content_topics.csv"
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".avif", ".webp"}
 
-
-def _progress_bar(current: int, total: int, width: int = 30) -> str:
-    pct = current / total if total else 0
-    filled = int(width * pct)
-    bar = "█" * filled + "░" * (width - filled)
-    return f"[{bar}] {current}/{total} ({pct:.0%})"
+console = Console()
 
 
 def filename_to_keyword(filename: str) -> str:
@@ -109,14 +105,12 @@ def main():
     total = len(images)
 
     if total == 0:
-        print(f"No image files found in {image_dir}")
+        console.print(f"No image files found in {image_dir}")
         sys.exit(1)
 
-    cols = get_terminal_size().columns
-    print("─" * min(cols, 60))
-    print(f"WP Media ID Lookup")
-    print(f"Folder: {image_dir}  |  Images: {total}")
-    print("─" * min(cols, 60))
+    console.rule("[bold]WP Media ID Lookup[/bold]")
+    console.print(f"Folder: {image_dir}  |  Images: {total}")
+    console.rule()
 
     found = 0
     not_found = 0
@@ -125,29 +119,31 @@ def main():
         writer = csv.writer(f)
         writer.writerow(["niche", "keyword", "image_url", "media_id"])
 
-        for i, img_path in enumerate(sorted(images)):
-            # Ensure UUID prefix for collision prevention
-            img_path = ensure_uuid_prefix(img_path)
+        with Progress(console=console) as progress:
+            task = progress.add_task("Looking up media IDs…", total=total)
 
-            keyword = filename_to_keyword(img_path.name)
-            media_id, wp_url = get_media_id(session, wp_cred.site_url, img_path.stem)
+            for i, img_path in enumerate(sorted(images)):
+                # Ensure UUID prefix for collision prevention
+                img_path = ensure_uuid_prefix(img_path)
 
-            writer.writerow([niche, keyword, wp_url, media_id or ""])
+                keyword = filename_to_keyword(img_path.name)
+                media_id, wp_url = get_media_id(session, wp_cred.site_url, img_path.stem)
 
-            status = "✓" if media_id else "✗"
-            if media_id:
-                found += 1
-            else:
-                not_found += 1
+                writer.writerow([niche, keyword, wp_url, media_id or ""])
 
-            print(f"  {status} ({i+1}/{total}) {keyword:<30} -> {media_id or 'not found'}")
-            print(f"    {_progress_bar(i + 1, total)}")
+                if media_id:
+                    found += 1
+                    console.print(f"  [green]✓[/green] ({i+1}/{total}) {keyword:<30} -> {media_id}")
+                else:
+                    not_found += 1
+                    console.print(f"  [red]✗[/red] ({i+1}/{total}) {keyword:<30} -> not found")
 
-    print("")
-    print("─" * min(cols, 60))
-    print(f"  Found: {found}  |  Not found: {not_found}  |  Total: {total}")
-    print(f"  Output: {OUTPUT_FILE}")
-    print("─" * min(cols, 60))
+                progress.advance(task)
+
+    console.rule()
+    console.print(f"  Found: {found}  |  Not found: {not_found}  |  Total: {total}")
+    console.print(f"  Output: {OUTPUT_FILE}")
+    console.rule()
 
 
 if __name__ == "__main__":

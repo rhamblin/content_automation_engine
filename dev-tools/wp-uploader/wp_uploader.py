@@ -12,7 +12,6 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from shutil import get_terminal_size
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
@@ -24,42 +23,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from settings import load_dev_settings
 
 from config import load_config
+from rich.console import Console
+from rich.progress import Progress
+
 from common.workflows.wp_uploader import WpUploaderService
 
 logger = AppLogger(__name__)
+console = Console()
 
 OUTPUT_DIR = Path(__file__).parent / "output"
-
-# ── Terminal progress helpers ────────────────────────────────────────────────
-
-STEPS = ["Resolve Media", "LLM Generate", "Publish", "Done"]
-
-
-def _progress_bar(current: int, total: int, width: int = 30) -> str:
-    pct = current / total if total else 0
-    filled = int(width * pct)
-    bar = "\u2588" * filled + "\u2591" * (width - filled)
-    return f"[{bar}] {current}/{total} ({pct:.0%})"
-
-
-def _step_indicator(step_idx: int) -> str:
-    parts = []
-    for i, name in enumerate(STEPS):
-        if i < step_idx:
-            parts.append(f"  \u2713 {name}")
-        elif i == step_idx:
-            parts.append(f"  \u25b8 {name}")
-        else:
-            parts.append(f"  \u00b7 {name}")
-    return " ".join(parts)
-
-
-def _log_header(total: int) -> None:
-    cols = get_terminal_size().columns
-    logger.info("\u2500" * min(cols, 60))
-    logger.info("WP Uploader")
-    logger.info(f"Keywords: {total} | Output: {OUTPUT_DIR}")
-    logger.info("\u2500" * min(cols, 60))
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -107,10 +79,12 @@ def main():
         logger.warning("No keywords found")
         return
 
-    _log_header(total)
-
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_file = OUTPUT_DIR / f"{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+
+    console.rule("[bold]WP Uploader[/bold]")
+    console.print(f"Keywords: {total} | Output: {OUTPUT_DIR}")
+    console.rule()
 
     completed = 0
     failed = 0
@@ -121,57 +95,55 @@ def main():
         writer = csv.writer(out)
         writer.writerow(["niche", "keyword", "post_id", "url", "status"])
 
-        for i, keyword in enumerate(request.keywords):
-            logger.info("")
-            logger.info(f"({i+1}/{total}) {keyword}")
-            logger.info(f"  {_progress_bar(i, total)}")
-            logger.info(f"  {_step_indicator(0)}")
+        with Progress(console=console) as progress:
+            task = progress.add_task("Uploading keywords…", total=total)
 
-            # Resolve media from WP library
-            media_id, image_url = service.resolve_media(
-                keyword=keyword,
-                site_url=wp_cred.site_url,
-                username=wp_cred.username,
-                app_password=wp_cred.app_password,
-            )
+            for i, keyword in enumerate(request.keywords):
+                progress.update(task, description=f"[cyan]({i+1}/{total})[/cyan] {keyword}")
 
-            if media_id is None:
-                logger.warning(f"  No media found for '{keyword}', skipping")
-                skipped += 1
-                continue
-
-            logger.info(f"  {_step_indicator(1)}")
-            logger.info(f"  Media: id={media_id}")
-
-            try:
-                result = service.upload_topic(
+                # Resolve media from WP library
+                media_id, image_url = service.resolve_media(
                     keyword=keyword,
-                    niche=request.niche,
-                    image_url=image_url,
-                    media_id=media_id,
-                    status=request.status,
-                    persona_prompt=prompts.persona_prompt or None,
-                    copy_style_prompt=prompts.copy_style_prompt or None,
-                    audience_prompt=prompts.audience_prompt or None,
+                    site_url=wp_cred.site_url,
+                    username=wp_cred.username,
+                    app_password=wp_cred.app_password,
                 )
 
-                logger.info(f"  {_step_indicator(3)}")
-                logger.info(f"  \u2713 Published: {result.url}")
+                if media_id is None:
+                    logger.warning(f"No media found for '{keyword}', skipping")
+                    skipped += 1
+                    progress.advance(task)
+                    continue
 
-                writer.writerow([request.niche, keyword, result.post_id, result.url, result.status])
-                completed += 1
+                logger.info(f"Media: id={media_id}")
 
-            except Exception as e:
-                logger.error(f"  \u2717 Failed: {e}")
-                failed += 1
+                try:
+                    result = service.upload_topic(
+                        keyword=keyword,
+                        niche=request.niche,
+                        image_url=image_url,
+                        media_id=media_id,
+                        status=request.status,
+                        persona_prompt=prompts.persona_prompt or None,
+                        copy_style_prompt=prompts.copy_style_prompt or None,
+                        audience_prompt=prompts.audience_prompt or None,
+                    )
+
+                    console.print(f"  [green]✓[/green] Published: {result.url}")
+                    writer.writerow([request.niche, keyword, result.post_id, result.url, result.status])
+                    completed += 1
+
+                except Exception as e:
+                    console.print(f"  [red]✗[/red] Failed: {e}")
+                    failed += 1
+
+                progress.advance(task)
 
     elapsed = time.time() - start_time
-    logger.info("")
-    logger.info(f"{_progress_bar(total, total)}")
-    logger.info("\u2500" * 40)
-    logger.info(f"  Completed: {completed}  Skipped: {skipped}  Failed: {failed}  Elapsed: {elapsed:.1f}s")
-    logger.info(f"  Output: {output_file}")
-    logger.info("\u2500" * 40)
+    console.rule()
+    console.print(f"  Completed: {completed}  Skipped: {skipped}  Failed: {failed}  Elapsed: {elapsed:.1f}s")
+    console.print(f"  Output: {output_file}")
+    console.rule()
 
 
 if __name__ == "__main__":

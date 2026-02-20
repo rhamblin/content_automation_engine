@@ -21,6 +21,8 @@ dependencies = [
     "tenacity>=8.0.0",
     # Auth
     "PyJWT[crypto]>=2.8.0",
+    # Terminal UI
+    "rich>=13.0.0",
 ]
 
 [tool.setuptools.packages.find]
