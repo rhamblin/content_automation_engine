@@ -93,9 +93,9 @@ title-generator:
 logs:
 	docker compose logs -f
 
-# ==========================================
+# ===========================================
 # Testing
-# ==========================================
+# ===========================================
 
 tests:  ## Run tests in Docker container
 	docker compose --env-file ./config/local/variables.env --profile test run --rm --build test-runner
