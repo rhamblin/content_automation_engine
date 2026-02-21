@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-upload wp-media-ids pin-maker pin-uploader board-manager style-editor get-pin-ids get-pin-stats plot-pin-analytics account-analytics promotion-manager publication-manager unified-dashboard title-generator amazon-affiliate amazon-get amazon-url amazon-search logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-uploader pin-maker style-editor account-analytics title-generator logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -75,59 +75,20 @@ publish:
 consume:
 	. dev-tools/dev-shell.sh && python dev-tools/local_topic_consume.py
 
-wp-upload:
+wp-uploader:
 	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/wp_uploader.py
-
-wp-media-ids:
-	. dev-tools/dev-shell.sh && cd dev-tools && python wp-uploader/get_media_ids.py $(MEDIA_FOLDER)
 
 pin-maker:
 	. dev-tools/dev-shell.sh && cd dev-tools && python pin-maker/pin_maker.py pin-maker/data/input.json
 
-pin-uploader:
-	. dev-tools/dev-shell.sh && cd dev-tools && python pin-uploader/pin_uploader.py pin-uploader/data/example.json
-
-board-manager:
-	. dev-tools/dev-shell.sh && cd dev-tools && python board-manager/board_manager.py board-manager/data/example.json
-
 style-editor:
 	. dev-tools/dev-shell.sh && cd dev-tools/style-editor && streamlit run style_editor.py
-
-get-pin-ids:
-	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/get_pin_ids.py
-
-get-pin-stats:
-	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/get_pin_stats.py $(PIN_ID)
-
-plot-pin-analytics:
-	. dev-tools/dev-shell.sh && cd dev-tools && python get-pin-ids/plot_pin_analytics.py $(PIN_ID) --open
 
 account-analytics:
 	. dev-tools/dev-shell.sh && cd dev-tools && python account-analytics/account_analytics.py --open
 
-promotion-manager:
-	. dev-tools/dev-shell.sh && cd dev-tools && python promotion-manager/promotion_manager.py
-
-publication-manager:
-	. dev-tools/dev-shell.sh && cd dev-tools && python publication-manager/publication_manager.py
-
-unified-dashboard:
-	. dev-tools/dev-shell.sh && cd dev-tools && python unified-dashboard/dashboard.py --open
-
 title-generator:
 	. dev-tools/dev-shell.sh && cd dev-tools && python title-generator/title_generator.py
-
-amazon-affiliate:
-	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py $(CMD)
-
-amazon-get:
-	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py get $(ASIN) --json
-
-amazon-url:
-	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py url "$(URL)" --json
-
-amazon-search:
-	. dev-tools/dev-shell.sh && cd dev-tools && python amazon-affiliate/amazon_affiliate.py search "$(KEYWORDS)" --json
 
 logs:
 	docker compose logs -f
@@ -180,24 +141,11 @@ help:  ## Show this help message
 	@echo "  make local          - Run infra → services → frontend → seed-images"
 	@echo "  make cleanup        - Stop and remove all containers"
 	@echo "  make logs           - Tail docker-compose logs"
-	@echo "  make wp-upload      - Generate and upload content to WordPress"
-	@echo "  make wp-media-ids MEDIA_FOLDER=/path/to/images - Get WordPress media IDs"
+	@echo "  make wp-uploader      - Generate and upload content to WordPress"
 	@echo "  make pin-maker       - Create Pinterest pins (edit data/input.json)"
-	@echo "  make pin-uploader    - Upload pins to Pinterest draft board (edit data/input.json)"
-	@echo "  make board-manager   - Create Pinterest boards (edit data/input.json)"
 	@echo "  make style-editor   - Visual style editor (add ?channel=name in URL, default: pinterest)"
-	@echo "  make get-pin-ids    - Fetch all Pinterest pins and IDs via OAuth"
-	@echo "  make get-pin-stats PIN_ID=123 - Get pin campaign stats for yesterday"
-	@echo "  make plot-pin-analytics PIN_ID=123 - Generate 14-day analytics HTML report"
 	@echo "  make account-analytics - Generate account-wide analytics report"
-	@echo "  make promotion-manager - Evaluate and manage Pinterest campaigns (edit data/input.json)"
-	@echo "  make publication-manager - Evaluate organic pin performance (edit data/input.json)"
-	@echo "  make unified-dashboard - Multi-platform analytics dashboard"
 	@echo "  make title-generator  - Generate titles (edit data/input.json)"
-	@echo "  make amazon-affiliate CMD='get B0BSHF7WHW' - Amazon affiliate (generic)"
-	@echo "  make amazon-get ASIN=B0BSHF7WHW - Fetch product by ASIN (JSON)"
-	@echo "  make amazon-url URL='https://www.amazon.com/dp/B0BSHF7WHW' - Fetch product by URL (JSON)"
-	@echo "  make amazon-search KEYWORDS='chef knife' - Search products (JSON)"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"

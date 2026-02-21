@@ -20,13 +20,12 @@ from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from common.workflows.wp_uploader import WpUploaderService
+from rich.console import Console
+from rich.progress import Progress
 from settings import load_dev_settings
 
 from config import load_config
-from rich.console import Console
-from rich.progress import Progress
-
-from common.workflows.wp_uploader import WpUploaderService
 
 logger = AppLogger(__name__)
 console = Console()
@@ -44,16 +43,20 @@ def main():
     prompts = config.niche_prompts
 
     if not prompts.channel_prompt:
-        logger.error(f"No wordpress channel prompt configured for niche '{request.niche}'. "
-                      "Add channel_prompts.wordpress to the niche JSON.")
+        logger.error(
+            f"No wordpress channel prompt configured for niche '{request.niche}'. "
+            "Add channel_prompts.wordpress to the niche JSON."
+        )
         sys.exit(1)
 
     settings = load_dev_settings()
 
     wp_cred = settings.wp_credentials.get(request.niche)
     if not wp_cred:
-        logger.error(f"No WordPress credentials for niche '{request.niche}'. "
-                      "Add credentials under config/tenants/dev-tenant/niches/<name>/credentials/wordpress.json")
+        logger.error(
+            f"No WordPress credentials for niche '{request.niche}'. "
+            "Add credentials under config/tenants/dev-tenant/niches/<name>/credentials/wordpress.json"
+        )
         sys.exit(1)
 
     azure_client = AzureOpenAI(
@@ -99,7 +102,9 @@ def main():
             task = progress.add_task("Uploading keywords…", total=total)
 
             for i, keyword in enumerate(request.keywords):
-                progress.update(task, description=f"[cyan]({i+1}/{total})[/cyan] {keyword}")
+                progress.update(
+                    task, description=f"[cyan]({i+1}/{total})[/cyan] {keyword}"
+                )
 
                 # Resolve media from WP library
                 media_id, image_url = service.resolve_media(
@@ -110,12 +115,11 @@ def main():
                 )
 
                 if media_id is None:
-                    logger.warning(f"No media found for '{keyword}', skipping")
-                    skipped += 1
-                    progress.advance(task)
-                    continue
-
-                logger.info(f"Media: id={media_id}")
+                    logger.info(
+                        f"No media found for '{keyword}', proceeding without featured image"
+                    )
+                else:
+                    logger.info(f"Media: id={media_id}")
 
                 try:
                     result = service.upload_topic(
@@ -130,7 +134,15 @@ def main():
                     )
 
                     console.print(f"  [green]✓[/green] Published: {result.url}")
-                    writer.writerow([request.niche, keyword, result.post_id, result.url, result.status])
+                    writer.writerow(
+                        [
+                            request.niche,
+                            keyword,
+                            result.post_id,
+                            result.url,
+                            result.status,
+                        ]
+                    )
                     completed += 1
 
                 except Exception as e:
@@ -141,7 +153,9 @@ def main():
 
     elapsed = time.time() - start_time
     console.rule()
-    console.print(f"  Completed: {completed}  Skipped: {skipped}  Failed: {failed}  Elapsed: {elapsed:.1f}s")
+    console.print(
+        f"  Completed: {completed}  Skipped: {skipped}  Failed: {failed}  Elapsed: {elapsed:.1f}s"
+    )
     console.print(f"  Output: {output_file}")
     console.rule()
 

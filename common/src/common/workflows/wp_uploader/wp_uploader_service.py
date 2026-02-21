@@ -5,7 +5,6 @@ from requests.auth import HTTPBasicAuth
 
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.wordpress import WordPressChannel
-
 from common.workflows.wp_uploader.wp_uploader_response import WpUploadResult
 
 logger = AppLogger(__name__)
@@ -43,7 +42,10 @@ class WpUploaderService:
         for media in resp.json():
             source_url = media.get("source_url", "")
             slug = media.get("slug", "")
-            if search_term.lower() in source_url.lower() or search_term.lower() in slug.lower():
+            if (
+                search_term.lower() in source_url.lower()
+                or search_term.lower() in slug.lower()
+            ):
                 return media["id"], source_url
 
         first = resp.json()[0]
@@ -72,7 +74,15 @@ class WpUploaderService:
             copy_style_prompt=copy_style_prompt,
             audience_prompt=audience_prompt,
         )
-        logger.info("Content generated")
+
+        logger.info(
+            "Content generated: %s \n\n %s",
+            content.get("title", "Untitled"),
+            content.get("content", "No content"),
+        )
+
+        if content.get("content") is None:
+            raise ValueError("LLM did not return any content")
 
         tags = [keyword]
         result = self.wp.publish(

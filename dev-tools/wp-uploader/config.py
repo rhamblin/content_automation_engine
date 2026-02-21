@@ -36,7 +36,7 @@ def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
     return value
 
 
-def load_request(path: Path) -> WpUploaderRequest:
+def load_request(path: Path, niche: str, status: str) -> WpUploaderRequest:
     """Load a JSON data file and return a validated WpUploaderRequest."""
     raw = json.loads(path.read_text())
 
@@ -47,16 +47,9 @@ def load_request(path: Path) -> WpUploaderRequest:
     if not keywords:
         raise ValueError("keywords must not be empty")
 
-    if "niche" not in raw:
-        raise ValueError("data file missing required field: niche")
-
-    status = raw.get("status", "draft")
-    if status not in VALID_STATUSES:
-        raise ValueError(f"invalid status '{status}', must be one of {VALID_STATUSES}")
-
     return WpUploaderRequest(
         keywords=tuple(keywords),
-        niche=raw["niche"],
+        niche=niche,
         status=status,
     )
 
@@ -76,12 +69,20 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> WpUploaderConfig:
     niche_data = json.loads(niche_json.read_text())
 
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
-    copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
-    audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
+    copy_style_prompt = (
+        _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
+    )
+    audience_prompt = (
+        _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
+    )
     channel_prompts = niche_data.get("channel_prompts", {})
     channel_prompt = _resolve_prompt(channel_prompts.get("wordpress"), niche_dir) or ""
 
-    request = load_request(path)
+    status = niche_data.get("status", "draft")
+    if status not in VALID_STATUSES:
+        raise ValueError(f"invalid status '{status}', must be one of {VALID_STATUSES}")
+
+    request = load_request(niche_json, niche=niche_name, status=status)
 
     return WpUploaderConfig(
         request=request,

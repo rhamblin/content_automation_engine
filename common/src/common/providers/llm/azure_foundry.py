@@ -128,10 +128,7 @@ Return ONLY valid JSON with the exact fields shown above.
         audience_prompt: str | None = None,
         image_base64: str | None = None,
     ) -> str:
-        user_text = (
-            f"Niche: {niche}\n"
-            f"Primary keyword: {keyword}\n"
-        )
+        user_text = f"Niche: {niche}\n" f"Primary keyword: {keyword}\n"
         if blog_url:
             user_text += f"Blog URL: {blog_url}\n"
 
@@ -172,6 +169,7 @@ Return ONLY valid JSON with the exact fields shown above.
                 model="gpt-4.1",
                 temperature=0.9,
             )
+            self.logger.info(f"Azure OpenAI response: {response}")
         except APIError as e:
             raise ConnectionError(f"Azure OpenAI API error: {e}") from e
 
@@ -182,6 +180,9 @@ Return ONLY valid JSON with the exact fields shown above.
             )
             raise ValueError("Azure OpenAI returned empty content")
 
+        self.logger.info(
+            f"Azure OpenAI response: {response.choices[0].message.content}"
+        )
         return response.choices[0].message.content
 
     def generate(

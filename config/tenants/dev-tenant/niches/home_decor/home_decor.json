@@ -1,35 +1,18 @@
 {
   "title": "Home Decor",
-  "brand_name": "HomeDecorBrand",
-  "brand_website": "https://homedecorbrand.com",
-  "brand_watermark": "homedecorbrand.com",
+  "brand_name": "Decor Moods",
+  "brand_website": "https://decormoods.com",
+  "brand_watermark": "decormoods.com",
   "persona_name": "decor_enthusiast",
   "persona_prompt": "prompts/persona.txt",
   "copy_style_prompt": "prompts/copy_style.txt",
   "audience_prompt": "prompts/audiences.txt",
   "channel_prompts": {
-    "pinterest": "prompts/pinterest.txt"
+    "pinterest": "prompts/pinterest.txt",
+    "wordpress": "prompts/wordpress.txt"
   },
   "keywords": [
-    "Living room makeover",
-    "Small bedroom ideas",
-    "Boho living room",
-    "Minimalist home decor",
-    "Apartment decorating ideas",
-    "Cozy bedroom aesthetic",
-    "Modern farmhouse decor",
-    "Gallery wall ideas",
-    "DIY wall art",
-    "Bathroom shelf styling",
-    "Kitchen counter decor",
-    "Entryway table styling",
-    "Neutral living room",
-    "Budget home refresh",
-    "Thrift flip furniture",
-    "Rental friendly decor",
-    "Floating shelf decor",
-    "Accent wall ideas",
-    "Candle styling ideas",
-    "Small space storage"
+    "peel and stick wall molding ideas",
+    "renter friendly accent wall ideas"
   ]
 }
