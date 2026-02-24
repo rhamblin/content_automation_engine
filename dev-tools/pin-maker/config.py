@@ -21,6 +21,7 @@ class PinMakerConfig:
     copy_style_prompt: str
     audience_prompt: str
     channel_prompt: str
+    brand_watermark: str
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -102,6 +103,7 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
         copy_style_prompt=copy_style_prompt,
         audience_prompt=audience_prompt,
         channel_prompt=channel_prompt,
+        brand_watermark=niche_data.get("brand_watermark", ""),
     )
 
 
