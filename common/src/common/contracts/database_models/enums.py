@@ -55,6 +55,12 @@ class TenantUserRole(str, Enum):
     VIEWER = "viewer"
 
 
+class KeywordIntent(str, Enum):
+    INFORMATIONAL = "informational"
+    BUYER = "buyer"
+    BUYER_INFO = "buyer_info"
+
+
 class IdentityProvider(str, Enum):
     AZURE_B2C = "azure_b2c"
     AZURE_ENTRA = "azure_entra"

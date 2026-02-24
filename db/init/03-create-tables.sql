@@ -120,6 +120,8 @@ CREATE TABLE keywords (
   tenant_id   UUID        NOT NULL REFERENCES tenants(external_id) ON DELETE CASCADE,
   niche_id    UUID        NOT NULL REFERENCES niches(external_id) ON DELETE CASCADE,
   term        TEXT        NOT NULL,
+  intent      TEXT        NOT NULL DEFAULT 'informational',
+  amazon_monetization_angle TEXT,
   is_active   BOOLEAN     NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by  UUID,

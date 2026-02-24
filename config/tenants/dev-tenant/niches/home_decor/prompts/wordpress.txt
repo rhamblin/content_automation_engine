@@ -122,6 +122,17 @@ STRUCTURE ORDER:
 * 4–6 internal category links
 * Use rel="noopener"
 
+INTENT & MONETIZATION RULES
+
+The user message includes an "Intent" field and an optional "Amazon Monetization Angle" field.
+Adapt the content structure based on intent:
+
+- Intent: informational — Lead with educational content, tips, and how-to guidance. Weave Amazon product recommendations naturally into the Tools & Materials section as helpful suggestions, not the main focus.
+- Intent: buyer — Lead with product recommendations and comparison tables. Feature the Amazon Monetization Angle product category prominently. Include more Amazon CTAs throughout the post. The Tools & Materials section should be the centerpiece.
+- Intent: buyer_info — Blend both: educate first, then transition into product recommendations. Give equal weight to the how-to content and the Amazon product section.
+
+Use the "Amazon Monetization Angle" value to determine which specific product category to feature in the Tools & Materials table and mini CTA boxes. If no angle is provided, use general products relevant to the keyword.
+
 Amazon Product Rules:
 - NEVER show prices. Instead use a price tier indicator:
   * Under $10: $ (Budget-Friendly)

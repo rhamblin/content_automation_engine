@@ -59,8 +59,9 @@ class WpUploaderService:
         media_id: int | None,
         status: str = "draft",
         persona_prompt: str | None = None,
-        copy_style_prompt: str | None = None,
         audience_prompt: str | None = None,
+        intent: str = "informational",
+        amazon_monetization_angle: str = "",
     ) -> WpUploadResult:
         """Generate content via LLM and publish to WordPress."""
         content = self.wp.render_content(
@@ -69,9 +70,10 @@ class WpUploaderService:
                 "niche": niche,
                 "keyword": keyword,
                 "image_url": image_url,
+                "intent": intent,
+                "amazon_monetization_angle": amazon_monetization_angle,
             },
             persona_prompt=persona_prompt,
-            copy_style_prompt=copy_style_prompt,
             audience_prompt=audience_prompt,
         )
 

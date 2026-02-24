@@ -16,7 +16,6 @@ class TitleGenConfig:
     request: TitleGenRequest
     persona_prompt: str
     channel_prompt: str
-    copy_style_prompt: str
     audience_prompt: str
     keyword_images: dict[str, str] | None = None  # keyword → image_path
     keyword_blog_urls: dict[str, str] | None = None    # keyword → url
@@ -81,13 +80,9 @@ def load_config(path: Path) -> TitleGenConfig:
     niche_data = json.loads(niche_json.read_text())
 
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
-    copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
     audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
     channel_prompts = niche_data.get("channel_prompts", {})
     channel_prompt = _resolve_prompt(channel_prompts.get(channel), niche_dir) or ""
-
-    if not copy_style_prompt:
-        raise ValueError(f"copy_style_prompt not configured for niche: {niche}")
 
     request = TitleGenRequest(
         tenant=tenant,
@@ -101,7 +96,6 @@ def load_config(path: Path) -> TitleGenConfig:
         request=request,
         persona_prompt=persona_prompt,
         channel_prompt=channel_prompt,
-        copy_style_prompt=copy_style_prompt,
         audience_prompt=audience_prompt,
         keyword_images=keyword_images,
         keyword_blog_urls=keyword_blog_urls,

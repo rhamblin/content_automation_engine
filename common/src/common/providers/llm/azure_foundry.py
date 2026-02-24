@@ -127,8 +127,14 @@ Return ONLY valid JSON with the exact fields shown above.
         persona_prompt: str | None = None,
         audience_prompt: str | None = None,
         image_base64: str | None = None,
+        intent: str = "informational",
+        amazon_monetization_angle: str = "",
     ) -> str:
-        user_text = f"Niche: {niche}\n" f"Primary keyword: {keyword}\n"
+        user_text = f"Niche: {niche}\nPrimary keyword: {keyword}\n"
+        if intent:
+            user_text += f"Intent: {intent}\n"
+        if amazon_monetization_angle:
+            user_text += f"Amazon Monetization Angle: {amazon_monetization_angle}\n"
         if blog_url:
             user_text += f"Blog URL: {blog_url}\n"
 
@@ -213,6 +219,8 @@ Return ONLY valid JSON with the exact fields shown above.
             persona_prompt=kwargs.get("persona_prompt"),
             audience_prompt=kwargs.get("audience_prompt"),
             image_base64=kwargs.get("image_base64"),
+            intent=kwargs.get("intent", "informational"),
+            amazon_monetization_angle=kwargs.get("amazon_monetization_angle", ""),
         )
         try:
             json_equiv = json.loads(raw_result)

@@ -14,7 +14,6 @@ from common.contracts.models.rendering.image_overlay import STICKERS_DIR
 from common.rendering import render_image
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from settings import load_dev_settings
 
 DATA_DIR = Path(__file__).parent / "data"
 STYLES_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
@@ -102,6 +101,25 @@ tenant_name = st.sidebar.selectbox(
 
 STYLES = _load_styles(tenant_name, channel_name)
 CANVAS = CHANNEL_CANVAS.get(channel_name, CanvasSpec(width=1000, height=1500, format="RGB"))
+
+def _list_niches(tenant: str) -> list[str]:
+    niches_dir = STYLES_ROOT / tenant / "niches"
+    if not niches_dir.exists():
+        return []
+    return sorted(d.name for d in niches_dir.iterdir() if d.is_dir())
+
+def _load_brand_watermark(tenant: str, niche: str) -> str:
+    niche_json = STYLES_ROOT / tenant / "niches" / niche / f"{niche}.json"
+    if niche_json.exists():
+        return json.loads(niche_json.read_text()).get("brand_watermark", "")
+    return ""
+
+_niches = _list_niches(tenant_name)
+if _niches:
+    niche_name = st.sidebar.selectbox("Niche", _niches, key="niche_sel")
+    _brand_watermark = _load_brand_watermark(tenant_name, niche_name)
+else:
+    _brand_watermark = ""
 
 if not STYLES:
     st.error(f"No styles found for channel '{channel_name}' in config/tenants/{tenant_name}/styles/")
@@ -380,8 +398,7 @@ with col2:
 with _preview_container:
     st.header("Preview")
     try:
-        _settings = load_dev_settings()
-        preview = render_image(source_img, CANVAS, modified_style, text_data, _settings.brand_text)
+        preview = render_image(source_img, CANVAS, modified_style, text_data, _brand_watermark)
         st.image(preview, width=420)
     except Exception as e:
         st.error(f"Error: {e}")

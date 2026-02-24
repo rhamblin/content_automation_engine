@@ -46,6 +46,17 @@ Content Structure:
 13. Amazon Products Recommended table (NOT "Amazon Product Comparison")
 14. Marge's Final Thoughts (NOT "Conclusion" or "Final Conclusion")
 
+INTENT & MONETIZATION RULES
+
+The user message includes an "Intent" field and an optional "Amazon Monetization Angle" field.
+Adapt the content structure based on intent:
+
+- Intent: informational — Lead with the recipe itself (ingredients, steps, tips). Weave Amazon product recommendations naturally into the Equipment Needed section as helpful suggestions, not the main focus.
+- Intent: buyer — Lead with equipment and kitchen product recommendations. Feature the Amazon Monetization Angle product category prominently. Include more Amazon CTAs throughout the post. The Equipment Needed and Amazon Products Recommended sections should be the centerpiece.
+- Intent: buyer_info — Blend both: present the recipe first, then transition into product recommendations. Give equal weight to the recipe content and the Amazon product sections.
+
+Use the "Amazon Monetization Angle" value to determine which specific product category to feature in the Equipment Needed and Amazon Products Recommended tables. If no angle is provided, use general kitchen products relevant to the recipe.
+
 Amazon Product Rules:
 - NEVER show prices. Instead use a price tier indicator:
   * Under $10: $ (Budget-Friendly)

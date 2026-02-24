@@ -18,7 +18,6 @@ class PinMakerConfig:
 
     request: PinMakerRequest
     persona_prompt: str
-    copy_style_prompt: str
     audience_prompt: str
     channel_prompt: str
     brand_watermark: str
@@ -90,7 +89,6 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
     niche_data = json.loads(niche_json.read_text())
 
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
-    copy_style_prompt = _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
     audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
     channel_prompts = niche_data.get("channel_prompts", {})
     channel_prompt = _resolve_prompt(channel_prompts.get("pinterest"), niche_dir) or ""
@@ -100,7 +98,6 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
     return PinMakerConfig(
         request=request,
         persona_prompt=persona_prompt,
-        copy_style_prompt=copy_style_prompt,
         audience_prompt=audience_prompt,
         channel_prompt=channel_prompt,
         brand_watermark=niche_data.get("brand_watermark", ""),

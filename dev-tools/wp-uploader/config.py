@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from common.workflows.wp_uploader import WpUploaderRequest
+from common.workflows.wp_uploader import KeywordEntry, WpUploaderRequest
 
 VALID_STATUSES = {"draft", "publish"}
 
@@ -17,7 +17,6 @@ class NichePrompts:
 
     channel_prompt: str
     persona_prompt: str
-    copy_style_prompt: str
     audience_prompt: str
 
 
@@ -36,6 +35,17 @@ def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
     return value
 
 
+def _normalize_keyword(item: str | dict) -> KeywordEntry:
+    """Normalize a keyword item (string or dict) into a KeywordEntry."""
+    if isinstance(item, str):
+        return KeywordEntry(term=item)
+    return KeywordEntry(
+        term=item["term"],
+        intent=item.get("intent", "informational"),
+        amazon_monetization_angle=item.get("amazon_monetization_angle", ""),
+    )
+
+
 def load_request(path: Path, niche: str, status: str) -> WpUploaderRequest:
     """Load a JSON data file and return a validated WpUploaderRequest."""
     raw = json.loads(path.read_text())
@@ -48,7 +58,7 @@ def load_request(path: Path, niche: str, status: str) -> WpUploaderRequest:
         raise ValueError("keywords must not be empty")
 
     return WpUploaderRequest(
-        keywords=tuple(keywords),
+        keywords=tuple(_normalize_keyword(k) for k in keywords),
         niche=niche,
         status=status,
     )
@@ -69,9 +79,6 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> WpUploaderConfig:
     niche_data = json.loads(niche_json.read_text())
 
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
-    copy_style_prompt = (
-        _resolve_prompt(niche_data.get("copy_style_prompt"), niche_dir) or ""
-    )
     audience_prompt = (
         _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
     )
@@ -89,7 +96,6 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> WpUploaderConfig:
         niche_prompts=NichePrompts(
             channel_prompt=channel_prompt,
             persona_prompt=persona_prompt,
-            copy_style_prompt=copy_style_prompt,
             audience_prompt=audience_prompt,
         ),
     )

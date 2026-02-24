@@ -106,7 +106,6 @@ def main():
                     style=style,
                     brand_text=config.brand_watermark,
                     persona_prompt=config.persona_prompt or None,
-                    copy_style_prompt=config.copy_style_prompt or None,
                     audience_prompt=config.audience_prompt or None,
                 )
                 out_path = output_folder / f"{image_path.stem}_{result.style_name}.jpg"

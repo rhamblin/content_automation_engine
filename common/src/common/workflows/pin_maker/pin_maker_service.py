@@ -30,7 +30,6 @@ class PinMakerService:
         style: VisualStyle,
         brand_text: str,
         persona_prompt: str | None = None,
-        copy_style_prompt: str | None = None,
         audience_prompt: str | None = None,
     ) -> PinResult:
         """Generate text via LLM, render pin, return result."""
@@ -41,7 +40,6 @@ class PinMakerService:
             style=style,
             locale=locale,
             persona_prompt=persona_prompt,
-            copy_style_prompt=copy_style_prompt,
             audience_prompt=audience_prompt,
         )
 

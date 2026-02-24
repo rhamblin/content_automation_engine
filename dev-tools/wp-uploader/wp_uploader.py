@@ -96,19 +96,19 @@ def main():
 
     with open(output_file, "w", newline="") as out:
         writer = csv.writer(out)
-        writer.writerow(["niche", "keyword", "post_id", "url", "status"])
+        writer.writerow(["niche", "keyword", "intent", "amazon_monetization_angle", "post_id", "url", "status"])
 
         with Progress(console=console) as progress:
             task = progress.add_task("Uploading keywords…", total=total)
 
-            for i, keyword in enumerate(request.keywords):
+            for i, kw in enumerate(request.keywords):
                 progress.update(
-                    task, description=f"[cyan]({i+1}/{total})[/cyan] {keyword}"
+                    task, description=f"[cyan]({i+1}/{total})[/cyan] {kw.term}"
                 )
 
                 # Resolve media from WP library
                 media_id, image_url = service.resolve_media(
-                    keyword=keyword,
+                    keyword=kw.term,
                     site_url=wp_cred.site_url,
                     username=wp_cred.username,
                     app_password=wp_cred.app_password,
@@ -116,28 +116,31 @@ def main():
 
                 if media_id is None:
                     logger.info(
-                        f"No media found for '{keyword}', proceeding without featured image"
+                        f"No media found for '{kw.term}', proceeding without featured image"
                     )
                 else:
                     logger.info(f"Media: id={media_id}")
 
                 try:
                     result = service.upload_topic(
-                        keyword=keyword,
+                        keyword=kw.term,
                         niche=request.niche,
                         image_url=image_url,
                         media_id=media_id,
                         status=request.status,
                         persona_prompt=prompts.persona_prompt or None,
-                        copy_style_prompt=prompts.copy_style_prompt or None,
                         audience_prompt=prompts.audience_prompt or None,
+                        intent=kw.intent,
+                        amazon_monetization_angle=kw.amazon_monetization_angle,
                     )
 
                     console.print(f"  [green]✓[/green] Published: {result.url}")
                     writer.writerow(
                         [
                             request.niche,
-                            keyword,
+                            kw.term,
+                            kw.intent,
+                            kw.amazon_monetization_angle,
                             result.post_id,
                             result.url,
                             result.status,

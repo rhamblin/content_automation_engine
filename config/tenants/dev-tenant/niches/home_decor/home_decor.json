@@ -3,6 +3,7 @@
   "brand_name": "Decor Moods",
   "brand_website": "https://decormoods.com",
   "brand_watermark": "decormoods.com",
+  "amazon_tag": "decormoods-20",
   "persona_name": "decor_enthusiast",
   "persona_prompt": "prompts/persona.txt",
   "copy_style_prompt": "prompts/copy_style.txt",
@@ -12,7 +13,105 @@
     "wordpress": "prompts/wordpress.txt"
   },
   "keywords": [
-    "peel and stick wall molding ideas",
-    "renter friendly accent wall ideas"
+    {
+      "term": "peel and stick wall molding ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "Amazon molding kits"
+    },
+    {
+      "term": "renter friendly accent wall ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "removable wallpaper on Amazon"
+    },
+    {
+      "term": "LED light strips bedroom ideas aesthetic",
+      "intent": "buyer",
+      "amazon_monetization_angle": "LED strips on Amazon"
+    },
+    {
+      "term": "boho living room on a budget",
+      "intent": "buyer_info",
+      "amazon_monetization_angle": "boho throw pillows and macrame on Amazon"
+    },
+    {
+      "term": "small apartment entryway ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "slim entryway tables on Amazon"
+    },
+    {
+      "term": "DIY gallery wall layout",
+      "intent": "informational",
+      "amazon_monetization_angle": "gallery wall frame sets on Amazon"
+    },
+    {
+      "term": "cozy reading nook ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "reading nook chairs and lamps on Amazon"
+    },
+    {
+      "term": "best peel and stick backsplash tiles",
+      "intent": "buyer",
+      "amazon_monetization_angle": "peel and stick tiles on Amazon"
+    },
+    {
+      "term": "floating shelf styling tips",
+      "intent": "informational",
+      "amazon_monetization_angle": "floating shelves on Amazon"
+    },
+    {
+      "term": "japandi living room decor",
+      "intent": "informational",
+      "amazon_monetization_angle": "japandi furniture and vases on Amazon"
+    },
+    {
+      "term": "bathroom spa makeover ideas",
+      "intent": "buyer_info",
+      "amazon_monetization_angle": "spa bath accessories on Amazon"
+    },
+    {
+      "term": "affordable nightstand alternatives",
+      "intent": "buyer",
+      "amazon_monetization_angle": "nightstands under $50 on Amazon"
+    },
+    {
+      "term": "curtain styling ideas for small windows",
+      "intent": "informational",
+      "amazon_monetization_angle": "curtain rods and panels on Amazon"
+    },
+    {
+      "term": "kitchen open shelving organization",
+      "intent": "informational",
+      "amazon_monetization_angle": "shelf organizers and baskets on Amazon"
+    },
+    {
+      "term": "best smart home gadgets for apartments",
+      "intent": "buyer",
+      "amazon_monetization_angle": "smart plugs and lights on Amazon"
+    },
+    {
+      "term": "modern farmhouse dining room ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "farmhouse dining tables on Amazon"
+    },
+    {
+      "term": "wall art ideas for living room",
+      "intent": "buyer_info",
+      "amazon_monetization_angle": "canvas art prints on Amazon"
+    },
+    {
+      "term": "bedroom rug placement guide",
+      "intent": "informational",
+      "amazon_monetization_angle": "area rugs on Amazon"
+    },
+    {
+      "term": "closet organization hacks small space",
+      "intent": "buyer_info",
+      "amazon_monetization_angle": "closet organizer systems on Amazon"
+    },
+    {
+      "term": "minimalist desk setup home office",
+      "intent": "buyer",
+      "amazon_monetization_angle": "desk organizers and monitor stands on Amazon"
+    }
   ]
 }

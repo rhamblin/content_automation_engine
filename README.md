@@ -143,6 +143,9 @@ make logs
 
 3. There is multiple locales support but
 
+4. **Keyword `intent` and `amazon_monetization_angle` are only supported in the WP-Uploader workflow.** These fields are appended to the LLM user message and the WordPress channel prompt contains rules to adapt content structure accordingly.
+   The Pin-Maker workflow and Pinterest prompts do not use these fields — Pinterest pins are short-form content where intent-based adaptation is not applicable.
+
 ## Data Model
 
 ### Entity Relationship Diagram
@@ -299,6 +302,8 @@ erDiagram
     uuid tenant_id fk
     uuid  niche_id  fk
     text  term
+    text  intent
+    text  amazon_monetization_angle
     boolean is_active
     timestamp created_at
     uuid  created_by

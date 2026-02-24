@@ -25,7 +25,6 @@ class TitleGeneratorService:
         niche: str,
         keyword: str,
         count: int = 1,
-        copy_style_prompt: str = "",
         persona_prompt: str = "",
         audience_prompt: str = "",
         image_base64: str | None = None,
@@ -43,8 +42,7 @@ class TitleGeneratorService:
                     niche=niche,
                     keyword=keyword,
                     channel=self.channel,
-                    copy_style_prompt=f"Use only the style option {style_to_use} {copy_style_prompt}"
-                    or None,
+                    copy_style_prompt=f"Use only the style option {style_to_use}",
                     persona_prompt=persona_prompt or None,
                     audience_prompt=audience_prompt or None,
                     image_base64=image_base64,

@@ -73,6 +73,8 @@ class WordPressChannel(IDistributionChannel):
             style=style,
             locale=text_data.get("locale", "en"),
             image_url=text_data.get("image_url", ""),
+            intent=text_data.get("intent", "informational"),
+            amazon_monetization_angle=text_data.get("amazon_monetization_angle", ""),
             **kwargs,
         )
 
