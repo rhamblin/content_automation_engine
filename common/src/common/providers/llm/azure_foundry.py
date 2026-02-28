@@ -71,11 +71,10 @@ Return ONLY valid JSON with the exact fields shown above.
         persona=None,
         style=None,
         locale: str = "en",
-        copy_style_prompt: str | None = None,
         persona_prompt: str | None = None,
         audience_prompt: str | None = None,
     ) -> str:
-        """Build system prompt: channel (platform) + persona (voice) + style (fields) + locale + copy style + audience."""
+        """Build system prompt: channel (platform) + persona (voice) + style (fields) + locale + audience."""
         locale_instruction = LOCALE_INSTRUCTIONS.get(locale, LOCALE_INSTRUCTIONS["en"])
 
         prompt = channel.system_prompt
@@ -100,9 +99,6 @@ Return ONLY valid JSON with the exact fields shown above.
             )
             prompt = f"{prompt}\n\n{style_section}"
 
-        if copy_style_prompt:
-            prompt = f"{prompt}\n\n{copy_style_prompt}"
-
         if audience_prompt:
             prompt = f"{prompt}\n\n{audience_prompt}"
 
@@ -123,7 +119,6 @@ Return ONLY valid JSON with the exact fields shown above.
         style=None,
         locale: str = "en",
         blog_url: str = "",
-        copy_style_prompt: str | None = None,
         persona_prompt: str | None = None,
         audience_prompt: str | None = None,
         image_base64: str | None = None,
@@ -161,7 +156,6 @@ Return ONLY valid JSON with the exact fields shown above.
                             persona,
                             style,
                             locale,
-                            copy_style_prompt,
                             persona_prompt,
                             audience_prompt,
                         ),
@@ -215,7 +209,6 @@ Return ONLY valid JSON with the exact fields shown above.
             style,
             locale,
             blog_url=kwargs.get("blog_url", ""),
-            copy_style_prompt=kwargs.get("copy_style_prompt"),
             persona_prompt=kwargs.get("persona_prompt"),
             audience_prompt=kwargs.get("audience_prompt"),
             image_base64=kwargs.get("image_base64"),

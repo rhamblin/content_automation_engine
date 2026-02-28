@@ -83,7 +83,6 @@ class ChannelWorker:
                         keyword.term,
                         distribution_channel,
                         persona_prompt=niche.persona_prompt,
-                        copy_style_prompt=niche.copy_style_prompt,
                         audience_prompt=niche.audience_prompt,
                     )
 

@@ -25,7 +25,6 @@ niches/<niche_name>/
 ├── <niche_name>.json          # Niche config (brand, keywords, channels)
 ├── prompts/
 │   ├── persona.txt            # Brand voice & personality
-│   ├── copy_style.txt         # Sensory vocabulary, title/description formulas
 │   ├── audiences.txt          # 3-5 target audience segments
 │   ├── pinterest.txt          # Pinterest channel prompt (if channel enabled)
 │   └── wordpress.txt          # WordPress channel prompt (if channel enabled)
@@ -62,11 +61,6 @@ For each segment, define:
 - Provide 10-20 seed keywords that represent the content pillars of this niche
 - Keywords should be specific enough to generate focused content (e.g., "boho living room" not just "decor")
 
-**6. Copy Style**
-- What sensory/descriptive vocabulary fits this niche? (e.g., food → juicy, crispy, golden; decor → cozy, airy, layered; fitness → powerful, lean, energized)
-- Are there any words or tones to AVOID?
-- Emoji policy? (default: no emoji/unicode)
-
 ### Niche Config (`<niche_name>.json`) Template
 
 ```json
@@ -77,7 +71,6 @@ For each segment, define:
   "brand_watermark": "<domain>",
   "persona_name": "<snake_case_persona>",
   "persona_prompt": "prompts/persona.txt",
-  "copy_style_prompt": "prompts/copy_style.txt",
   "audience_prompt": "prompts/audiences.txt",
   "channel_prompts": {
     "pinterest": "prompts/pinterest.txt",
@@ -92,7 +85,6 @@ Only include channel keys in `channel_prompts` for channels that are active. Cre
 ### Quality Checklist
 
 - [ ] `persona.txt` — establishes voice, tone, and relationship to audience; includes emoji/unicode policy
-- [ ] `copy_style.txt` — defines niche-specific sensory vocabulary, 5 title formula styles (A-E), 4 description styles, alt text rules
 - [ ] `audiences.txt` — 3-5 segments each with label, pain points, and motivators
 - [ ] Channel prompts — output format rules (JSON-only, no emoji), channel-specific goals
 - [ ] `<niche_name>.json` — all fields populated, keywords are specific and actionable

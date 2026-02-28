@@ -1,7 +1,5 @@
 """Title-generator business logic — no file I/O."""
 
-import random
-
 from common.app_logger import AppLogger
 from common.contracts.interfaces.distribution_channel import IDistributionChannel
 from common.contracts.interfaces.llm_provider import ILLMProvider
@@ -37,12 +35,10 @@ class TitleGeneratorService:
         options: list[TitleOption] = []
         for i in range(count):
             try:
-                style_to_use = self._pick_copy_style()
                 result = self.llm.generate(
                     niche=niche,
                     keyword=keyword,
                     channel=self.channel,
-                    copy_style_prompt=f"Use only the style option {style_to_use}",
                     persona_prompt=persona_prompt or None,
                     audience_prompt=audience_prompt or None,
                     image_base64=image_base64,
@@ -73,6 +69,3 @@ class TitleGeneratorService:
             for item in items
         ]
 
-    def _pick_copy_style(self) -> str:
-        options = ["A", "B", "C", "D", "E"]
-        return random.choice(options)

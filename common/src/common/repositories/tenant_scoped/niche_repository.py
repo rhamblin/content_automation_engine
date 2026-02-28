@@ -32,7 +32,6 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
         brand_watermark: str | None = None,
         persona_name: str | None = None,
         persona_prompt: str | None = None,
-        copy_style_prompt: str | None = None,
         audience_prompt: str | None = None,
         channel_prompts: dict | None = None,
     ) -> Niche:
@@ -44,7 +43,6 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
             existing.brand_watermark = brand_watermark
             existing.persona_name = persona_name
             existing.persona_prompt = persona_prompt
-            existing.copy_style_prompt = copy_style_prompt
             existing.audience_prompt = audience_prompt
             existing.channel_prompts = channel_prompts
             existing.is_active = True
@@ -58,7 +56,6 @@ class NicheRepository(BaseTenantScopedRepository[Niche]):
             brand_watermark=brand_watermark,
             persona_name=persona_name,
             persona_prompt=persona_prompt,
-            copy_style_prompt=copy_style_prompt,
             audience_prompt=audience_prompt,
             channel_prompts=channel_prompts,
         )

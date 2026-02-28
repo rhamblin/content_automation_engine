@@ -60,7 +60,7 @@ class WordPressChannel(IDistributionChannel):
             source: Not used for WordPress (pass None)
             text_data: Dict with niche, keyword, image_url, persona, locale
             style: Optional VisualStyle for field schema
-            **kwargs: Forwarded to LLM generate (persona_prompt, copy_style_prompt, audience_prompt)
+            **kwargs: Forwarded to LLM generate (persona_prompt, audience_prompt)
 
         Returns:
             Dict with title, content (HTML), etc.

@@ -144,7 +144,6 @@ async def load_niches(
 
         # Resolve file-ref prompts to full text
         persona_prompt = _resolve_prompt(data.get("persona_prompt"), base_dir)
-        copy_style_prompt = _resolve_prompt(data.get("copy_style_prompt"), base_dir)
         audience_prompt = _resolve_prompt(data.get("audience_prompt"), base_dir)
 
         channel_prompts_raw = data.get("channel_prompts") or {}
@@ -161,7 +160,6 @@ async def load_niches(
             brand_watermark=data.get("brand_watermark"),
             persona_name=data.get("persona_name"),
             persona_prompt=persona_prompt,
-            copy_style_prompt=copy_style_prompt,
             audience_prompt=audience_prompt,
             channel_prompts=channel_prompts or None,
         )

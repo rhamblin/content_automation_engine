@@ -6,7 +6,6 @@
   "amazon_tag": "chefexotic-20",
   "persona_name": "home_cook",
   "persona_prompt": "prompts/persona.txt",
-  "copy_style_prompt": "prompts/copy_style.txt",
   "audience_prompt": "prompts/audiences.txt",
   "channel_prompts": {
     "wordpress": "prompts/wordpress.txt",

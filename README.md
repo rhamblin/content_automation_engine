@@ -30,7 +30,6 @@ config/tenants/<tenant-name>/
       <niche-name>.json                # required — niche config (title, keywords, prompts, etc.)
       prompts/                         # optional — prompt text files referenced from niche JSON
         persona.txt
-        copy_style.txt
         ...
       credentials/                     # required — channel credentials per niche (gitignored)
         wordpress.json                 #   { "channel": "wordpress", "site_url": "", "username": "", "app_password": "" }
@@ -285,7 +284,6 @@ erDiagram
     text brand_watermark
     text persona_name
     text persona_prompt
-    text copy_style_prompt
     text audience_prompt
     jsonb channel_prompts
     boolean is_active

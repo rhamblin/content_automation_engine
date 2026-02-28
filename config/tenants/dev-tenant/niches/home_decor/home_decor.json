@@ -6,7 +6,6 @@
   "amazon_tag": "decormoods-20",
   "persona_name": "decor_enthusiast",
   "persona_prompt": "prompts/persona.txt",
-  "copy_style_prompt": "prompts/copy_style.txt",
   "audience_prompt": "prompts/audiences.txt",
   "channel_prompts": {
     "pinterest": "prompts/pinterest.txt",
