@@ -100,7 +100,7 @@ def main():
                 image_base64 = base64.b64encode(abs_path.read_bytes()).decode()
                 logger.info(f"    Attached image: {image_path}")
             else:
-                logger.warning(f"    Image not found, skipping: {abs_path}")
+                raise FileNotFoundError(f"Image not found: {abs_path}")
 
         blog_url = config.keyword_blog_urls.get(keyword, "")
 

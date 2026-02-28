@@ -1,12 +1,19 @@
-  const schedule_date = "25/02/2026";  // DD/MM/YYYY
+  const schedule_date = "01/03/2026";  // DD/MM/YYYY
   const schedule_time = "09:30 AM";    // HH:MM AM/PM
 
-  const pin =       {
-        "title": "Chilli shrimps cups delight",
-        "description": "Rich spicy shrimp cups burst with smoky heat and juicy bites. A quick crowd pleasing starter that comes together in minutes for weeknights or parties. Save this delicious idea for your next get together.",
-        "alt_text": "Crispy bite sized cups filled with spicy chilli shrimp topping",
-        "reasoning": "The title front loads the exact keyword for Pinterest SEO and uses crave worthy sensory language to drive saves and clicks."
-      };
+  const pin =
+{
+      "blog_url": "https://chefexotic.com/chia-pudding-bowl-recipe-creamy-overnight-chia-pudding-bowl/",
+      "options": [
+        {
+          "title": "Creamy Chia Pudding Bowls for Busy Mornings",
+          "description": "Craving an easy breakfast you can actually look forward to? These creamy chia pudding bowls are ready when you wake up, with flavors the whole family will love. Perfect for prep-ahead mornings and picky eaters alike.\n\nSave this pin and discover all five quick recipes now.",
+          "alt_text": "A glass bowl of chia pudding topped with mango cubes and pomegranate seeds with a spoonful of chia seeds beside it",
+          "reasoning": "The title uses Style C to target busy weeknight cooks, front-loading the primary keyword 'chia pudding' and highlighting quick variety for busy mornings. The description Style 4 emphasizes convenience and family appeal, suiting Pinterest users who need fast solutions for breakfast."
+        }
+      ]
+    }
+  ;
 
   function fillTextarea(placeholder, value) {
     const el = document.querySelector(`textarea[placeholder="${placeholder}"]`);
@@ -35,16 +42,16 @@
   }
 
   // Fill text fields
-  fillTextarea("Add your title", pin.title);
-  fillDraftJs(pin.description);
-  fillTextarea("Add a destination link", pin.link);
+  fillTextarea("Add your title", pin.options[0].title);
+  fillDraftJs(pin.options[0].description);
+  fillTextarea("Add a destination link", pin.blog_url);
 
   // Alt text is behind a toggle — click it, then fill after DOM updates
   const altBtn = document.querySelector('[data-test-id="pin-draft-alttext-expand"]')
     || [...document.querySelectorAll('button')].find(b => b.textContent.includes('alt text') || b.textContent.includes('Alt text'));
   if (altBtn) {
     altBtn.click();
-    setTimeout(() => fillTextarea("Explain what people can see in the Pin", pin.alt_text), 300);
+    setTimeout(() => fillTextarea("Explain what people can see in the Pin", pin.options[0].alt_text), 300);
   } else {
     fillTextarea("Explain what people can see in the Pin", pin.alt_text);
   }

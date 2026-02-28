@@ -1,6 +1,7 @@
 """Pinterest Pin Maker — orchestrator (all I/O lives here)."""
 
 import argparse
+import random
 import re
 import sys
 from pathlib import Path
@@ -14,9 +15,9 @@ from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from common.workflows.pin_maker import PinMakerService
 from settings import load_dev_settings
 
-from common.workflows.pin_maker import PinMakerService
 from config import load_config, load_styles
 
 logger = AppLogger(__name__)
@@ -31,8 +32,12 @@ def extract_keyword(filename: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Pinterest pins")
-    parser.add_argument("data_file", nargs="?", type=Path, help="JSON data file (see data/input.json)")
-    parser.add_argument("--list-styles", action="store_true", help="List available styles")
+    parser.add_argument(
+        "data_file", nargs="?", type=Path, help="JSON data file (see data/input.json)"
+    )
+    parser.add_argument(
+        "--list-styles", action="store_true", help="List available styles"
+    )
     args = parser.parse_args()
 
     # Load styles from tenant config
@@ -52,8 +57,10 @@ def main():
     request = config.request
 
     if not config.channel_prompt:
-        logger.error(f"No pinterest channel prompt configured for niche '{request.niche}'. "
-                      "Add channel_prompts.pinterest to the niche JSON.")
+        logger.error(
+            f"No pinterest channel prompt configured for niche '{request.niche}'. "
+            "Add channel_prompts.pinterest to the niche JSON."
+        )
         sys.exit(1)
 
     # Wire up providers
@@ -76,7 +83,11 @@ def main():
 
         # Determine output folder (next to first image, or cwd)
         first_path = Path(request.keywords[0].get("image_path", ""))
-        output_folder = first_path.parent / "output" if first_path.parent.is_dir() else Path("output")
+        output_folder = (
+            first_path.parent / "output"
+            if first_path.parent.is_dir()
+            else Path("output")
+        )
         output_folder.mkdir(exist_ok=True)
 
         saved, errors = 0, 0
@@ -88,11 +99,13 @@ def main():
                 errors += 1
                 continue
             if not image_path.is_file():
-                logger.warning(f"  Skipping '{keyword}': image not found at {image_path}")
+                logger.warning(
+                    f"  Skipping '{keyword}': image not found at {image_path}"
+                )
                 errors += 1
                 continue
 
-            style_name = style_names[idx % len(style_names)]
+            style_name = random.choice(style_names)
             style = styles[style_name]
             logger.info(f"  {image_path.name} -> '{keyword}' [{style_name}]")
 
@@ -135,13 +148,15 @@ def main():
     logger.info(f"Found {len(jpg_files)} images")
 
     if len(jpg_files) > len(style_names):
-        logger.warning(f"{len(jpg_files)} images but only {len(style_names)} styles — some will repeat")
+        logger.warning(
+            f"{len(jpg_files)} images but only {len(style_names)} styles — some will repeat"
+        )
 
     # Process each image
     saved, errors = 0, 0
     for idx, img_path in enumerate(jpg_files):
         keyword = extract_keyword(img_path.name)
-        style_name = style_names[idx % len(style_names)]
+        style_name = random.choice(style_names)
         style = styles[style_name]
         logger.info(f"{img_path.name} -> '{keyword}' [{style_name}]")
 
@@ -155,7 +170,6 @@ def main():
                 style=style,
                 brand_text=config.brand_watermark,
                 persona_prompt=config.persona_prompt or None,
-                copy_style_prompt=config.copy_style_prompt or None,
                 audience_prompt=config.audience_prompt or None,
             )
 

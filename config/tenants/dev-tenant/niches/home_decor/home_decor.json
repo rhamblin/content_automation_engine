@@ -14,14 +14,9 @@
   },
   "keywords": [
     {
-      "term": "peel and stick wall molding ideas",
-      "intent": "informational",
-      "amazon_monetization_angle": "Amazon molding kits"
-    },
-    {
-      "term": "renter friendly accent wall ideas",
-      "intent": "informational",
-      "amazon_monetization_angle": "removable wallpaper on Amazon"
+      "term": "budget luxury living room decor",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Mirrors, lighting"
     },
     {
       "term": "LED light strips bedroom ideas aesthetic",
@@ -29,89 +24,79 @@
       "amazon_monetization_angle": "LED strips on Amazon"
     },
     {
-      "term": "boho living room on a budget",
-      "intent": "buyer_info",
-      "amazon_monetization_angle": "boho throw pillows and macrame on Amazon"
-    },
-    {
-      "term": "small apartment entryway ideas",
+      "term": "floating shelves styling ideas for living room",
       "intent": "informational",
-      "amazon_monetization_angle": "slim entryway tables on Amazon"
+      "amazon_monetization_angle": "Floating shelves"
     },
     {
-      "term": "DIY gallery wall layout",
-      "intent": "informational",
-      "amazon_monetization_angle": "gallery wall frame sets on Amazon"
-    },
-    {
-      "term": "cozy reading nook ideas",
-      "intent": "informational",
-      "amazon_monetization_angle": "reading nook chairs and lamps on Amazon"
-    },
-    {
-      "term": "best peel and stick backsplash tiles",
+      "term": "neutral boho bedroom decor on a budget",
       "intent": "buyer",
-      "amazon_monetization_angle": "peel and stick tiles on Amazon"
+      "amazon_monetization_angle": "Bedding, wall art"
     },
     {
-      "term": "floating shelf styling tips",
+      "term": "entryway wall decor ideas small space",
       "intent": "informational",
-      "amazon_monetization_angle": "floating shelves on Amazon"
+      "amazon_monetization_angle": "Hooks, mirrors"
     },
     {
-      "term": "japandi living room decor",
+      "term": "over the couch wall decor ideas modern",
       "intent": "informational",
-      "amazon_monetization_angle": "japandi furniture and vases on Amazon"
+      "amazon_monetization_angle": "Canvas art"
     },
     {
-      "term": "bathroom spa makeover ideas",
-      "intent": "buyer_info",
-      "amazon_monetization_angle": "spa bath accessories on Amazon"
-    },
-    {
-      "term": "affordable nightstand alternatives",
+      "term": "Amazon home decor finds under $50",
       "intent": "buyer",
-      "amazon_monetization_angle": "nightstands under $50 on Amazon"
+      "amazon_monetization_angle": "Roundup post"
     },
     {
-      "term": "curtain styling ideas for small windows",
-      "intent": "informational",
-      "amazon_monetization_angle": "curtain rods and panels on Amazon"
-    },
-    {
-      "term": "kitchen open shelving organization",
-      "intent": "informational",
-      "amazon_monetization_angle": "shelf organizers and baskets on Amazon"
-    },
-    {
-      "term": "best smart home gadgets for apartments",
+      "term": "peel and stick backsplash for renters",
       "intent": "buyer",
-      "amazon_monetization_angle": "smart plugs and lights on Amazon"
+      "amazon_monetization_angle": "Amazon tiles"
     },
     {
-      "term": "modern farmhouse dining room ideas",
+      "term": "minimalist coffee table decor ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "farmhouse dining tables on Amazon"
+      "amazon_monetization_angle": "Decor trays, books"
     },
     {
-      "term": "wall art ideas for living room",
-      "intent": "buyer_info",
-      "amazon_monetization_angle": "canvas art prints on Amazon"
-    },
-    {
-      "term": "bedroom rug placement guide",
+      "term": "DIY picture frame wall layout ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "area rugs on Amazon"
+      "amazon_monetization_angle": "Frames"
     },
     {
-      "term": "closet organization hacks small space",
-      "intent": "buyer_info",
-      "amazon_monetization_angle": "closet organizer systems on Amazon"
-    },
-    {
-      "term": "minimalist desk setup home office",
+      "term": "affordable large wall art ideas",
       "intent": "buyer",
-      "amazon_monetization_angle": "desk organizers and monitor stands on Amazon"
+      "amazon_monetization_angle": "Canvas art"
+    },
+    {
+      "term": "small dining room wall decor ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "Mirrors, art"
+    },
+    {
+      "term": "cozy bedroom lighting ideas no wiring",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Plug-in sconces"
+    },
+    {
+      "term": "aesthetic home office decor ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "Desk decor"
+    },
+    {
+      "term": "mirror wall decor ideas for living room",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Mirrors"
+    },
+    {
+      "term": "studio apartment decor ideas on a budget",
+      "intent": "informational",
+      "amazon_monetization_angle": "Multi-product roundup"
+    },
+    {
+      "term": "DIY wall paneling cheap ideas",
+      "intent": "informational",
+      "amazon_monetization_angle": "Panel kits"
     }
   ]
 }

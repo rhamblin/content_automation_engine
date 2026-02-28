@@ -175,7 +175,7 @@ Return ONLY valid JSON with the exact fields shown above.
                 model="gpt-4.1",
                 temperature=0.9,
             )
-            self.logger.info(f"Azure OpenAI response: {response}")
+            # self.logger.info(f"Azure OpenAI response: {response}")
         except APIError as e:
             raise ConnectionError(f"Azure OpenAI API error: {e}") from e
 
@@ -186,9 +186,9 @@ Return ONLY valid JSON with the exact fields shown above.
             )
             raise ValueError("Azure OpenAI returned empty content")
 
-        self.logger.info(
-            f"Azure OpenAI response: {response.choices[0].message.content}"
-        )
+        # self.logger.info(
+        #     f"Azure OpenAI response: {response.choices[0].message.content}"
+        # )
         return response.choices[0].message.content
 
     def generate(

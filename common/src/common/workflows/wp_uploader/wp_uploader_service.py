@@ -77,11 +77,11 @@ class WpUploaderService:
             audience_prompt=audience_prompt,
         )
 
-        logger.info(
-            "Content generated: %s \n\n %s",
-            content.get("title", "Untitled"),
-            content.get("content", "No content"),
-        )
+        # logger.info(
+        #     "Content generated: %s \n\n %s",
+        #     content.get("title", "Untitled"),
+        #     content.get("content", "No content"),
+        # )
 
         if content.get("content") is None:
             raise ValueError("LLM did not return any content")
