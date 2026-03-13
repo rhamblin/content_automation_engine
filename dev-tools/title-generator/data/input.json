@@ -2,5 +2,77 @@
   "tenant": "dev-tenant",
   "channel": "pinterest",
   "niche": "recipes",
+  "keywords": [
+    {
+      "keyword": "Jollof rice with goat",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/jollof_with_smoked_goat1_ribbon_box.jpg",
+      "blog_url": "https://chefexotic.com/jollof-with-smoked-goat-cozy-nigerian-one-pot-rice-dinner/"
+    },
+    {
+      "keyword": "Garlic lemon shrimp",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/shrimp_recipe1_slab_script.jpg",
+      "blog_url": "https://chefexotic.com/shrimp-recipe-quick-and-flavorful-garlic-lemon-shrimp/"
+    },
+    {
+      "keyword": "Lemon herb baked chicken",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/baked_chicken1_bold_overlay.jpg",
+      "blog_url": "https://chefexotic.com/lemon-herb-baked-chicken-juicy-zesty-oven-baked-dinner-recipe/"
+    },
+    {
+      "keyword": "Cozy noodle bowl",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/noodle_bowl1_ribbon_box.jpg",
+      "blog_url": "https://chefexotic.com/curry-noodle-bowl-recipe-cozy-coconut-curry-noodles-in-one-bowl/"
+    },
+    {
+      "keyword": "Lobster recipe",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/lobster_recipe1_slab_script.jpg",
+      "blog_url": "https://chefexotic.com/lobster-recipe-succulent-garlic-butter-lobster-tail-dinner/"
+    },
+    {
+      "keyword": "Curry noodle bowl",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/curry_noodle_bowl1_split_reveal.jpg",
+      "blog_url": "https://chefexotic.com/curry-noodle-bowl-recipe-cozy-coconut-curry-noodles-in-one-bowl/"
+    },
+    {
+      "keyword": "Plantain bites",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/plantain_bites1_bold_band.jpg",
+      "blog_url": "https://chefexotic.com/plantain-bites-recipe-crispy-plantain-snacks-for-the-family/"
+    },
+    {
+      "keyword": "Pudding bowls",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/pudding_bowl1_bold_overlay.jpg",
+      "blog_url": "https://chefexotic.com/pudding-bowl-recipe-creamy-vanilla-pudding-in-a-cozy-bowl/"
+    },
+    {
+      "keyword": "Coconut pancakes",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/coconut_pancakes1_bold_band.jpg",
+      "blog_url": "https://chefexotic.com/coconut-pancakes-recipe-fluffy-tropical-coconut-pancakes-for-breakfast/"
+    },
+    {
+      "keyword": "Chilli shrimps cups",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/chili_shrimp_cups1_bold_band.jpg",
+      "blog_url": "https://chefexotic.com/chili-shrimp-cups-easy-crispy-shrimp-bites-recipe-for-parties/"
+    },
+    {
+      "keyword": "Jackfruit wraps",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/jackfruit_wraps1_ribbon_box.jpg",
+      "blog_url": "https://chefexotic.com/jackfruit-wraps-flavorful-plant-based-wrap-recipe-for-cozy-weeknights/"
+    },
+    {
+      "keyword": "Lava cake",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/lava_cake1_script_box.jpg",
+      "blog_url": "https://chefexotic.com/lava-cake-recipe-quick-gooey-molten-chocolate-cakes-for-family-dinners/"
+    },
+    {
+      "keyword": "Rum pudding",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/rum_pudding1_bold_band.jpg",
+      "blog_url": "https://chefexotic.com/rum-pudding-creamy-caribbean-style-comfort-in-every-bite/"
+    },
+    {
+      "keyword": "Chia pudding",
+      "image_path": "/Users/rhamblin/Desktop/tester/feb23/chia_pudding_bowl1_bold_overlay.jpg",
+      "blog_url": "https://chefexotic.com/chia-pudding-bowl-recipe-creamy-overnight-chia-pudding-bowl/"
+    }
+  ],
   "count": 1
 }

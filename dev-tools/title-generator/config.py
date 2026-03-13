@@ -38,31 +38,17 @@ def load_config(path: Path) -> TitleGenConfig:
     """Load a JSON data file, resolve niche config, return validated config."""
     raw = json.loads(path.read_text())
 
-    for field in ("tenant", "channel", "niche"):
+    for field in ("tenant", "channel", "niche", "keywords"):
         if field not in raw:
             raise ValueError(f"data file missing required field: {field}")
 
-    tenant = raw["tenant"]
-    niche = raw["niche"]
-    channel = raw["channel"]
-
-    # --- resolve niche config ---
-    niche_dir = CONFIG_ROOT / tenant / "niches" / niche
-    niche_json = niche_dir / f"{niche}.json"
-    if not niche_json.exists():
-        raise ValueError(f"niche config not found: {niche_json}")
-
-    niche_data = json.loads(niche_json.read_text())
-
-    # Keywords: use input file if provided, otherwise read from niche config
-    raw_keywords = raw.get("keywords") or niche_data.get("keywords")
-    if not raw_keywords:
-        raise ValueError("no keywords found in data file or niche config")
-
+    raw_keywords = raw["keywords"]
     if isinstance(raw_keywords, str):
         raw_keywords = [raw_keywords]
+    if not raw_keywords:
+        raise ValueError("keywords must not be empty")
 
-    # Support both plain strings and {"keyword": "...", "image_path": "...", "blog_url": "..."} objects
+    # Support both plain strings and {"keyword": "...", "image_path": "...", "url": "..."} objects
     keywords: list[str] = []
     keyword_images: dict[str, str] = {}
     keyword_blog_urls: dict[str, str] = {}
@@ -80,6 +66,18 @@ def load_config(path: Path) -> TitleGenConfig:
                 keyword_blog_urls[kw] = entry["blog_url"]
         else:
             raise ValueError(f"invalid keyword entry: {entry}")
+
+    tenant = raw["tenant"]
+    niche = raw["niche"]
+    channel = raw["channel"]
+
+    # --- resolve niche config ---
+    niche_dir = CONFIG_ROOT / tenant / "niches" / niche
+    niche_json = niche_dir / f"{niche}.json"
+    if not niche_json.exists():
+        raise ValueError(f"niche config not found: {niche_json}")
+
+    niche_data = json.loads(niche_json.read_text())
 
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
     audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
