@@ -1,0 +1,91 @@
+{
+  "title": "Recipes",
+  "brand_name": "ChefExotic",
+  "brand_website": "https://chefexotic.com",
+  "brand_watermark": "chefexotic.com",
+  "amazon_tag": "chefexotic-20",
+  "persona_name": "home_cook",
+  "persona_prompt": "prompts/persona.txt",
+  "audience_prompt": "prompts/audiences.txt",
+  "channel_prompts": {
+    "wordpress": "prompts/wordpress.txt",
+    "pinterest": "prompts/pinterest.txt"
+  },
+  "keywords": [
+    {
+      "term": "how to make brown sugar boba tea at home",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Boba kits, tapioca pearls, bubble tea straws"
+    },
+    {
+      "term": "tropical pineapple coconut mocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Blenders, cocktail shakers, glassware"
+    },
+    {
+      "term": "matcha bubble tea recipe with tapioca pearls",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Matcha powder, boba pearls, milk frothers"
+    },
+    {
+      "term": "exotic dragon fruit mocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Blenders, bar tools, drink pitchers"
+    },
+    {
+      "term": "caribbean guava mocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Citrus presses, pitchers, bar sets"
+    },
+    {
+      "term": "passionfruit martini cocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Martini glasses, cocktail shaker sets"
+    },
+    {
+      "term": "iced coconut matcha latte recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Matcha whisk sets, milk frothers"
+    },
+    {
+      "term": "mango passionfruit mocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Cocktail shakers, drink mixers"
+    },
+    {
+      "term": "how to cook tapioca pearls for bubble tea",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Tapioca pearls, bubble tea kits"
+    },
+    {
+      "term": "frozen mango daiquiri blender recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "High-power blenders, cocktail kits"
+    },
+    {
+      "term": "dragon fruit mocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Blenders, cocktail glasses"
+    },
+    {
+      "term": "matcha bubble tea recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Matcha powder, bubble tea kits"
+    },
+    {
+      "term": "brown sugar bubble tea recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Boba pearls, syrup kits"
+    },
+    {
+      "term": "tropical rum punch recipe Caribbean",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Drink dispensers, bar sets"
+    },
+    {
+      "term": "mango mocktail recipe",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Blenders, citrus juicers"
+    }
+  ]
+}

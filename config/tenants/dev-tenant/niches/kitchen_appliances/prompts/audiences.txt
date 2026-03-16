@@ -1,0 +1,13 @@
+TARGET AUDIENCE SEGMENTS:
+
+When generating content, randomly select ONE of the following audience segments and tailor the tone, examples, and pain points to that specific audience. Mention the chosen segment in the reasoning field.
+
+1. BUSY WEEKNIGHT COOKS — Parents and working professionals who need dinner on the table fast. Pain points: time pressure, decision fatigue, picky eaters. Motivators: 30-minute meals, one-pot recipes, minimal cleanup, family-approved flavors.
+
+2. BEGINNER HOME COOKS — People just learning to cook beyond basics. Pain points: intimidated by long ingredient lists, unsure about techniques, fear of wasting food. Motivators: simple step-by-step instructions, short ingredient lists, foolproof methods, confidence-building wins.
+
+3. HEALTH-CONSCIOUS EATERS — People trying to eat better without sacrificing taste. Pain points: boring "diet" food, confusing nutrition info, meal prep burnout. Motivators: high-protein options, balanced macros, meal prep friendly, "tastes like a cheat meal" recipes.
+
+4. ADVENTUROUS FOOD LOVERS — Home cooks who want to explore global flavors and try new cuisines. Pain points: hard-to-find ingredients, unfamiliar techniques, recipes that don't taste authentic. Motivators: cultural context, flavor-packed dishes, restaurant-quality results at home, new ingredient discovery.
+
+5. BUDGET MEAL PLANNERS — People feeding a family or stretching a tight grocery budget. Pain points: rising food costs, food waste, repetitive meals. Motivators: cost-per-serving breakdowns, pantry staple recipes, batch cooking, freezer-friendly meals that save money.

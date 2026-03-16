@@ -14,10 +14,11 @@ STRICT OUTPUT RULES:
 - Keep titles short (2-4 words) so they fit on one line at large font sizes
 
 TONE & VOICE:
-- Lead with sensory words (juicy, crispy, golden, buttery, smoky, rich, tender, creamy, tangy, caramelized)
+- Lead with vivid, specific language that makes the reader taste the dish. Draw from a WIDE range of sensory words — do NOT default to the same adjectives every time. Vary your vocabulary across pins. Examples of sensory words to rotate through: juicy, crispy, golden, buttery, smoky, rich, tender, creamy, tangy, caramelized, flaky, zesty, velvety, charred, sticky, melty, bright, savory, herbaceous, toasty, silky, peppery, gooey, crunchy, fragrant, warm, snappy, briny, luscious, pillowy, whipped, roasted, seared, thick, chunky, airy, light
+- IMPORTANT: Never repeat the same leading adjective across consecutive pins. Surprise the reader with unexpected but accurate descriptors.
 - Focus on the experience of eating, not the process of cooking
 - Keep language simple, warm and inviting
-- Use power words that drive clicks: easy, best, perfect, ultimate, secret, no-fail, foolproof, melt-in-your-mouth
+- Use a variety of high-engagement words that drive clicks — rotate through: easy, best, perfect, secret, no-fail, foolproof, must-try, go-to, crowd-favorite, game-changing, next-level, crave-worthy, fan-favorite, weeknight-saving, reader-favorite, genius, underrated, elevated, effortless, irresistible. Do NOT overuse "ultimate" — save it for truly standout recipes.
 - CTA main focus is always to encourage viewers to click the pin and check out content on website
 - Only use the style option that was selected and generate the JSON using only the selected style.
 
@@ -57,11 +58,11 @@ Max 100 characters. First 40 characters MUST contain the primary keyword.
 --- TITLE FEW-SHOT EXAMPLES ---
 
 Style A:
-  "Crispy Baked Chicken Thighs (30-Minute Weeknight Dinner)"
-  "Golden Garlic Butter Shrimp Pasta (One-Pan Recipe)"
-  "Smoky Jerk Chicken Wings (No Grill Needed)"
-  "Buttery Lemon Pound Cake (Foolproof Dessert)"
-  "Rich Creamy Tomato Basil Soup (Ready in 20 Min)"
+  "Sticky Honey Garlic Salmon (Ready in 15 Min)"
+  "Charred Street Corn Tacos (No-Fuss Summer Dinner)"
+  "Velvety Mushroom Risotto (One-Pot Comfort Food)"
+  "Flaky Pesto Chicken Pinwheels (Easy Appetizer)"
+  "Zesty Lemon Herb Shrimp (Weeknight Winner)"
 
 Style B:
   "This Pasta Trick Makes Restaurant-Quality Sauce Every Time"

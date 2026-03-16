@@ -31,6 +31,7 @@ def extract_keyword(filename: str) -> str:
 
 
 def main():
+    print("Pinterest Pin Maker\n")
     parser = argparse.ArgumentParser(description="Generate Pinterest pins")
     parser.add_argument(
         "data_file", nargs="?", type=Path, help="JSON data file (see data/input.json)"

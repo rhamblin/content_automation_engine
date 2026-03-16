@@ -1,0 +1,86 @@
+{
+  "title": "Recipes",
+  "brand_name": "ChefExotic",
+  "brand_website": "https://chefexotic.com",
+  "brand_watermark": "chefexotic.com",
+  "amazon_tag": "chefexotic-20",
+  "persona_name": "home_cook",
+  "persona_prompt": "prompts/persona.txt",
+  "audience_prompt": "prompts/audiences.txt",
+  "channel_prompts": {
+    "wordpress": "prompts/wordpress.txt",
+    "pinterest": "prompts/pinterest.txt"
+  },
+  "keywords": [
+    {
+      "term": "Jollof rice with goat",
+      "intent": "informational",
+      "amazon_monetization_angle": "Dutch ovens, spice kits"
+    },
+    {
+      "term": "Garlic lemon shrimp",
+      "intent": "informational",
+      "amazon_monetization_angle": "Cast iron skillets, garlic press"
+    },
+    {
+      "term": "Lemon herb baked chicken",
+      "intent": "informational",
+      "amazon_monetization_angle": "Roasting pans, herb scissors"
+    },
+    {
+      "term": "Cozy Noodle bowl",
+      "intent": "informational",
+      "amazon_monetization_angle": "Ramen bowls, chopsticks"
+    },
+    {
+      "term": "Lobster recipe",
+      "intent": "informational",
+      "amazon_monetization_angle": "Seafood tools, butter warmers"
+    },
+    {
+      "term": "Curry noodle bowl",
+      "intent": "informational",
+      "amazon_monetization_angle": "Curry paste, woks"
+    },
+    {
+      "term": "Plantain bites",
+      "intent": "informational",
+      "amazon_monetization_angle": "Plantain chips, air fryers"
+    },
+    {
+      "term": "Pudding bowls",
+      "intent": "informational",
+      "amazon_monetization_angle": "Dessert cups, ramekins"
+    },
+    {
+      "term": "Coconut pancakes",
+      "intent": "informational",
+      "amazon_monetization_angle": "Coconut flour, griddles"
+    },
+    {
+      "term": "Chilli shrimps cups",
+      "intent": "informational",
+      "amazon_monetization_angle": "Mini cup molds, chilli flakes"
+    },
+    {
+      "term": "Jackfruit wraps",
+      "intent": "informational",
+      "amazon_monetization_angle": "Canned jackfruit, tortilla press"
+    },
+    {
+      "term": "Lava cake",
+      "intent": "informational",
+      "amazon_monetization_angle": "Ramekins, chocolate melts"
+    },
+    {
+      "term": "Rum pudding",
+      "intent": "informational",
+      "amazon_monetization_angle": "Pudding molds, rum extract"
+    },
+    {
+      "term": "Chia pudding",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Chia seeds, mason jars"
+    }
+  ]
+}

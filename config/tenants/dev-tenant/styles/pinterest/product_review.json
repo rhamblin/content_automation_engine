@@ -1,0 +1,46 @@
+{
+  "name": "product_review",
+  "channel": "pinterest",
+  "description": "Product image top 60%, white bottom with bold title and accent — designed for kitchen appliance and product review pins.",
+  "spec": {
+    "layout": {
+      "type": "image_over_color",
+      "split_pct": 0.60,
+      "color": "#F5F0EB",
+      "crop_focus_top": "center"
+    },
+    "title": {
+      "font_file": "BebasNeue.ttf",
+      "font_size": 110,
+      "color": "#1a1a1a",
+      "y_position": 1000,
+      "outline_width": 0,
+      "max_lines": 2,
+      "max_width_pct": 0.85
+    },
+    "accent": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 64,
+      "color": "#C2185B",
+      "y_position": 1200,
+      "outline_width": 0
+    },
+    "watermark": {
+      "font_file": "DancingScript.ttf",
+      "font_size": 48,
+      "color": "#5C3A1E",
+      "y_position": -60,
+      "alignment": "right",
+      "outline_width": 0
+    },
+    "overlays": [
+      {
+        "position": "center",
+        "color": "#5C3A1E",
+        "opacity": 1.0,
+        "height_pct": 0.004,
+        "y_position": 920
+      }
+    ]
+  }
+}

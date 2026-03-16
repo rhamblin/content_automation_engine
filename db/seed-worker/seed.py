@@ -167,16 +167,38 @@ async def load_niches(
         logger.info(f"Niche '{title}': {niche.external_id}")
 
         # Upsert keywords
-        for term in data.get("keywords", []):
+        for entry in data.get("keywords", []):
+            # Support both plain strings and dict entries
+            if isinstance(entry, str):
+                term = entry
+                intent = "informational"
+                monetization = None
+                is_active = True
+            else:
+                term = entry["term"]
+                intent = entry.get("intent", "informational")
+                monetization = entry.get("amazon_monetization_angle")
+                # No status field = active; only "disabled" deactivates
+                is_active = entry.get("status", "active") != "disabled"
+
             existing_kw = await niche_repo.get_keyword_by_term(niche.external_id, term)
-            if not existing_kw:
+            if existing_kw:
+                # Sync is_active from config on every seed run
+                if existing_kw.is_active != is_active:
+                    existing_kw.is_active = is_active
+                    await session.flush()
+                    logger.info(f"  Keyword '{term}' → is_active={is_active}")
+            else:
                 kw = Keyword(
                     tenant_id=tenant_id,
                     niche_id=niche.external_id,
                     term=term,
+                    intent=intent,
+                    amazon_monetization_angle=monetization,
+                    is_active=is_active,
                 )
                 await niche_repo.add_keyword(kw)
-                logger.info(f"  Keyword '{term}'")
+                logger.info(f"  Keyword '{term}' (active={is_active})")
 
         # Create integration profiles for each channel
         for identifier, channel_id in channel_map.items():

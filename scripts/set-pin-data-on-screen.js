@@ -1,15 +1,15 @@
-  const schedule_date = "01/03/2026";  // DD/MM/YYYY
+  const schedule_date = "21/03/2026";  // DD/MM/YYYY
   const schedule_time = "09:30 AM";    // HH:MM AM/PM
 
   const pin =
 {
-      "blog_url": "https://chefexotic.com/chia-pudding-bowl-recipe-creamy-overnight-chia-pudding-bowl/",
+      "blog_url": "https://chefexotic.com/keto-bread-recipe-book-quick-preview/",
       "options": [
         {
-          "title": "Creamy Chia Pudding Bowls for Busy Mornings",
-          "description": "Craving an easy breakfast you can actually look forward to? These creamy chia pudding bowls are ready when you wake up, with flavors the whole family will love. Perfect for prep-ahead mornings and picky eaters alike.\n\nSave this pin and discover all five quick recipes now.",
-          "alt_text": "A glass bowl of chia pudding topped with mango cubes and pomegranate seeds with a spoonful of chia seeds beside it",
-          "reasoning": "The title uses Style C to target busy weeknight cooks, front-loading the primary keyword 'chia pudding' and highlighting quick variety for busy mornings. The description Style 4 emphasizes convenience and family appeal, suiting Pinterest users who need fast solutions for breakfast."
+          "title": "Crispy Keto French Bread (Easy Bake)",
+          "description": "Craving that crunchy bread fix but staying low carb? This crispy keto french bread is ready in under an hour and bakes up golden with almond flour for authentic flavor.\nPerfect for busy weeknight cooks needing quick sides or sandwich options.\n\n\u2714 Just 5 simple ingredients\n\u2714 No kneading required\n\u2714 Kid and family approved\n\nSave and click for the full step-by-step recipe.",
+          "alt_text": "A loaf of keto french bread on a wooden cutting board with a dish of olive oil and basil leaves",
+          "reasoning": "Chose Style A for strong keto french bread SEO targeting and clear value for busy weeknight cooks; combined with Description Style 1 for instant skimmable benefits and a save-worthy CTA."
         }
       ]
     }
