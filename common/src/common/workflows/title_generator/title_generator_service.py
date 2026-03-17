@@ -22,36 +22,29 @@ class TitleGeneratorService:
         self,
         niche: str,
         keyword: str,
-        count: int = 1,
         persona_prompt: str = "",
         audience_prompt: str = "",
         image_base64: str | None = None,
         blog_url: str = "",
     ) -> TitleGenResult:
-        """Generate title/description/alt_text via LLM provider.
+        """Generate title/description/alt_text via LLM provider."""
+        try:
+            result = self.llm.generate(
+                niche=niche,
+                keyword=keyword,
+                channel=self.channel,
+                persona_prompt=persona_prompt or None,
+                audience_prompt=audience_prompt or None,
+                image_base64=image_base64,
+                blog_url=blog_url,
+            )
+        except (ConnectionError, ValueError) as e:
+            logger.error(f"LLM error for '{keyword}': {e}")
+            return TitleGenResult(error=f"LLM call failed for '{keyword}': {e}")
 
-        Calls the LLM once per count so each generation gets full model attention.
-        """
-        options: list[TitleOption] = []
-        for i in range(count):
-            try:
-                result = self.llm.generate(
-                    niche=niche,
-                    keyword=keyword,
-                    channel=self.channel,
-                    persona_prompt=persona_prompt or None,
-                    audience_prompt=audience_prompt or None,
-                    image_base64=image_base64,
-                    blog_url=blog_url,
-                )
-            except (ConnectionError, ValueError) as e:
-                logger.error(f"LLM error for '{keyword}' (option {i + 1}/{count}): {e}")
-                continue
-
-            options.extend(self._parse_result(result))
-
+        options = self._parse_result(result)
         if not options:
-            return TitleGenResult(error=f"All {count} LLM calls failed for '{keyword}'")
+            return TitleGenResult(error=f"No options parsed for '{keyword}'")
         return TitleGenResult(options=options)
 
     @staticmethod
@@ -68,4 +61,3 @@ class TitleGeneratorService:
             )
             for item in items
         ]
-

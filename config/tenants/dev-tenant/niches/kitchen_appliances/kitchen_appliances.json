@@ -1,5 +1,5 @@
 {
-  "title": "Recipes",
+  "title": "Kitchen Appliances",
   "brand_name": "ChefExotic",
   "brand_website": "https://chefexotic.com",
   "brand_watermark": "chefexotic.com",
@@ -13,79 +13,60 @@
   },
   "keywords": [
     {
-      "term": "how to make brown sugar boba tea at home",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Boba kits, tapioca pearls, bubble tea straws"
+      "term": "Gourmet french door air fryer review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Gourmet french door air fryer",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     },
     {
-      "term": "tropical pineapple coconut mocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, cocktail shakers, glassware"
+      "term": "Fullstar original pro chopper review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Fullstar original pro chopper",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     },
     {
-      "term": "matcha bubble tea recipe with tapioca pearls",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Matcha powder, boba pearls, milk frothers"
+      "term": "Cuisinart multiclad roasting pan and rack review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Cuisinart multiclad roasting pan and rack",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     },
     {
-      "term": "exotic dragon fruit mocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, bar tools, drink pitchers"
+      "term": "Sensarte nonstick deep skillet review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Sensarte nonstick deep skillet",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     },
     {
-      "term": "caribbean guava mocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Citrus presses, pitchers, bar sets"
+      "term": "ThermoPro meat thermometer review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "ThermoPro meat thermometer",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     },
     {
-      "term": "passionfruit martini cocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Martini glasses, cocktail shaker sets"
+      "term": "Gourmia air fryer review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Gourmia air fryer",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     },
     {
-      "term": "iced coconut matcha latte recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Matcha whisk sets, milk frothers"
-    },
-    {
-      "term": "mango passionfruit mocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Cocktail shakers, drink mixers"
-    },
-    {
-      "term": "how to cook tapioca pearls for bubble tea",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Tapioca pearls, bubble tea kits"
-    },
-    {
-      "term": "frozen mango daiquiri blender recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "High-power blenders, cocktail kits"
-    },
-    {
-      "term": "dragon fruit mocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, cocktail glasses"
-    },
-    {
-      "term": "matcha bubble tea recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Matcha powder, bubble tea kits"
-    },
-    {
-      "term": "brown sugar bubble tea recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Boba pearls, syrup kits"
-    },
-    {
-      "term": "tropical rum punch recipe Caribbean",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Drink dispensers, bar sets"
-    },
-    {
-      "term": "mango mocktail recipe",
-      "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, citrus juicers"
+      "term": "Weber Spirit II grill review",
+      "intent": "buyer",
+      "amazon_monetization_angle": "Weber Spirit II grill",
+      "active": true,
+      "blog_url": "https://chefexotic.com/shop/",
+      "source_imgs_folder": ""
     }
   ]
 }

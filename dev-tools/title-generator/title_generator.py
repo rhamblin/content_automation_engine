@@ -2,6 +2,7 @@
 
 import base64
 import json
+import random
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -23,7 +24,7 @@ logger = AppLogger(__name__)
 OUTPUT_DIR = Path(__file__).parent / "output"
 
 
-def save_results(all_results: dict[str, "TitleGenResult"], request, keyword_blog_urls: dict[str, str]) -> Path:
+def save_results(all_results: list[dict], request) -> Path:
     """Save results to JSON file in output directory."""
     OUTPUT_DIR.mkdir(exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -35,36 +36,45 @@ def save_results(all_results: dict[str, "TitleGenResult"], request, keyword_blog
             "tenant": request.tenant,
             "channel": request.channel,
             "niche": request.niche,
-            "keywords": list(request.keywords),
         },
-        "results": {
-            keyword: {
-                "blog_url": keyword_blog_urls.get(keyword, ""),
-                "options": [
-                    {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
-                    for o in result.options
-                ],
-            }
-            for keyword, result in all_results.items()
-        },
+        "results": all_results,
     }
     filepath.write_text(json.dumps(output, indent=2))
     return filepath
 
 
-def print_results(all_results: dict[str, "TitleGenResult"], request):
+def print_results(all_results: list[dict], request):
     """Print results in formatted output."""
-    for keyword, result in all_results.items():
+    for entry in all_results:
+        keyword = entry["keyword"]
         print(f"\n{'=' * 70}")
         print(f"Channel: {request.channel} | Niche: {request.niche} | Keyword: {keyword}")
         print(f"{'=' * 70}")
 
-        for i, opt in enumerate(result.options, 1):
+        for i, opt in enumerate(entry["options"], 1):
             print(f"\n--- Option {i} ---")
-            print(f"\nTitle:\n  {opt.title}")
-            print(f"\nDescription:\n  {opt.description}")
-            print(f"\nStrategy:\n  {opt.reasoning}")
+            print(f"\nTitle:\n  {opt['title']}")
+            print(f"\nDescription:\n  {opt['description']}")
+            print(f"\nStrategy:\n  {opt['reasoning']}")
             print()
+
+
+def _pick_random_image(folder_path: str) -> str | None:
+    """Pick a random image from folder and return base64-encoded content."""
+    folder = Path(folder_path)
+    if not folder.is_dir():
+        logger.warning("source_imgs_folder not found: %s", folder_path)
+        return None
+
+    image_exts = {".jpg", ".jpeg", ".png", ".webp"}
+    images = [f for f in folder.iterdir() if f.suffix.lower() in image_exts]
+    if not images:
+        logger.warning("No images found in: %s", folder_path)
+        return None
+
+    chosen = random.choice(images)
+    logger.info("    Picked image: %s", chosen.name)
+    return base64.b64encode(chosen.read_bytes()).decode()
 
 
 def main():
@@ -82,53 +92,56 @@ def main():
     llm = AzureFoundryLLMProvider(azure_client)
     service = TitleGeneratorService(llm=llm, channel=channel)
 
-    logger.info(f"Generating {request.count} title(s) each for {len(request.keywords)} keywords ({request.channel})")
+    logger.info(
+        "Generating titles for %d keywords (%s)",
+        len(config.keywords), request.channel,
+    )
 
-    data_dir = Path(__file__).parent
-
-    all_results: dict[str, object] = {}
+    all_results: list[dict] = []
     failed = []
-    for keyword in request.keywords:
-        logger.info(f"  → {keyword}")
+    for kw_dict in config.keywords:
+        keyword = kw_dict["term"]
+        blog_url = kw_dict.get("blog_url", "")
+        logger.info("  → %s", keyword)
 
-        # Load optional reference image for grounding
+        # Load optional reference image from source_imgs_folder
         image_base64 = None
-        image_path = config.keyword_images.get(keyword)
-        if image_path:
-            abs_path = data_dir / image_path
-            if abs_path.is_file():
-                image_base64 = base64.b64encode(abs_path.read_bytes()).decode()
-                logger.info(f"    Attached image: {image_path}")
-            else:
-                raise FileNotFoundError(f"Image not found: {abs_path}")
-
-        blog_url = config.keyword_blog_urls.get(keyword, "")
+        source_folder = kw_dict.get("source_imgs_folder")
+        if source_folder:
+            image_base64 = _pick_random_image(source_folder)
 
         result = service.generate(
             niche=request.niche,
             keyword=keyword,
-            count=request.count,
             persona_prompt=config.persona_prompt,
             audience_prompt=config.audience_prompt,
             image_base64=image_base64,
             blog_url=blog_url,
         )
         if result.error:
-            logger.error(f"Failed for '{keyword}': {result.error}")
+            logger.error("Failed for '%s': %s", keyword, result.error)
             failed.append(keyword)
             continue
-        all_results[keyword] = result
+
+        all_results.append({
+            "keyword": keyword,
+            "blog_url": blog_url,
+            "options": [
+                {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
+                for o in result.options
+            ],
+        })
 
     if not all_results:
         logger.error("All keywords failed")
         sys.exit(1)
 
-    filepath = save_results(all_results, request, config.keyword_blog_urls)
-    logger.info(f"Saved to: {filepath}")
+    filepath = save_results(all_results, request)
+    logger.info("Saved to: %s", filepath)
     print_results(all_results, request)
 
     if failed:
-        logger.warning(f"Failed keywords: {failed}")
+        logger.warning("Failed keywords: %s", failed)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,11 @@ VALID_LOCALES = {"en", "es", "sw"}
 CONFIG_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
 
 
+def _to_slug(term: str) -> str:
+    """Convert keyword term to slug: lowercase, spaces → hyphens."""
+    return term.lower().replace(" ", "-")
+
+
 @dataclass(frozen=True)
 class PinMakerConfig:
     """Validated config from data file + tenant niche config."""
@@ -21,6 +26,7 @@ class PinMakerConfig:
     audience_prompt: str
     channel_prompt: str
     brand_watermark: str
+    keywords: list[dict]
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -46,13 +52,8 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
     """Load a JSON data file and return a validated PinMakerRequest."""
     raw = json.loads(path.read_text())
 
-    has_keywords = "keywords" in raw and raw["keywords"] is not None
-    has_folder = "input_folder" in raw and raw["input_folder"] is not None
-
-    if has_keywords and has_folder:
-        raise ValueError("Provide either 'keywords' or 'input_folder', not both")
-    if not has_keywords and not has_folder:
-        raise ValueError("Provide either 'keywords' or 'input_folder'")
+    if "input_folder" not in raw or not raw["input_folder"]:
+        raise ValueError("'input_folder' is required in the data file")
 
     locale = raw.get("locale", "en")
     if locale not in VALID_LOCALES:
@@ -68,11 +69,10 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
                 raise ValueError(f"unknown style '{s}', available: {list(all_styles.keys())}")
 
     return PinMakerRequest(
+        input_folder=raw["input_folder"],
         niche=raw.get("niche", "food"),
         locale=locale,
         styles=raw_styles,
-        keywords=raw.get("keywords") if has_keywords else None,
-        input_folder=raw.get("input_folder") if has_folder else None,
     )
 
 
@@ -88,6 +88,15 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
 
     niche_data = json.loads(niche_json.read_text())
 
+    # Read keywords from niche config, filter out disabled
+    all_keywords = niche_data.get("keywords", [])
+    active_keywords = [kw for kw in all_keywords if kw.get("active", True) is not False]
+    if not active_keywords:
+        raise ValueError(
+            f"No active keywords in niche config '{niche_name}'. "
+            "All keywords are disabled or the keywords list is empty."
+        )
+
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
     audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
     channel_prompts = niche_data.get("channel_prompts", {})
@@ -101,6 +110,7 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
         audience_prompt=audience_prompt,
         channel_prompt=channel_prompt,
         brand_watermark=niche_data.get("brand_watermark", ""),
+        keywords=active_keywords,
     )
 
 

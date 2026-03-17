@@ -178,8 +178,7 @@ async def load_niches(
                 term = entry["term"]
                 intent = entry.get("intent", "informational")
                 monetization = entry.get("amazon_monetization_angle")
-                # No status field = active; only "disabled" deactivates
-                is_active = entry.get("status", "active") != "disabled"
+                is_active = entry.get("active", True) is not False
 
             existing_kw = await niche_repo.get_keyword_by_term(niche.external_id, term)
             if existing_kw:

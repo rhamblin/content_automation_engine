@@ -15,78 +15,122 @@
     {
       "term": "how to make brown sugar boba tea at home",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Boba kits, tapioca pearls, bubble tea straws"
+      "amazon_monetization_angle": "Boba kits, tapioca pearls, bubble tea straws",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "tropical pineapple coconut mocktail recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, cocktail shakers, glassware"
+      "amazon_monetization_angle": "Blenders, cocktail shakers, glassware",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "matcha bubble tea recipe with tapioca pearls",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Matcha powder, boba pearls, milk frothers"
+      "amazon_monetization_angle": "Matcha powder, boba pearls, milk frothers",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "exotic dragon fruit mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Blenders, bar tools, drink pitchers",
-      "status": "disabled"
+      "active": false,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "caribbean guava mocktail recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Citrus presses, pitchers, bar sets"
+      "amazon_monetization_angle": "Citrus presses, pitchers, bar sets",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "passionfruit martini cocktail recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Martini glasses, cocktail shaker sets"
+      "amazon_monetization_angle": "Martini glasses, cocktail shaker sets",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "iced coconut matcha latte recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Matcha whisk sets, milk frothers"
+      "amazon_monetization_angle": "Matcha whisk sets, milk frothers",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "mango passionfruit mocktail recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Cocktail shakers, drink mixers"
+      "amazon_monetization_angle": "Cocktail shakers, drink mixers",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "how to cook tapioca pearls for bubble tea",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Tapioca pearls, bubble tea kits"
+      "amazon_monetization_angle": "Tapioca pearls, bubble tea kits",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "frozen mango daiquiri blender recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "High-power blenders, cocktail kits"
+      "amazon_monetization_angle": "High-power blenders, cocktail kits",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "dragon fruit mocktail recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, cocktail glasses"
+      "amazon_monetization_angle": "Blenders, cocktail glasses",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "matcha bubble tea recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Matcha powder, bubble tea kits"
+      "amazon_monetization_angle": "Matcha powder, bubble tea kits",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "brown sugar bubble tea recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Boba pearls, syrup kits"
+      "amazon_monetization_angle": "Boba pearls, syrup kits",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "tropical rum punch recipe Caribbean",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Drink dispensers, bar sets"
+      "amazon_monetization_angle": "Drink dispensers, bar sets",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "mango mocktail recipe",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Blenders, citrus juicers"
+      "amazon_monetization_angle": "Blenders, citrus juicers",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     }
   ]
 }

@@ -1,9 +1,10 @@
 """Pinterest Pin Maker — orchestrator (all I/O lives here)."""
 
 import argparse
+import json
 import random
-import re
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from openai import AzureOpenAI
@@ -18,16 +19,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from common.workflows.pin_maker import PinMakerService
 from settings import load_dev_settings
 
-from config import load_config, load_styles
+from config import _to_slug, load_config, load_styles
 
 logger = AppLogger(__name__)
 
-
-def extract_keyword(filename: str) -> str:
-    """Extract keyword from filename like 'lava_cake1.jpg' -> 'lava cake'."""
-    stem = Path(filename).stem
-    stem = re.sub(r"\d+$", "", stem)
-    return re.sub(r"[_-]", " ", stem).strip().lower()
+IMAGE_EXTENSIONS = {"*.jpg", "*.jpeg", "*.png", "*.webp", "*.JPG", "*.JPEG", "*.PNG", "*.WEBP"}
 
 
 def main():
@@ -53,7 +49,7 @@ def main():
     if not args.data_file:
         parser.error("a data file is required (e.g. data/input.json)")
 
-    # Layer 2: load + validate request + niche config from JSON data file
+    # Load + validate request + niche config (keywords come from niche config)
     config = load_config(args.data_file)
     request = config.request
 
@@ -78,94 +74,56 @@ def main():
 
     style_names = request.styles or list(styles.keys())
 
-    # ── Keyword-image list mode ──────────────────────────────────────────────
-    if request.keywords is not None:
-        logger.info(f"Keyword-image mode: {len(request.keywords)} entries")
-
-        # Determine output folder (next to first image, or cwd)
-        first_path = Path(request.keywords[0].get("image_path", ""))
-        output_folder = (
-            first_path.parent / "output"
-            if first_path.parent.is_dir()
-            else Path("output")
-        )
-        output_folder.mkdir(exist_ok=True)
-
-        saved, errors = 0, 0
-        for idx, entry in enumerate(request.keywords):
-            keyword = entry.get("keyword", "")
-            image_path = Path(entry.get("image_path", ""))
-            if not keyword:
-                logger.warning(f"  Skipping entry {idx}: missing keyword")
-                errors += 1
-                continue
-            if not image_path.is_file():
-                logger.warning(
-                    f"  Skipping '{keyword}': image not found at {image_path}"
-                )
-                errors += 1
-                continue
-
-            style_name = random.choice(style_names)
-            style = styles[style_name]
-            logger.info(f"  {image_path.name} -> '{keyword}' [{style_name}]")
-
-            try:
-                source_image = Image.open(image_path).convert("RGB")
-                result = service.make_pin(
-                    source_image=source_image,
-                    keyword=keyword,
-                    niche=request.niche,
-                    locale=request.locale,
-                    style=style,
-                    brand_text=config.brand_watermark,
-                    persona_prompt=config.persona_prompt or None,
-                    audience_prompt=config.audience_prompt or None,
-                )
-                out_path = output_folder / f"{image_path.stem}_{result.style_name}.jpg"
-                result.image.save(out_path, "JPEG", quality=95)
-                logger.info(f"    Saved: {out_path}")
-                saved += 1
-            except Exception as e:
-                logger.error(f"    Error processing '{keyword}': {e}")
-                errors += 1
-
-        logger.info(f"Done — {saved} saved, {errors} errors. Output: {output_folder}")
-        return
-
-    # ── Folder scan mode ─────────────────────────────────────────────────────
+    # Resolve input folder and create timestamped output folder as sibling
     input_folder = Path(request.input_folder)
-
     if not input_folder.is_dir():
         logger.error(f"{input_folder} is not a directory")
         sys.exit(1)
 
-    output_folder = input_folder / "output"
-    output_folder.mkdir(exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    output_folder = input_folder.parent / f"output-{timestamp}"
+    output_folder.mkdir(parents=True, exist_ok=True)
 
-    # Collect image files
-    jpg_files = list(input_folder.glob("*.jpg")) + list(input_folder.glob("*.jpeg"))
-    jpg_files += list(input_folder.glob("*.JPG")) + list(input_folder.glob("*.JPEG"))
-    logger.info(f"Found {len(jpg_files)} images")
+    # Process each active keyword
+    manifest = []
+    saved, errors, skipped = 0, 0, 0
+    seen_slugs = set()
 
-    if len(jpg_files) > len(style_names):
-        logger.warning(
-            f"{len(jpg_files)} images but only {len(style_names)} styles — some will repeat"
-        )
+    for kw in config.keywords:
+        term = kw["term"]
+        slug = _to_slug(term)
 
-    # Process each image
-    saved, errors = 0, 0
-    for idx, img_path in enumerate(jpg_files):
-        keyword = extract_keyword(img_path.name)
+        # Warn on duplicate slugs
+        if slug in seen_slugs:
+            logger.warning(f"Duplicate slug '{slug}' from term '{term}' — processing anyway")
+        seen_slugs.add(slug)
+
+        subfolder = input_folder / slug
+        if not subfolder.is_dir():
+            logger.warning(f"Skipping '{term}': no subfolder at {subfolder}")
+            skipped += 1
+            continue
+
+        # Collect images from subfolder
+        images = []
+        for ext in IMAGE_EXTENSIONS:
+            images.extend(subfolder.glob(ext))
+        if not images:
+            logger.warning(f"Skipping '{term}': subfolder {subfolder} has no images")
+            skipped += 1
+            continue
+
+        # Pick random image and style
+        img_path = random.choice(images)
         style_name = random.choice(style_names)
         style = styles[style_name]
-        logger.info(f"{img_path.name} -> '{keyword}' [{style_name}]")
+        logger.info(f"'{term}' [{style_name}] <- {img_path.name}")
 
         try:
             source_image = Image.open(img_path).convert("RGB")
             result = service.make_pin(
                 source_image=source_image,
-                keyword=keyword,
+                keyword=term,
                 niche=request.niche,
                 locale=request.locale,
                 style=style,
@@ -174,16 +132,32 @@ def main():
                 audience_prompt=config.audience_prompt or None,
             )
 
-            output_path = output_folder / f"{img_path.stem}_{result.style_name}.jpg"
-            result.image.save(output_path, "JPEG", quality=95)
-            logger.info(f"  Saved: {output_path}")
+            out_name = f"{img_path.stem}_{result.style_name}.jpg"
+            out_path = output_folder / out_name
+            result.image.save(out_path, "JPEG", quality=95)
+            logger.info(f"  Saved: {out_path}")
             saved += 1
 
+            manifest.append({
+                "keyword": term,
+                "style_name": result.style_name,
+                "output_file": out_name,
+                "source_image": str(img_path),
+            })
+
         except Exception as e:
-            logger.error(f"  Error processing {img_path.name}: {e}")
+            logger.error(f"  Error processing '{term}': {e}")
             errors += 1
 
-    logger.info(f"Done — {saved} saved, {errors} errors. Output: {output_folder}")
+    # Write manifest
+    manifest_path = output_folder / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2))
+    logger.info(f"Manifest written: {manifest_path}")
+
+    logger.info(
+        f"Done — {saved} saved, {errors} errors, {skipped} skipped. "
+        f"Output: {output_folder}"
+    )
 
 
 if __name__ == "__main__":

@@ -1,10 +1,13 @@
-"""Config loader — reads JSON data file, resolves niche config for prompts."""
+"""Config loader — reads JSON data file, resolves niche config for prompts and keywords."""
 
 import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
 from common.workflows.title_generator import TitleGenRequest
+
+logger = logging.getLogger(__name__)
 
 CONFIG_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
 
@@ -17,14 +20,7 @@ class TitleGenConfig:
     persona_prompt: str
     channel_prompt: str
     audience_prompt: str
-    keyword_images: dict[str, str] | None = None  # keyword → image_path
-    keyword_blog_urls: dict[str, str] | None = None    # keyword → url
-
-    def __post_init__(self):
-        if self.keyword_images is None:
-            object.__setattr__(self, "keyword_images", {})
-        if self.keyword_blog_urls is None:
-            object.__setattr__(self, "keyword_blog_urls", {})
+    keywords: list[dict]  # active keyword dicts from niche config (with blog_url)
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -38,34 +34,9 @@ def load_config(path: Path) -> TitleGenConfig:
     """Load a JSON data file, resolve niche config, return validated config."""
     raw = json.loads(path.read_text())
 
-    for field in ("tenant", "channel", "niche", "keywords"):
+    for field in ("tenant", "channel", "niche"):
         if field not in raw:
             raise ValueError(f"data file missing required field: {field}")
-
-    raw_keywords = raw["keywords"]
-    if isinstance(raw_keywords, str):
-        raw_keywords = [raw_keywords]
-    if not raw_keywords:
-        raise ValueError("keywords must not be empty")
-
-    # Support both plain strings and {"keyword": "...", "image_path": "...", "url": "..."} objects
-    keywords: list[str] = []
-    keyword_images: dict[str, str] = {}
-    keyword_blog_urls: dict[str, str] = {}
-    for entry in raw_keywords:
-        if isinstance(entry, str):
-            keywords.append(entry)
-        elif isinstance(entry, dict):
-            kw = entry.get("keyword", "")
-            if not kw:
-                raise ValueError("keyword object missing 'keyword' field")
-            keywords.append(kw)
-            if entry.get("image_path"):
-                keyword_images[kw] = entry["image_path"]
-            if entry.get("blog_url"):
-                keyword_blog_urls[kw] = entry["blog_url"]
-        else:
-            raise ValueError(f"invalid keyword entry: {entry}")
 
     tenant = raw["tenant"]
     niche = raw["niche"]
@@ -79,6 +50,29 @@ def load_config(path: Path) -> TitleGenConfig:
 
     niche_data = json.loads(niche_json.read_text())
 
+    # --- keywords from niche config ---
+    all_keywords = niche_data.get("keywords", [])
+    active_keywords = [kw for kw in all_keywords if kw.get("active", True) is not False]
+
+    skipped = 0
+    keywords_with_blog: list[dict] = []
+    for kw in active_keywords:
+        if not kw.get("blog_url"):
+            logger.warning("Skipping keyword '%s' — no blog_url", kw.get("term", "?"))
+            skipped += 1
+            continue
+        keywords_with_blog.append(kw)
+
+    if skipped:
+        logger.info("Skipped %d keyword(s) without blog_url", skipped)
+
+    if not keywords_with_blog:
+        raise ValueError(
+            f"No usable keywords in niche config '{niche}'. "
+            "All keywords are disabled or missing blog_url."
+        )
+
+    # --- prompts ---
     persona_prompt = _resolve_prompt(niche_data.get("persona_prompt"), niche_dir) or ""
     audience_prompt = _resolve_prompt(niche_data.get("audience_prompt"), niche_dir) or ""
     channel_prompts = niche_data.get("channel_prompts", {})
@@ -88,8 +82,6 @@ def load_config(path: Path) -> TitleGenConfig:
         tenant=tenant,
         channel=channel,
         niche=niche,
-        keywords=tuple(keywords),
-        count=raw.get("count", 1),
     )
 
     return TitleGenConfig(
@@ -97,6 +89,5 @@ def load_config(path: Path) -> TitleGenConfig:
         persona_prompt=persona_prompt,
         channel_prompt=channel_prompt,
         audience_prompt=audience_prompt,
-        keyword_images=keyword_images,
-        keyword_blog_urls=keyword_blog_urls,
+        keywords=keywords_with_blog,
     )

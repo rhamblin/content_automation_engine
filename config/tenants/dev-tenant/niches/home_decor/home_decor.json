@@ -15,87 +15,138 @@
     {
       "term": "budget luxury living room decor",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Mirrors, lighting"
+      "amazon_monetization_angle": "Mirrors, lighting",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "LED light strips bedroom ideas aesthetic",
       "intent": "buyer",
-      "amazon_monetization_angle": "LED strips on Amazon"
+      "amazon_monetization_angle": "LED strips on Amazon",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "floating shelves styling ideas for living room",
       "intent": "informational",
-      "amazon_monetization_angle": "Floating shelves"
+      "amazon_monetization_angle": "Floating shelves",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "neutral boho bedroom decor on a budget",
       "intent": "buyer",
-      "amazon_monetization_angle": "Bedding, wall art"
+      "amazon_monetization_angle": "Bedding, wall art",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "entryway wall decor ideas small space",
       "intent": "informational",
-      "amazon_monetization_angle": "Hooks, mirrors"
+      "amazon_monetization_angle": "Hooks, mirrors",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "over the couch wall decor ideas modern",
       "intent": "informational",
-      "amazon_monetization_angle": "Canvas art"
+      "amazon_monetization_angle": "Canvas art",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "Amazon home decor finds under $50",
       "intent": "buyer",
-      "amazon_monetization_angle": "Roundup post"
+      "amazon_monetization_angle": "Roundup post",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "peel and stick backsplash for renters",
       "intent": "buyer",
-      "amazon_monetization_angle": "Amazon tiles"
+      "amazon_monetization_angle": "Amazon tiles",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "minimalist coffee table decor ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "Decor trays, books"
+      "amazon_monetization_angle": "Decor trays, books",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "DIY picture frame wall layout ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "Frames"
+      "amazon_monetization_angle": "Frames",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "affordable large wall art ideas",
       "intent": "buyer",
-      "amazon_monetization_angle": "Canvas art"
+      "amazon_monetization_angle": "Canvas art",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "small dining room wall decor ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "Mirrors, art"
+      "amazon_monetization_angle": "Mirrors, art",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "cozy bedroom lighting ideas no wiring",
       "intent": "buyer",
-      "amazon_monetization_angle": "Plug-in sconces"
+      "amazon_monetization_angle": "Plug-in sconces",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "aesthetic home office decor ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "Desk decor"
+      "amazon_monetization_angle": "Desk decor",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "mirror wall decor ideas for living room",
       "intent": "buyer/informational",
-      "amazon_monetization_angle": "Mirrors"
+      "amazon_monetization_angle": "Mirrors",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "studio apartment decor ideas on a budget",
       "intent": "informational",
-      "amazon_monetization_angle": "Multi-product roundup"
+      "amazon_monetization_angle": "Multi-product roundup",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     },
     {
       "term": "DIY wall paneling cheap ideas",
       "intent": "informational",
-      "amazon_monetization_angle": "Panel kits"
+      "amazon_monetization_angle": "Panel kits",
+      "active": true,
+      "blog_url": "",
+      "source_imgs_folder": ""
     }
   ]
 }
