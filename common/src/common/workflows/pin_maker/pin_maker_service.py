@@ -31,6 +31,7 @@ class PinMakerService:
         brand_text: str,
         persona_prompt: str | None = None,
         audience_prompt: str | None = None,
+        blog_url: str = "",
     ) -> PinResult:
         """Generate text via LLM, render pin, return result."""
         text_data = self.llm.generate(
@@ -41,6 +42,7 @@ class PinMakerService:
             locale=locale,
             persona_prompt=persona_prompt,
             audience_prompt=audience_prompt,
+            blog_url=blog_url,
         )
 
         logger.info(f"Style: {style.name} | Title: {text_data.get('title')}")

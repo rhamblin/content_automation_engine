@@ -91,6 +91,7 @@ def main():
 
     for kw in config.keywords:
         term = kw["term"]
+        blog_url = kw.get("blog_url", "")
         slug = _to_slug(term)
 
         # Warn on duplicate slugs
@@ -130,6 +131,7 @@ def main():
                 brand_text=config.brand_watermark,
                 persona_prompt=config.persona_prompt or None,
                 audience_prompt=config.audience_prompt or None,
+                blog_url=blog_url,
             )
 
             out_name = f"{img_path.stem}_{result.style_name}.jpg"
