@@ -7,6 +7,19 @@ from PIL import Image, ImageDraw
 from common.contracts.models import CanvasSpec, Layout, VisualStyle
 
 
+def scale_to_fit(
+    img: Image.Image, target_w: int, target_h: int, bg_color: str = "#000000"
+) -> Image.Image:
+    """Scale image to fit within target dimensions, letterboxing with bg_color."""
+    img = img.copy()
+    img.thumbnail((target_w, target_h), Image.Resampling.LANCZOS)
+    canvas = Image.new("RGB", (target_w, target_h), bg_color)
+    x = (target_w - img.width) // 2
+    y = (target_h - img.height) // 2
+    canvas.paste(img, (x, y))
+    return canvas
+
+
 def smart_crop_resize(
     img: Image.Image, target_w: int, target_h: int
 ) -> Image.Image:
@@ -53,19 +66,25 @@ def _crop_with_focus(
 
 
 def compose_canvas(
-    source: Image.Image, canvas: CanvasSpec, layout: Layout
+    source: Image.Image, canvas: CanvasSpec, layout: Layout, product: bool = False
 ) -> Image.Image:
     """Build the background canvas from source image according to layout type."""
     w, h = canvas.width, canvas.height
 
     if layout.type == "single":
+        if product:
+            return scale_to_fit(source, w, h, layout.color)
         return smart_crop_resize(source, w, h)
 
     if layout.type == "split_duplicate":
         top_h = int(h * layout.split_pct)
         bot_h = h - top_h - layout.gap
-        top_img = _crop_with_focus(source, w, top_h, layout.crop_focus_top)
-        bot_img = _crop_with_focus(source, w, bot_h, layout.crop_focus_bottom)
+        if product:
+            top_img = scale_to_fit(source, w, top_h, layout.color)
+            bot_img = scale_to_fit(source, w, bot_h, layout.color)
+        else:
+            top_img = _crop_with_focus(source, w, top_h, layout.crop_focus_top)
+            bot_img = _crop_with_focus(source, w, bot_h, layout.crop_focus_bottom)
         composed = Image.new("RGB", (w, h), layout.color)
         composed.paste(top_img, (0, 0))
         composed.paste(bot_img, (0, top_h + layout.gap))
@@ -74,8 +93,12 @@ def compose_canvas(
     if layout.type == "split_horizontal":
         left_w = int(w * layout.split_pct)
         right_w = w - left_w - layout.gap
-        left_img = _crop_with_focus(source, left_w, h, layout.crop_focus_top)
-        right_img = _crop_with_focus(source, right_w, h, layout.crop_focus_bottom)
+        if product:
+            left_img = scale_to_fit(source, left_w, h, layout.color)
+            right_img = scale_to_fit(source, right_w, h, layout.color)
+        else:
+            left_img = _crop_with_focus(source, left_w, h, layout.crop_focus_top)
+            right_img = _crop_with_focus(source, right_w, h, layout.crop_focus_bottom)
         composed = Image.new("RGB", (w, h), layout.color)
         composed.paste(left_img, (0, 0))
         composed.paste(right_img, (left_w + layout.gap, 0))
@@ -84,7 +107,10 @@ def compose_canvas(
     if layout.type == "grid_2x2":
         cell_w = (w - layout.gap) // 2
         cell_h = (h - layout.gap) // 2
-        cell = smart_crop_resize(source, cell_w, cell_h)
+        if product:
+            cell = scale_to_fit(source, cell_w, cell_h, layout.color)
+        else:
+            cell = smart_crop_resize(source, cell_w, cell_h)
         composed = Image.new("RGB", (w, h), layout.color)
         composed.paste(cell, (0, 0))
         composed.paste(cell, (cell_w + layout.gap, 0))
@@ -94,19 +120,27 @@ def compose_canvas(
 
     if layout.type == "image_over_color":
         img_h = int(h * layout.split_pct)
-        top_img = _crop_with_focus(source, w, img_h, layout.crop_focus_top)
+        if product:
+            top_img = scale_to_fit(source, w, img_h, layout.color)
+        else:
+            top_img = _crop_with_focus(source, w, img_h, layout.crop_focus_top)
         composed = Image.new("RGB", (w, h), layout.color)
         composed.paste(top_img, (0, 0))
         return composed
 
     if layout.type == "color_over_image":
         img_h = int(h * (1.0 - layout.split_pct))
-        bot_img = _crop_with_focus(source, w, img_h, layout.crop_focus_bottom)
+        if product:
+            bot_img = scale_to_fit(source, w, img_h, layout.color)
+        else:
+            bot_img = _crop_with_focus(source, w, img_h, layout.crop_focus_bottom)
         composed = Image.new("RGB", (w, h), layout.color)
         composed.paste(bot_img, (0, h - img_h))
         return composed
 
     # Fallback to single
+    if product:
+        return scale_to_fit(source, w, h, layout.color)
     return smart_crop_resize(source, w, h)
 
 
@@ -116,6 +150,7 @@ def render_image(
     style: Any,
     text_data: dict,
     brand_text: str = "",
+    product: bool = False,
 ) -> Image.Image:
     """Render an image using the shared pipeline.
 
@@ -127,12 +162,13 @@ def render_image(
         style: VisualStyle object (or None).
         text_data: Dict mapping element keys to text strings.
         brand_text: Brand watermark text.
+        product: If True, scale-to-fit instead of crop/zoom.
 
     Returns:
         Final rendered PIL Image.
     """
     layout = style.layout if style and hasattr(style, "layout") else Layout()
-    img = compose_canvas(source, canvas, layout)
+    img = compose_canvas(source, canvas, layout, product=product)
 
     if style and style.overlays:
         for overlay in style.overlays:

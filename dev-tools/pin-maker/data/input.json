@@ -1,6 +1,7 @@
 {
+  "tenant": "dev-tenant",
   "niche": "recipes",
   "locale": "en",
-  "styles": "product_review",
-  "input_folder": "/Users/rhamblin/Desktop/content-engine/images/recipes/amazon-equipment"
+  "styles": null,
+  "output_folder": "/Users/rhamblin/Desktop/content-engine/images/output"
 }

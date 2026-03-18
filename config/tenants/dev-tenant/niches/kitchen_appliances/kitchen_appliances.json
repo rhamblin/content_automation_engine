@@ -3,6 +3,7 @@
   "brand_name": "ChefExotic",
   "brand_website": "https://chefexotic.com",
   "brand_watermark": "chefexotic.com",
+  "product": true,
   "amazon_tag": "chefexotic-20",
   "persona_name": "home_cook",
   "persona_prompt": "prompts/persona.txt",

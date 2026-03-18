@@ -1,4 +1,5 @@
 {
+  "tenant": "dev-tenant",
   "niche": "kitchen_appliances",
   "status": "draft"
 }

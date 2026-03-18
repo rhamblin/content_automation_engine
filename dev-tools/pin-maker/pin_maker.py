@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from common.workflows.pin_maker import PinMakerService
 from settings import load_dev_settings
 
-from config import _to_slug, load_config, load_styles
+from config import load_config, load_styles
 
 logger = AppLogger(__name__)
 
@@ -37,8 +37,17 @@ def main():
     )
     args = parser.parse_args()
 
+    if not args.data_file and not args.list_styles:
+        parser.error("a data file is required (e.g. data/input.json)")
+
+    # Read tenant from data file (default: dev-tenant)
+    tenant = "dev-tenant"
+    if args.data_file:
+        raw = json.loads(args.data_file.read_text())
+        tenant = raw.get("tenant", "dev-tenant")
+
     # Load styles from tenant config
-    styles = load_styles()
+    styles = load_styles(tenant=tenant)
 
     # --list-styles: no API call needed
     if args.list_styles:
@@ -46,11 +55,8 @@ def main():
             print(f"  {name}: {style.description}")
         sys.exit(0)
 
-    if not args.data_file:
-        parser.error("a data file is required (e.g. data/input.json)")
-
     # Load + validate request + niche config (keywords come from niche config)
-    config = load_config(args.data_file)
+    config = load_config(args.data_file, tenant=tenant)
     request = config.request
 
     if not config.channel_prompt:
@@ -74,44 +80,39 @@ def main():
 
     style_names = request.styles or list(styles.keys())
 
-    # Resolve input folder and create timestamped output folder as sibling
-    input_folder = Path(request.input_folder)
-    if not input_folder.is_dir():
-        logger.error(f"{input_folder} is not a directory")
-        sys.exit(1)
-
+    # Create timestamped output folder
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    output_folder = input_folder.parent / f"output-{timestamp}"
+    output_folder = Path(request.output_folder) / f"{request.niche}-{timestamp}"
     output_folder.mkdir(parents=True, exist_ok=True)
 
     # Process each active keyword
     manifest = []
-    saved, errors, skipped = 0, 0, 0
-    seen_slugs = set()
+    saved, errors = 0, 0
 
     for kw in config.keywords:
         term = kw["term"]
         blog_url = kw.get("blog_url", "")
-        slug = _to_slug(term)
+        source_imgs_folder = kw.get("source_imgs_folder", "")
 
-        # Warn on duplicate slugs
-        if slug in seen_slugs:
-            logger.warning(f"Duplicate slug '{slug}' from term '{term}' — processing anyway")
-        seen_slugs.add(slug)
-
-        subfolder = input_folder / slug
-        if not subfolder.is_dir():
-            logger.warning(f"Skipping '{term}': no subfolder at {subfolder}")
-            skipped += 1
+        # Validate source_imgs_folder
+        if not source_imgs_folder:
+            logger.error(f"FAILED '{term}': source_imgs_folder is not set")
+            errors += 1
             continue
 
-        # Collect images from subfolder
+        img_dir = Path(source_imgs_folder)
+        if not img_dir.is_dir():
+            logger.error(f"FAILED '{term}': source_imgs_folder not found at {img_dir}")
+            errors += 1
+            continue
+
+        # Collect images from source folder
         images = []
         for ext in IMAGE_EXTENSIONS:
-            images.extend(subfolder.glob(ext))
+            images.extend(img_dir.glob(ext))
         if not images:
-            logger.warning(f"Skipping '{term}': subfolder {subfolder} has no images")
-            skipped += 1
+            logger.error(f"FAILED '{term}': no images in {img_dir}")
+            errors += 1
             continue
 
         # Pick random image and style
@@ -132,6 +133,7 @@ def main():
                 persona_prompt=config.persona_prompt or None,
                 audience_prompt=config.audience_prompt or None,
                 blog_url=blog_url,
+                product=config.product,
             )
 
             out_name = f"{img_path.stem}_{result.style_name}.jpg"
@@ -157,7 +159,7 @@ def main():
     logger.info(f"Manifest written: {manifest_path}")
 
     logger.info(
-        f"Done — {saved} saved, {errors} errors, {skipped} skipped. "
+        f"Done — {saved} saved, {errors} errors. "
         f"Output: {output_folder}"
     )
 

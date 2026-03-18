@@ -3,6 +3,7 @@
   "brand_name": "Decor Moods",
   "brand_website": "https://decormoods.com",
   "brand_watermark": "decormoods.com",
+  "product": false,
   "amazon_tag": "decormoods-20",
   "persona_name": "decor_enthusiast",
   "persona_prompt": "prompts/persona.txt",

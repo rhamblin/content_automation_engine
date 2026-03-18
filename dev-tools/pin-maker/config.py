@@ -12,10 +12,6 @@ VALID_LOCALES = {"en", "es", "sw"}
 CONFIG_ROOT = Path(__file__).parent.parent.parent / "config" / "tenants"
 
 
-def _to_slug(term: str) -> str:
-    """Convert keyword term to slug: lowercase, spaces → hyphens."""
-    return term.lower().replace(" ", "-")
-
 
 @dataclass(frozen=True)
 class PinMakerConfig:
@@ -27,6 +23,7 @@ class PinMakerConfig:
     channel_prompt: str
     brand_watermark: str
     keywords: list[dict]
+    product: bool
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -52,8 +49,8 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
     """Load a JSON data file and return a validated PinMakerRequest."""
     raw = json.loads(path.read_text())
 
-    if "input_folder" not in raw or not raw["input_folder"]:
-        raise ValueError("'input_folder' is required in the data file")
+    if "output_folder" not in raw or not raw["output_folder"]:
+        raise ValueError("'output_folder' is required in the data file")
 
     locale = raw.get("locale", "en")
     if locale not in VALID_LOCALES:
@@ -69,7 +66,7 @@ def load_request(path: Path, tenant: str = "dev-tenant", channel: str = "pintere
                 raise ValueError(f"unknown style '{s}', available: {list(all_styles.keys())}")
 
     return PinMakerRequest(
-        input_folder=raw["input_folder"],
+        output_folder=raw["output_folder"],
         niche=raw.get("niche", "food"),
         locale=locale,
         styles=raw_styles,
@@ -111,6 +108,7 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
         channel_prompt=channel_prompt,
         brand_watermark=niche_data.get("brand_watermark", ""),
         keywords=active_keywords,
+        product=bool(niche_data.get("product", False)),
     )
 
 

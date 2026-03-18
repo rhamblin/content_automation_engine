@@ -8,6 +8,7 @@ What still needs manual work: verify content, set category/tags, affiliate links
 """
 
 import csv
+import json
 import sys
 import time
 from datetime import datetime
@@ -38,7 +39,9 @@ OUTPUT_DIR = Path(__file__).parent / "output"
 
 def main():
     data_file = Path(__file__).parent / "data" / "input.json"
-    config = load_config(data_file)
+    raw = json.loads(data_file.read_text())
+    tenant = raw.get("tenant", "dev-tenant")
+    config = load_config(data_file, tenant=tenant)
     request = config.request
     prompts = config.niche_prompts
 
@@ -55,7 +58,7 @@ def main():
     if not wp_cred:
         logger.error(
             f"No WordPress credentials for niche '{request.niche}'. "
-            "Add credentials under config/tenants/dev-tenant/niches/<name>/credentials/wordpress.json"
+            f"Add credentials under config/tenants/{tenant}/niches/<name>/credentials/wordpress.json"
         )
         sys.exit(1)
 
