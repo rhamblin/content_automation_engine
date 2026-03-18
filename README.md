@@ -286,6 +286,8 @@ erDiagram
     text persona_prompt
     text audience_prompt
     jsonb channel_prompts
+    boolean product
+    text amazon_tag
     boolean is_active
     timestamp created_at
     uuid  created_by
@@ -302,6 +304,7 @@ erDiagram
     text  term
     text  intent
     text  amazon_monetization_angle
+    text  blog_url
     boolean is_active
     timestamp created_at
     uuid  created_by

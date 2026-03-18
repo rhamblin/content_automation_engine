@@ -1076,7 +1076,7 @@ def main():
     print(f"Niche: {config.niche} | Tenant: {config.tenant}")
 
     try:
-        access_token = get_access_token(tenant=config.tenant)
+        access_token = get_access_token(tenant=config.tenant, niche=config.niche)
     except (FileNotFoundError, RuntimeError) as e:
         print(f"Error: {e}")
         sys.exit(1)

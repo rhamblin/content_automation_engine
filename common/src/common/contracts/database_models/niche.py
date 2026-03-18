@@ -29,6 +29,8 @@ class Niche(Base):
     persona_prompt: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     audience_prompt: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     channel_prompts: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    product: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    amazon_tag: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     created_by: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)

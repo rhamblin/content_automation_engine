@@ -17,7 +17,6 @@ SCOPES = "boards:read,boards:write,pins:read,pins:write,user_accounts:read,ads:r
 
 MODULE_DIR = Path(__file__).parent
 CERTS_DIR = MODULE_DIR / "certs"
-TOKEN_FILE = MODULE_DIR / ".access_token"
 CONFIG_ROOT = MODULE_DIR.parent.parent / "config" / "tenants"
 
 
@@ -49,9 +48,9 @@ class OAuthCallbackHandler(http.server.BaseHTTPRequestHandler):
         pass
 
 
-def _load_credentials(tenant: str) -> tuple[str, str]:
-    """Load Pinterest client_id and client_secret from tenant credentials."""
-    creds_path = CONFIG_ROOT / tenant / "credentials" / "pinterest.json"
+def _load_credentials(tenant: str, niche: str) -> tuple[str, str]:
+    """Load Pinterest client_id and client_secret from niche credentials."""
+    creds_path = CONFIG_ROOT / tenant / "niches" / niche / "credentials" / "pinterest.json"
     if not creds_path.exists():
         raise FileNotFoundError(
             f"Credentials file not found: {creds_path}\n\n"
@@ -161,26 +160,28 @@ def is_token_valid(token: str) -> bool:
     return response.ok
 
 
-def get_access_token(tenant: str = "dev-tenant") -> str:
+def get_access_token(tenant: str = "dev-tenant", niche: str = "recipes") -> str:
     """Get valid access token, running OAuth flow if needed.
 
-    1. Check cached token file
+    1. Check cached token file (per-niche)
     2. If expired/missing, run browser OAuth flow
     3. Cache token for reuse across tools
     """
+    token_file = MODULE_DIR / f".access_token_{niche}"
+
     # Check cached token
-    if TOKEN_FILE.exists():
-        token = TOKEN_FILE.read_text().strip()
+    if token_file.exists():
+        token = token_file.read_text().strip()
         if token and is_token_valid(token):
-            print("Using cached Pinterest token.")
+            print(f"Using cached Pinterest token for niche '{niche}'.")
             return token
         print("Cached token expired, re-authenticating...")
 
     # OAuth flow
-    client_id, client_secret = _load_credentials(tenant)
+    client_id, client_secret = _load_credentials(tenant, niche)
     auth_code = _get_auth_code(client_id)
     token = _exchange_code_for_token(client_id, client_secret, auth_code)
 
-    TOKEN_FILE.write_text(token)
+    token_file.write_text(token)
     print("Token cached for future use.")
     return token

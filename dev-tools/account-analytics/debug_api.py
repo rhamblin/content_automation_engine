@@ -10,7 +10,10 @@ import requests
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 
-access_token = get_access_token()
+from config import load_config
+
+config = load_config(Path(__file__).parent / "data" / "input.json")
+access_token = get_access_token(tenant=config.tenant, niche=config.niche)
 headers = {"Authorization": f"Bearer {access_token}"}
 
 # 1. Get one pin

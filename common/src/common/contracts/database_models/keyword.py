@@ -25,6 +25,7 @@ class Keyword(Base):
     term: Mapped[str] = mapped_column(String, nullable=False)
     intent: Mapped[str] = mapped_column(String, nullable=False, default="informational")
     amazon_monetization_angle: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    blog_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     created_by: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
