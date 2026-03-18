@@ -60,7 +60,7 @@ For each segment, define:
 **5. Keywords**
 - Provide 10-20 seed keywords that represent the content pillars of this niche
 - Keywords should be specific enough to generate focused content (e.g., "boho living room" not just "decor")
-- Optional per-keyword fields: `blog_url` (URL of the published blog post; required for title-generator), `source_imgs_folder` (absolute path to folder of source images for LLM grounding)
+- Optional per-keyword fields: `blog_url` (URL of the published blog post; required for title-generator), `reference_images` (absolute path to folder of source images for LLM grounding)
 
 ### Niche Config (`<niche_name>.json`) Template
 
@@ -84,7 +84,7 @@ For each segment, define:
       "amazon_monetization_angle": "Related products",
       "active": true,
       "blog_url": "https://example.com/post-slug/",
-      "source_imgs_folder": "/absolute/path/to/images/keyword-slug"
+      "reference_images": "/absolute/path/to/images/keyword-slug"
     }
   ]
 }

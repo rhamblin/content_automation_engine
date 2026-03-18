@@ -63,7 +63,7 @@ def _pick_random_image(folder_path: str) -> str | None:
     """Pick a random image from folder and return base64-encoded content."""
     folder = Path(folder_path)
     if not folder.is_dir():
-        logger.warning("source_imgs_folder not found: %s", folder_path)
+        logger.warning("reference_images not found: %s", folder_path)
         return None
 
     image_exts = {".jpg", ".jpeg", ".png", ".webp"}
@@ -104,9 +104,9 @@ def main():
         blog_url = kw_dict.get("blog_url", "")
         logger.info("  → %s", keyword)
 
-        # Load optional reference image from source_imgs_folder
+        # Load optional reference image from reference_images
         image_base64 = None
-        source_folder = kw_dict.get("source_imgs_folder")
+        source_folder = kw_dict.get("reference_images")
         if source_folder:
             image_base64 = _pick_random_image(source_folder)
 

@@ -19,7 +19,7 @@
       "amazon_monetization_angle": "Boba kits, tapioca pearls, bubble tea straws",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "tropical pineapple coconut mocktail recipe",
@@ -27,7 +27,7 @@
       "amazon_monetization_angle": "Blenders, cocktail shakers, glassware",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "matcha bubble tea recipe with tapioca pearls",
@@ -35,15 +35,15 @@
       "amazon_monetization_angle": "Matcha powder, boba pearls, milk frothers",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "exotic dragon fruit mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Blenders, bar tools, drink pitchers",
-      "active": false,
+      "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "caribbean guava mocktail recipe",
@@ -51,7 +51,7 @@
       "amazon_monetization_angle": "Citrus presses, pitchers, bar sets",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "passionfruit martini cocktail recipe",
@@ -59,7 +59,7 @@
       "amazon_monetization_angle": "Martini glasses, cocktail shaker sets",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "iced coconut matcha latte recipe",
@@ -67,7 +67,7 @@
       "amazon_monetization_angle": "Matcha whisk sets, milk frothers",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "mango passionfruit mocktail recipe",
@@ -75,7 +75,7 @@
       "amazon_monetization_angle": "Cocktail shakers, drink mixers",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "how to cook tapioca pearls for bubble tea",
@@ -83,7 +83,7 @@
       "amazon_monetization_angle": "Tapioca pearls, bubble tea kits",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "frozen mango daiquiri blender recipe",
@@ -91,7 +91,7 @@
       "amazon_monetization_angle": "High-power blenders, cocktail kits",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "dragon fruit mocktail recipe",
@@ -99,7 +99,7 @@
       "amazon_monetization_angle": "Blenders, cocktail glasses",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "matcha bubble tea recipe",
@@ -107,7 +107,7 @@
       "amazon_monetization_angle": "Matcha powder, bubble tea kits",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "brown sugar bubble tea recipe",
@@ -115,7 +115,7 @@
       "amazon_monetization_angle": "Boba pearls, syrup kits",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "tropical rum punch recipe Caribbean",
@@ -123,7 +123,7 @@
       "amazon_monetization_angle": "Drink dispensers, bar sets",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "mango mocktail recipe",
@@ -131,7 +131,119 @@
       "amazon_monetization_angle": "Blenders, citrus juicers",
       "active": true,
       "blog_url": "",
-      "source_imgs_folder": ""
+      "reference_images": ""
+    },
+    {
+      "term": "Jollof rice with goat",
+      "intent": "informational",
+      "amazon_monetization_angle": "Dutch ovens, spice kits",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Garlic lemon shrimp",
+      "intent": "informational",
+      "amazon_monetization_angle": "Cast iron skillets, garlic press",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Lemon herb baked chicken",
+      "intent": "informational",
+      "amazon_monetization_angle": "Roasting pans, herb scissors",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Cozy Noodle bowl",
+      "intent": "informational",
+      "amazon_monetization_angle": "Ramen bowls, chopsticks",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Lobster recipe",
+      "intent": "informational",
+      "amazon_monetization_angle": "Seafood tools, butter warmers",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Curry noodle bowl",
+      "intent": "informational",
+      "amazon_monetization_angle": "Curry paste, woks",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Plantain bites",
+      "intent": "informational",
+      "amazon_monetization_angle": "Plantain chips, air fryers",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Pudding bowls",
+      "intent": "informational",
+      "amazon_monetization_angle": "Dessert cups, ramekins",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Coconut pancakes",
+      "intent": "informational",
+      "amazon_monetization_angle": "Coconut flour, griddles",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Chilli shrimps cups",
+      "intent": "informational",
+      "amazon_monetization_angle": "Mini cup molds, chilli flakes",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Jackfruit wraps",
+      "intent": "informational",
+      "amazon_monetization_angle": "Canned jackfruit, tortilla press",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Lava cake",
+      "intent": "informational",
+      "amazon_monetization_angle": "Ramekins, chocolate melts",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Rum pudding",
+      "intent": "informational",
+      "amazon_monetization_angle": "Pudding molds, rum extract",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
+    },
+    {
+      "term": "Chia pudding",
+      "intent": "buyer/informational",
+      "amazon_monetization_angle": "Chia seeds, mason jars",
+      "active": false,
+      "blog_url": "",
+      "reference_images": ""
     }
   ]
 }

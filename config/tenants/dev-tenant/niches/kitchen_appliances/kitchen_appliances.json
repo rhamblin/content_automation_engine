@@ -19,7 +19,7 @@
       "amazon_monetization_angle": "Gourmet french door air fryer",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "Fullstar original pro chopper review",
@@ -27,7 +27,7 @@
       "amazon_monetization_angle": "Fullstar original pro chopper",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "Cuisinart multiclad roasting pan and rack review",
@@ -35,7 +35,7 @@
       "amazon_monetization_angle": "Cuisinart multiclad roasting pan and rack",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "Sensarte nonstick deep skillet review",
@@ -43,7 +43,7 @@
       "amazon_monetization_angle": "Sensarte nonstick deep skillet",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "ThermoPro meat thermometer review",
@@ -51,7 +51,7 @@
       "amazon_monetization_angle": "ThermoPro meat thermometer",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "Gourmia air fryer review",
@@ -59,7 +59,7 @@
       "amazon_monetization_angle": "Gourmia air fryer",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     },
     {
       "term": "Weber Spirit II grill review",
@@ -67,7 +67,7 @@
       "amazon_monetization_angle": "Weber Spirit II grill",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "source_imgs_folder": ""
+      "reference_images": ""
     }
   ]
 }

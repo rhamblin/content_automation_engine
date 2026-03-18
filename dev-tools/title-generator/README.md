@@ -8,7 +8,7 @@ Keywords are read from the **niche config** (`config/tenants/<tenant>/niches/<ni
 
 - Keywords with `active: false` are filtered out.
 - Keywords **without a `blog_url`** are skipped (with a warning log).
-- If a keyword has `source_imgs_folder`, a random image from that folder is picked and sent to the LLM for grounding.
+- If a keyword has `reference_images`, a random image from that folder is picked and sent to the LLM for grounding.
 
 ## Data File (`data/input.json`)
 
@@ -35,13 +35,13 @@ Keywords are read from the **niche config** (`config/tenants/<tenant>/niches/<ni
   "amazon_monetization_angle": "Gourmet french door air fryer",
   "active": true,
   "blog_url": "https://chefexotic.com/shop/",
-  "source_imgs_folder": "/absolute/path/to/images/keyword-slug"
+  "reference_images": "/absolute/path/to/images/keyword-slug"
 }
 ```
 
 - `active` — boolean. Keywords with `false` are skipped by all dev tools.
 - `blog_url` — optional. Keywords without it are skipped by title-generator.
-- `source_imgs_folder` — optional. Absolute path to a folder of source images for LLM grounding.
+- `reference_images` — optional. Absolute path to a folder of source images for LLM grounding.
 
 ## Usage
 

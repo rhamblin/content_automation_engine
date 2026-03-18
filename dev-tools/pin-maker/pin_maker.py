@@ -92,17 +92,17 @@ def main():
     for kw in config.keywords:
         term = kw["term"]
         blog_url = kw.get("blog_url", "")
-        source_imgs_folder = kw.get("source_imgs_folder", "")
+        reference_images = kw.get("reference_images", "")
 
-        # Validate source_imgs_folder
-        if not source_imgs_folder:
-            logger.error(f"FAILED '{term}': source_imgs_folder is not set")
+        # Validate reference_images
+        if not reference_images:
+            logger.error(f"FAILED '{term}': reference_images is not set")
             errors += 1
             continue
 
-        img_dir = Path(source_imgs_folder)
+        img_dir = Path(reference_images)
         if not img_dir.is_dir():
-            logger.error(f"FAILED '{term}': source_imgs_folder not found at {img_dir}")
+            logger.error(f"FAILED '{term}': reference_images not found at {img_dir}")
             errors += 1
             continue
 
