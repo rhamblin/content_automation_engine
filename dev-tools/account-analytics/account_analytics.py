@@ -12,6 +12,8 @@ import requests
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from pinterest_auth.auth import PINTEREST_API_URL, get_access_token
 
+from config import load_config
+
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -1062,19 +1064,27 @@ def main():
     parser = argparse.ArgumentParser(description="Pinterest Account Analytics")
     parser.add_argument("--limit", type=int, help="Limit pins to analyze")
     parser.add_argument("--open", action="store_true", help="Open in browser")
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path(__file__).parent / "data" / "input.json",
+        help="Path to config data file (default: data/input.json)",
+    )
     args = parser.parse_args()
 
+    config = load_config(args.config)
+    print(f"Niche: {config.niche} | Tenant: {config.tenant}")
+
     try:
-        access_token = get_access_token()
+        access_token = get_access_token(tenant=config.tenant)
     except (FileNotFoundError, RuntimeError) as e:
         print(f"Error: {e}")
         sys.exit(1)
 
     print("Fetching account info...")
     account_info = fetch_account_info(access_token)
-    brand_name = account_info.get("business_name", "")
     username = account_info.get("username", "Pinterest Account")
-    account_name = f"{brand_name} - {username}" if brand_name else username
+    account_name = f"{config.brand_name} - {username}" if config.brand_name else username
 
     print("Fetching pins...")
     pins = fetch_all_pins(access_token)
