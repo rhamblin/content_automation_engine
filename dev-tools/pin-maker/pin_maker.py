@@ -1,6 +1,7 @@
 """Pinterest Pin Maker — orchestrator (all I/O lives here)."""
 
 import argparse
+import base64
 import json
 import random
 import sys
@@ -123,6 +124,7 @@ def main():
 
         try:
             source_image = Image.open(img_path).convert("RGB")
+            image_b64 = base64.b64encode(img_path.read_bytes()).decode()
             result = service.make_pin(
                 source_image=source_image,
                 keyword=term,
@@ -134,6 +136,7 @@ def main():
                 audience_prompt=config.audience_prompt or None,
                 blog_url=blog_url,
                 product=config.product,
+                image_base64=image_b64,
             )
 
             out_name = f"{img_path.stem}_{result.style_name}.jpg"

@@ -1,7 +1,7 @@
 {
   "tenant": "dev-tenant",
-  "niche": "recipes",
+  "niche": "kitchen_appliances",
   "locale": "en",
-  "styles": null,
-  "output_folder": "/Users/rhamblin/Desktop/content-engine/images/output"
+  "styles": "slab_script",
+  "output_folder": "/Users/rhamblin/Desktop/content-engine/images/pins/march19"
 }

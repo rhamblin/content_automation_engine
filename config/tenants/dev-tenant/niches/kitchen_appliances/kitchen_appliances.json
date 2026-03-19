@@ -19,7 +19,7 @@
       "amazon_monetization_angle": "Gourmet french door air fryer",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/amazon-equipment/air-fryer-french-door"
     },
     {
       "term": "Fullstar original pro chopper review",
@@ -27,15 +27,7 @@
       "amazon_monetization_angle": "Fullstar original pro chopper",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
-    },
-    {
-      "term": "Cuisinart multiclad roasting pan and rack review",
-      "intent": "buyer",
-      "amazon_monetization_angle": "Cuisinart multiclad roasting pan and rack",
-      "active": true,
-      "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/amazon-equipment/fullstar-chopper"
     },
     {
       "term": "Sensarte nonstick deep skillet review",
@@ -43,7 +35,7 @@
       "amazon_monetization_angle": "Sensarte nonstick deep skillet",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/amazon-equipment/deep-skillet"
     },
     {
       "term": "ThermoPro meat thermometer review",
@@ -51,7 +43,7 @@
       "amazon_monetization_angle": "ThermoPro meat thermometer",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/amazon-equipment/meat-thermometer"
     },
     {
       "term": "Gourmia air fryer review",
@@ -59,15 +51,7 @@
       "amazon_monetization_angle": "Gourmia air fryer",
       "active": true,
       "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
-    },
-    {
-      "term": "Weber Spirit II grill review",
-      "intent": "buyer",
-      "amazon_monetization_angle": "Weber Spirit II grill",
-      "active": true,
-      "blog_url": "https://chefexotic.com/shop/",
-      "reference_images": ""
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/amazon-equipment/air-fryer-toast-oven"
     }
   ]
 }
