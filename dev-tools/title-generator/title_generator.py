@@ -1,14 +1,13 @@
 """Title Generator — orchestrator (all I/O lives here)."""
 
-import base64
 import json
-import random
 import sys
 from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
+from common.utils.images import pick_random_image
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -59,24 +58,6 @@ def print_results(all_results: list[dict], request):
             print()
 
 
-def _pick_random_image(folder_path: str) -> str | None:
-    """Pick a random image from folder and return base64-encoded content."""
-    folder = Path(folder_path)
-    if not folder.is_dir():
-        logger.warning("reference_images not found: %s", folder_path)
-        return None
-
-    image_exts = {".jpg", ".jpeg", ".png", ".webp"}
-    images = [f for f in folder.iterdir() if f.suffix.lower() in image_exts]
-    if not images:
-        logger.warning("No images found in: %s", folder_path)
-        return None
-
-    chosen = random.choice(images)
-    logger.info("    Picked image: %s", chosen.name)
-    return base64.b64encode(chosen.read_bytes()).decode()
-
-
 def main():
     data_file = Path(__file__).parent / "data" / "input.json"
     config = load_config(data_file)
@@ -108,7 +89,7 @@ def main():
         image_base64 = None
         source_folder = kw_dict.get("reference_images")
         if source_folder:
-            image_base64 = _pick_random_image(source_folder)
+            image_base64 = pick_random_image(source_folder)
 
         result = service.generate(
             niche=request.niche,

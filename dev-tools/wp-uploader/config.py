@@ -43,6 +43,7 @@ def _normalize_keyword(item: str | dict) -> KeywordEntry:
         term=item["term"],
         intent=item.get("intent", "informational"),
         amazon_monetization_angle=item.get("amazon_monetization_angle", ""),
+        reference_images=item.get("reference_images", ""),
     )
 
 

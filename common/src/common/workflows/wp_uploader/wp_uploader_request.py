@@ -10,6 +10,7 @@ class KeywordEntry:
     term: str
     intent: str = "informational"
     amazon_monetization_angle: str = ""
+    reference_images: str = ""
 
 
 @dataclass(frozen=True)

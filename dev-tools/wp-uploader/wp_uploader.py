@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.wordpress import WordPressChannel
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
+from common.utils.images import pick_random_image
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -124,6 +125,11 @@ def main():
                 else:
                     logger.info(f"Media: id={media_id}")
 
+                # Pick a random reference image for LLM grounding (optional)
+                image_base64 = None
+                if kw.reference_images:
+                    image_base64 = pick_random_image(kw.reference_images)
+
                 try:
                     result = service.upload_topic(
                         keyword=kw.term,
@@ -135,6 +141,7 @@ def main():
                         audience_prompt=prompts.audience_prompt or None,
                         intent=kw.intent,
                         amazon_monetization_angle=kw.amazon_monetization_angle,
+                        image_base64=image_base64,
                     )
 
                     console.print(f"  [green]✓[/green] Published: {result.url}")

@@ -62,6 +62,7 @@ class WpUploaderService:
         audience_prompt: str | None = None,
         intent: str = "informational",
         amazon_monetization_angle: str = "",
+        image_base64: str | None = None,
     ) -> WpUploadResult:
         """Generate content via LLM and publish to WordPress."""
         content = self.wp.render_content(
@@ -75,6 +76,7 @@ class WpUploaderService:
             },
             persona_prompt=persona_prompt,
             audience_prompt=audience_prompt,
+            image_base64=image_base64,
         )
 
         # logger.info(
