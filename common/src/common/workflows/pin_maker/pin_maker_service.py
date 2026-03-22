@@ -50,13 +50,18 @@ class PinMakerService:
 
         logger.info(f"Style: {style.name} | Title: {text_data.get('title')}")
 
-        pin_image = self.channel.render_content(
+        render_kwargs = dict(
             source=source_image,
             text_data=text_data,
             style=style,
             brand_text=brand_text,
             product=product,
         )
+        if product:
+            render_kwargs["width"] = 1000
+            render_kwargs["height"] = 1000
+
+        pin_image = self.channel.render_content(**render_kwargs)
 
         return PinResult(
             image=pin_image,
