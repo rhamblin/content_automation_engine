@@ -16,7 +16,7 @@ class ImageOverlay:
     color: str = "#000000"
     opacity: float = 0.3
     height_pct: float = 0.35
-    y_position: int = 750  # positive=from top, negative=from bottom (for center/box)
+    y_position: float = 0.5  # 0.0-1.0 relative to canvas height; negative=from bottom
     width_pct: float = 0.7  # box width (for "box" only)
     border_color: str = "#000000"
     border_width: int = 0
@@ -89,8 +89,8 @@ class ImageOverlay:
         if self.angle != 0:
             colored = colored.rotate(self.angle, resample=Image.Resampling.BICUBIC, expand=True)
 
-        # Position
-        center_y = self.y_position if self.y_position >= 0 else img.height + self.y_position
+        # Position (relative)
+        center_y = int(self.y_position * img.height) if self.y_position >= 0 else img.height + int(self.y_position * img.height)
         center_x = img.width // 2 + self.x_position
         paste_x = center_x - colored.width // 2
         paste_y = center_y - colored.height // 2
@@ -116,8 +116,8 @@ class ImageOverlay:
             border_rgb = self._parse_rgb(self.border_color)
             border_outline = (*border_rgb, 255)
 
-        # Calculate y (positive=from top, negative=from bottom)
-        center_y = self.y_position if self.y_position >= 0 else img.height + self.y_position
+        # Calculate y from relative position (positive=from top, negative=from bottom)
+        center_y = int(self.y_position * img.height) if self.y_position >= 0 else img.height + int(self.y_position * img.height)
 
         if self.position == "top":
             for i in range(h):

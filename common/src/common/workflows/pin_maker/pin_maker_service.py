@@ -58,8 +58,10 @@ class PinMakerService:
             product=product,
         )
         if product:
+            src_w, src_h = source_image.size
+            aspect = src_h / src_w
             render_kwargs["width"] = 1000
-            render_kwargs["height"] = 1000
+            render_kwargs["height"] = int(1000 * aspect)
 
         pin_image = self.channel.render_content(**render_kwargs)
 

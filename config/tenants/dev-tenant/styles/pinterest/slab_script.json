@@ -7,7 +7,7 @@
       "font_file": "BebasNeue.ttf",
       "font_size": 110,
       "color": "#5C3A1E",
-      "y_position": 620,
+      "y_position": 0.413,
       "outline_width": 0,
       "max_lines": 1
     },
@@ -15,7 +15,7 @@
       "font_file": "DancingScript.ttf",
       "font_size": 72,
       "color": "#C2185B",
-      "y_position": 740,
+      "y_position": 0.493,
       "outline_width": 1,
       "outline_color": "#FFFFFF"
     },
@@ -23,7 +23,7 @@
       "font_file": "DancingScript.ttf",
       "font_size": 48,
       "color": "#FFFFFF",
-      "y_position": -60,
+      "y_position": -0.04,
       "alignment": "right",
       "outline_width": 2,
       "outline_color": "#5C3A1E"
@@ -34,7 +34,7 @@
         "color": "#FFFFFF",
         "opacity": 0.70,
         "height_pct": 0.22,
-        "y_position": 710,
+        "y_position": 0.473,
         "border_color": "#5C3A1E",
         "border_width": 3
       }

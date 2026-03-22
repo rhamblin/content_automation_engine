@@ -7,7 +7,7 @@
       "font_file": "NexaRust.otf",
       "font_size": 130,
       "color": "#FFFFFF",
-      "y_position": 280,
+      "y_position": 0.187,
       "outline_width": 6,
       "outline_color": "#000000",
       "alignment": "left",
@@ -17,7 +17,7 @@
       "font_file": "Bangers.ttf",
       "font_size": 44,
       "color": "#FFD700",
-      "y_position": -180,
+      "y_position": -0.120,
       "outline_width": 3,
       "outline_color": "#000000"
     },
@@ -25,7 +25,7 @@
       "font_file": "DancingScript.ttf",
       "font_size": 48,
       "color": "#FFFFFF",
-      "y_position": -60,
+      "y_position": -0.04,
       "alignment": "right",
       "outline_width": 2,
       "outline_color": "#5C3A1E"

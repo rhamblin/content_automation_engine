@@ -7,14 +7,14 @@
       "font_file": "Montserrat.ttf",
       "font_size": 38,
       "color": "#3D4A1A",
-      "y_position": 640,
+      "y_position": 0.427,
       "outline_width": 1
     },
     "title": {
       "font_file": "BebasNeue.ttf",
       "font_size": 140,
       "color": "#1a1a1a",
-      "y_position": 700,
+      "y_position": 0.467,
       "outline_width": 0,
       "max_lines": 1
     },
@@ -22,14 +22,14 @@
       "font_file": "Montserrat.ttf",
       "font_size": 36,
       "color": "#3D4A1A",
-      "y_position": 850,
+      "y_position": 0.567,
       "outline_width": 1
     },
     "watermark": {
       "font_file": "DancingScript.ttf",
       "font_size": 48,
       "color": "#FFFFFF",
-      "y_position": -60,
+      "y_position": -0.04,
       "alignment": "right",
       "outline_width": 2,
       "outline_color": "#5C3A1E"
@@ -40,7 +40,7 @@
         "color": "#FFFFFF",
         "opacity": 0.95,
         "height_pct": 0.24,
-        "y_position": 750,
+        "y_position": 0.500,
         "border_color": "#9B8C4E",
         "border_width": 4
       }

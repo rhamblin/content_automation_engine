@@ -22,9 +22,8 @@ TONE & VOICE:
 - Only use the style option that was selected and generate the JSON using only the selected style.
 
 OUTPUT FORMAT:
-Return ONLY valid JSON matching this exact schema:
+Return ONLY valid JSON. Always include these fields alongside any style-specific fields (title, prefix, accent, tagline) requested below:
 {
-  "title": "...",
   "description": "...",
   "alt_text": "...",
   "reasoning": "..."

@@ -6,6 +6,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 FONTS_DIR = Path(__file__).parent.parent.parent.parent / "resources" / "rendering" / "fonts"
+REFERENCE_HEIGHT = 1500  # font_size values in style JSONs are authored for this height
 
 
 @dataclass
@@ -15,7 +16,7 @@ class TextElement:
     font_file: str
     font_size: int
     color: str
-    y_position: int  # positive=from top, negative=from bottom
+    y_position: float  # 0.0-1.0 relative to canvas height; negative=from bottom
     outline_width: int = 0
     outline_color: str = "#000000"
     alignment: str = "center"  # "center", "left", "right"
@@ -57,18 +58,20 @@ class TextElement:
         max_width = int(img_width * self.max_width_pct)
         margin = int(img_width * (1 - self.max_width_pct) / 2)
 
-        # Auto-shrink font to fit within max_lines
-        font_size = self.font_size
+        # Scale font size relative to canvas height
+        scale = img_height / REFERENCE_HEIGHT
+        font_size = max(12, int(self.font_size * scale))
         font = self._get_font(font_size)
-        while font_size > 20:
+        min_size = max(12, int(20 * scale))
+        while font_size > min_size:
             lines = self._wrap_text(text, font, max_width)
             if len(lines) <= self.max_lines:
                 break
             font_size -= 4
             font = self._get_font(font_size)
 
-        # Calculate y (positive=from top, negative=from bottom)
-        y = self.y_position if self.y_position >= 0 else img_height + self.y_position
+        # Calculate y from relative position (positive=from top, negative=from bottom)
+        y = int(self.y_position * img_height) if self.y_position >= 0 else img_height + int(self.y_position * img_height)
 
         lines = self._wrap_text(text, font, max_width)
 
@@ -76,11 +79,11 @@ class TextElement:
         if self.angle != 0 and base_img is not None:
             overlay = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 0))
             overlay_draw = ImageDraw.Draw(overlay)
-            self._draw_lines(overlay_draw, lines, font, img_width, margin, y)
+            self._draw_lines(overlay_draw, lines, font, img_width, margin, y, scale)
             rotated = overlay.rotate(self.angle, resample=Image.Resampling.BICUBIC, center=(img_width // 2, y))
             return Image.alpha_composite(base_img, rotated)
 
-        self._draw_lines(canvas, lines, font, img_width, margin, y)
+        self._draw_lines(canvas, lines, font, img_width, margin, y, scale)
         return None
 
     def _draw_lines(
@@ -91,8 +94,12 @@ class TextElement:
         img_width: int,
         margin: int,
         y: int,
+        scale: float = 1.0,
     ) -> None:
         """Draw text lines with outline."""
+        scaled_outline = max(1, int(self.outline_width * scale)) if self.outline_width > 0 else 0
+        line_gap = max(4, int(10 * scale))
+
         for line in lines:
             bbox = font.getbbox(line)
             text_w, text_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
@@ -103,11 +110,11 @@ class TextElement:
                 "right": img_width - text_w - margin,
             }[self.alignment]
 
-            if self.outline_width > 0:
-                for dx in range(-self.outline_width, self.outline_width + 1):
-                    for dy in range(-self.outline_width, self.outline_width + 1):
+            if scaled_outline > 0:
+                for dx in range(-scaled_outline, scaled_outline + 1):
+                    for dy in range(-scaled_outline, scaled_outline + 1):
                         if dx != 0 or dy != 0:
                             canvas.text((x + dx, y + dy), line, font=font, fill=self.outline_color)
 
             canvas.text((x, y), line, font=font, fill=self.color)
-            y += int(text_h) + 10
+            y += int(text_h) + line_gap

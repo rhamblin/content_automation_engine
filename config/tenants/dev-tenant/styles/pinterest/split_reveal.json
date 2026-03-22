@@ -15,7 +15,7 @@
       "font_file": "BebasNeue.ttf",
       "font_size": 110,
       "color": "#FFFFFF",
-      "y_position": 700,
+      "y_position": 0.467,
       "outline_width": 0,
       "max_lines": 1
     },
@@ -23,7 +23,7 @@
       "font_file": "DancingScript.ttf",
       "font_size": 48,
       "color": "#FFFFFF",
-      "y_position": -60,
+      "y_position": -0.04,
       "alignment": "right",
       "outline_width": 2,
       "outline_color": "#5C3A1E"
@@ -34,7 +34,7 @@
         "color": "#2D6A4F",
         "opacity": 1.0,
         "height_pct": 0.12,
-        "y_position": 750
+        "y_position": 0.500
       }
     ]
   }
