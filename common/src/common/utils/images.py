@@ -11,21 +11,23 @@ logger = AppLogger(__name__)
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
-def pick_random_image(folder_path: str) -> str | None:
-    """Pick a random image from *folder_path* and return base64-encoded content.
+def pick_random_image(folder_path: str) -> tuple[str, str] | tuple[None, None]:
+    """Pick a random image from *folder_path*.
 
-    Returns None (with a warning) when the folder doesn't exist or is empty.
+    Returns:
+        (base64_str, absolute_file_path) on success, or (None, None) when
+        the folder doesn't exist or is empty.
     """
     folder = Path(folder_path)
     if not folder.is_dir():
         logger.warning("reference_images not found: %s", folder_path)
-        return None
+        return None, None
 
     images = [f for f in folder.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS]
     if not images:
         logger.warning("No images found in: %s", folder_path)
-        return None
+        return None, None
 
     chosen = random.choice(images)
     logger.info("Picked reference image: %s", chosen.name)
-    return base64.b64encode(chosen.read_bytes()).decode()
+    return base64.b64encode(chosen.read_bytes()).decode(), str(chosen)

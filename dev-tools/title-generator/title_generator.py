@@ -89,7 +89,7 @@ def main():
         image_base64 = None
         source_folder = kw_dict.get("reference_images")
         if source_folder:
-            image_base64 = pick_random_image(source_folder)
+            image_base64, _ = pick_random_image(source_folder)
 
         result = service.generate(
             niche=request.niche,

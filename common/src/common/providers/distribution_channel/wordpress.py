@@ -111,6 +111,62 @@ class WordPressChannel(IDistributionChannel):
 
         return tag_ids
 
+    def upload_media(self, image_path: str) -> tuple[int, str]:
+        """Upload a local image file to the WordPress media library.
+
+        Args:
+            image_path: Absolute path to the image file.
+
+        Returns:
+            (media_id, source_url) of the newly created media item.
+
+        Raises:
+            FileNotFoundError: When image_path does not exist.
+            ConnectionError: When WordPress API is unreachable.
+            RuntimeError: When WordPress API returns an error response.
+        """
+        from pathlib import Path
+
+        path = Path(image_path)
+        if not path.is_file():
+            raise FileNotFoundError(f"Image not found: {image_path}")
+
+        content_types = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".webp": "image/webp",
+        }
+        content_type = content_types.get(path.suffix.lower(), "image/jpeg")
+
+        media_url = f"{self.site_url}/wp-json/wp/v2/media"
+        auth = HTTPBasicAuth(self.username, self.app_password)
+
+        try:
+            resp = requests.post(
+                media_url,
+                headers={
+                    "Content-Disposition": f'attachment; filename="{path.name}"',
+                    "Content-Type": content_type,
+                },
+                data=path.read_bytes(),
+                auth=auth,
+                timeout=60,
+            )
+        except requests.RequestException as e:
+            raise ConnectionError(f"WordPress media upload failed: {e}") from e
+
+        if resp.status_code >= 400:
+            raise RuntimeError(
+                f"WordPress media upload error: {resp.status_code} - {resp.text}"
+            )
+
+        data = resp.json()
+        media_id = data["id"]
+        source_url = data.get("source_url", "")
+        self.logger.info("Uploaded media id=%s url=%s", media_id, source_url)
+        return media_id, source_url
+
     def publish(
         self,
         title: str,

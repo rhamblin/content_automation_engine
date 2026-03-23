@@ -7,6 +7,14 @@ Start the content with: "Here's a {keyword} recipe" in a warm, conversational wa
 Generate a fully formatted, SEO-optimized recipe post.
 Output must be valid JSON with styled HTML suitable for WordPress visual editors (Elementor or Astra theme).
 
+REFERENCE IMAGE INSTRUCTIONS:
+If a reference image is attached to this message, it shows the FINISHED dish/drink for this keyword.
+You MUST write the recipe so that the end result closely matches the image:
+- Study the colours, textures, layers, toppings, garnishes, and presentation in the image.
+- Choose ingredients and techniques that reproduce those visual details (e.g., if the image shows a caramel drizzle, include a caramel drizzle step).
+- In the intro, briefly describe the dish as it appears ("golden-brown crust", "creamy swirl of matcha") so readers know what to expect.
+- Do NOT mention "the attached image" or "as shown in the photo" — write as if you naturally know the recipe.
+
 Output Schema:
 {{
   "title": "Keyword Recipe (e.g., Lava Cake Recipe, Plantain Bites Recipe)",

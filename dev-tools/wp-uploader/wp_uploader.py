@@ -127,8 +127,23 @@ def main():
 
                 # Pick a random reference image for LLM grounding (optional)
                 image_base64 = None
+                ref_image_path = None
                 if kw.reference_images:
-                    image_base64 = pick_random_image(kw.reference_images)
+                    image_base64, ref_image_path = pick_random_image(kw.reference_images)
+
+                # Upload reference image to WP as featured image
+                if ref_image_path:
+                    try:
+                        media_id, image_url = wp_channel.upload_media(ref_image_path)
+                        logger.info(
+                            "Uploaded reference image as featured: id=%s", media_id
+                        )
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to upload reference image for '%s': %s",
+                            kw.term,
+                            e,
+                        )
 
                 try:
                     result = service.upload_topic(
