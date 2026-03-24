@@ -2,6 +2,7 @@
 
 import argparse
 import base64
+import hashlib
 import json
 import random
 import sys
@@ -75,7 +76,9 @@ def _process_keyword(kw, service, styles, style_names, config, request, output_f
                 image_base64=image_b64,
             )
 
-            out_name = f"{img_path.stem}_{result.style_name}.jpg"
+            slug = term.lower().replace(" ", "_")
+            short_hash = hashlib.md5(img_path.name.encode()).hexdigest()[:4]
+            out_name = f"{slug}_{short_hash}.jpg"
             out_path = output_folder / out_name
             result.image.save(out_path, "JPEG", quality=95)
             logger.info(f"    Saved: {out_path}")

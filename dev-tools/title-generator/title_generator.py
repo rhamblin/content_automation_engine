@@ -1,5 +1,6 @@
 """Title Generator — orchestrator (all I/O lives here)."""
 
+import base64
 import json
 import sys
 from datetime import datetime
@@ -7,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
-from common.utils.images import pick_random_image
+from common.utils.images import collect_images
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -46,8 +47,12 @@ def print_results(all_results: list[dict], request):
     """Print results in formatted output."""
     for entry in all_results:
         keyword = entry["keyword"]
+        source_image = entry.get("source_image", "")
         print(f"\n{'=' * 70}")
-        print(f"Channel: {request.channel} | Niche: {request.niche} | Keyword: {keyword}")
+        header = f"Channel: {request.channel} | Niche: {request.niche} | Keyword: {keyword}"
+        if source_image:
+            header += f" | Image: {source_image}"
+        print(header)
         print(f"{'=' * 70}")
 
         for i, opt in enumerate(entry["options"], 1):
@@ -83,35 +88,51 @@ def main():
     for kw_dict in config.keywords:
         keyword = kw_dict["term"]
         blog_url = kw_dict.get("blog_url", "")
-        logger.info("  → %s", keyword)
-
-        # Load optional reference image from reference_images
-        image_base64 = None
         source_folder = kw_dict.get("reference_images")
+
+        # Build list of (image_base64, source_image_name) to iterate
+        image_items: list[tuple[str | None, str]] = []
         if source_folder:
-            image_base64, _ = pick_random_image(source_folder)
+            images = collect_images(source_folder)
+            if not images:
+                logger.warning("No images for '%s', skipping", keyword)
+                failed.append(keyword)
+                continue
+            for img_path in images:
+                b64 = base64.b64encode(img_path.read_bytes()).decode()
+                image_items.append((b64, img_path.name))
+        else:
+            # No reference_images — run once with no image
+            image_items.append((None, ""))
 
-        result = service.generate(
-            niche=request.niche,
-            keyword=keyword,
-            persona_prompt=config.persona_prompt,
-            audience_prompt=config.audience_prompt,
-            image_base64=image_base64,
-            blog_url=blog_url,
-        )
-        if result.error:
-            logger.error("Failed for '%s': %s", keyword, result.error)
-            failed.append(keyword)
-            continue
+        logger.info("  → %s (%d image(s))", keyword, len(image_items))
 
-        all_results.append({
-            "keyword": keyword,
-            "blog_url": blog_url,
-            "options": [
-                {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
-                for o in result.options
-            ],
-        })
+        for image_base64, source_image in image_items:
+            if source_image:
+                logger.info("    ← %s", source_image)
+
+            result = service.generate(
+                niche=request.niche,
+                keyword=keyword,
+                persona_prompt=config.persona_prompt,
+                audience_prompt=config.audience_prompt,
+                image_base64=image_base64,
+                blog_url=blog_url,
+            )
+            if result.error:
+                logger.error("Failed for '%s' [%s]: %s", keyword, source_image, result.error)
+                failed.append(keyword)
+                continue
+
+            all_results.append({
+                "keyword": keyword,
+                "blog_url": blog_url,
+                "source_image": source_image,
+                "options": [
+                    {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
+                    for o in result.options
+                ],
+            })
 
     if not all_results:
         logger.error("All keywords failed")
