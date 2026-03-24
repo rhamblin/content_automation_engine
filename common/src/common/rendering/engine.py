@@ -66,7 +66,11 @@ def _crop_with_focus(
 
 
 def compose_canvas(
-    source: Image.Image, canvas: CanvasSpec, layout: Layout, product: bool = False
+    source: Image.Image,
+    canvas: CanvasSpec,
+    layout: Layout,
+    product: bool = False,
+    secondary_image: Image.Image | None = None,
 ) -> Image.Image:
     """Build the background canvas from source image according to layout type."""
     w, h = canvas.width, canvas.height
@@ -84,6 +88,21 @@ def compose_canvas(
             bot_img = scale_to_fit(source, w, bot_h, layout.color)
         else:
             top_img = _crop_with_focus(source, w, top_h, layout.crop_focus_top)
+            bot_img = _crop_with_focus(source, w, bot_h, layout.crop_focus_bottom)
+        composed = Image.new("RGB", (w, h), layout.color)
+        composed.paste(top_img, (0, 0))
+        composed.paste(bot_img, (0, top_h + layout.gap))
+        return composed
+
+    if layout.type == "split_reveal":
+        top_h = int(h * layout.split_pct)
+        bot_h = h - top_h - layout.gap
+        top_source = secondary_image if secondary_image else source
+        if product:
+            top_img = scale_to_fit(top_source, w, top_h, layout.color)
+            bot_img = scale_to_fit(source, w, bot_h, layout.color)
+        else:
+            top_img = _crop_with_focus(top_source, w, top_h, layout.crop_focus_top)
             bot_img = _crop_with_focus(source, w, bot_h, layout.crop_focus_bottom)
         composed = Image.new("RGB", (w, h), layout.color)
         composed.paste(top_img, (0, 0))
@@ -151,6 +170,7 @@ def render_image(
     text_data: dict,
     brand_text: str = "",
     product: bool = False,
+    ingredient_image: Image.Image | None = None,
 ) -> Image.Image:
     """Render an image using the shared pipeline.
 
@@ -163,12 +183,14 @@ def render_image(
         text_data: Dict mapping element keys to text strings.
         brand_text: Brand watermark text.
         product: If True, scale-to-fit instead of crop/zoom.
+        ingredient_image: Optional secondary image for split_reveal layout.
 
     Returns:
         Final rendered PIL Image.
     """
     layout = style.layout if style and hasattr(style, "layout") else Layout()
-    img = compose_canvas(source, canvas, layout, product=product)
+    secondary = ingredient_image if style and getattr(style, "use_ingredient_image", False) else None
+    img = compose_canvas(source, canvas, layout, product=product, secondary_image=secondary)
 
     if style and style.overlays:
         for overlay in style.overlays:

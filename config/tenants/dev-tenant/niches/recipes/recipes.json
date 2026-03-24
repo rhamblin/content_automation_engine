@@ -17,121 +17,136 @@
       "term": "how to make brown sugar boba tea at home",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Boba kits, tapioca pearls, bubble tea straws",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/boba-tea"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/boba-tea",
+      "ingredient_images": ""
     },
     {
       "term": "tropical pineapple coconut mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Blenders, cocktail shakers, glassware",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/pineapple-coconut-mocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/pineapple-coconut-mocktail",
+      "ingredient_images": ""
     },
     {
       "term": "matcha bubble tea recipe with tapioca pearls",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Matcha powder, boba pearls, milk frothers",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/matcha-bubble-tea"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/matcha-bubble-tea",
+      "ingredient_images": ""
     },
     {
       "term": "exotic dragon fruit mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Blenders, bar tools, drink pitchers",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/dragon-fruit-mocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/dragonfruit-mocktail",
+      "ingredient_images": ""
     },
     {
       "term": "caribbean guava mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Citrus presses, pitchers, bar sets",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/guava-mocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/guava-mocktail",
+      "ingredient_images": ""
     },
     {
       "term": "passionfruit martini cocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Martini glasses, cocktail shaker sets",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/passionfruit-martini-cocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/passionfruit-martini-cocktail",
+      "ingredient_images": ""
     },
     {
       "term": "iced coconut matcha latte recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Matcha whisk sets, milk frothers",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/coconut-matcha-latte"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/coconut-matcha-latte",
+      "ingredient_images": ""
     },
     {
       "term": "mango passionfruit mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Cocktail shakers, drink mixers",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/passionfruit-mocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/passionfruit-mocktail",
+      "ingredient_images": ""
     },
     {
       "term": "how to cook tapioca pearls for bubble tea",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Tapioca pearls, bubble tea kits",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/tapioca-pearls"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/tapioca-pearls",
+      "ingredient_images": ""
     },
     {
       "term": "frozen mango daiquiri blender recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "High-power blenders, cocktail kits",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/mango-daiquiri"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/mango-daiquiri",
+      "ingredient_images": ""
     },
     {
       "term": "dragon fruit mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Blenders, cocktail glasses",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/dragonfruit-mocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/dragonfruit-mocktail",
+      "ingredient_images": ""
     },
     {
       "term": "matcha bubble tea recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Matcha powder, bubble tea kits",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/matcha-bubble-tea"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/matcha-bubble-tea",
+      "ingredient_images": ""
     },
     {
       "term": "brown sugar bubble tea recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Boba pearls, syrup kits",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/brown-sugar-bubble-tea"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/brown-sugar-bubble-tea",
+      "ingredient_images": ""
     },
     {
       "term": "tropical rum punch recipe Caribbean",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Drink dispensers, bar sets",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/rum-punch"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/rum-punch",
+      "ingredient_images": ""
     },
     {
       "term": "mango mocktail recipe",
       "intent": "buyer/informational",
       "amazon_monetization_angle": "Blenders, citrus juicers",
-      "active": true,
+      "active": false,
       "blog_url": "",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/mango-mocktail"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/drinks/mango-mocktail",
+      "ingredient_images": ""
     },
     {
       "term": "Jollof rice with goat",
@@ -139,7 +154,8 @@
       "amazon_monetization_angle": "Dutch ovens, spice kits",
       "active": true,
       "blog_url": "https://chefexotic.com/jollof-with-smoked-goat-cozy-nigerian-one-pot-rice-dinner/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/jollof_with_smoked_goat"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/jollof_with_smoked_goat",
+      "ingredient_images": ""
     },
     {
       "term": "Garlic lemon shrimp",
@@ -147,7 +163,8 @@
       "amazon_monetization_angle": "Cast iron skillets, garlic press",
       "active": true,
       "blog_url": "https://chefexotic.com/shrimp-recipe-quick-and-flavorful-garlic-lemon-shrimp/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/shrimp_recipe"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/shrimp_recipe",
+      "ingredient_images": ""
     },
     {
       "term": "Lemon herb baked chicken",
@@ -155,7 +172,8 @@
       "amazon_monetization_angle": "Roasting pans, herb scissors",
       "active": true,
       "blog_url": "https://chefexotic.com/lemon-herb-baked-chicken-juicy-zesty-oven-baked-dinner-recipe/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/baked_chicken"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/baked_chicken",
+      "ingredient_images": ""
     },
     {
       "term": "Cozy Noodle bowl",
@@ -163,7 +181,8 @@
       "amazon_monetization_angle": "Ramen bowls, chopsticks",
       "active": true,
       "blog_url": "https://chefexotic.com/curry-noodle-bowl-recipe-cozy-coconut-curry-noodles-in-one-bowl/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/noodle_bowl"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/noodle_bowl",
+      "ingredient_images": ""
     },
     {
       "term": "Lobster recipe",
@@ -171,7 +190,8 @@
       "amazon_monetization_angle": "Seafood tools, butter warmers",
       "active": true,
       "blog_url": "https://chefexotic.com/lobster-recipe-succulent-garlic-butter-lobster-tail-dinner/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/lobster_recipe"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/lobster_recipe",
+      "ingredient_images": ""
     },
     {
       "term": "Curry noodle bowl",
@@ -179,7 +199,8 @@
       "amazon_monetization_angle": "Curry paste, woks",
       "active": true,
       "blog_url": "https://chefexotic.com/curry-noodle-bowl-recipe-cozy-coconut-curry-noodles-in-one-bowl/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/curry_noodle_bowl"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/curry_noodle_bowl",
+      "ingredient_images": ""
     },
     {
       "term": "Plantain bites",
@@ -187,7 +208,8 @@
       "amazon_monetization_angle": "Plantain chips, air fryers",
       "active": true,
       "blog_url": "https://chefexotic.com/plantain-bites-recipe-crispy-plantain-snacks-for-the-family/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/plantain_bites"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/plantain_bites",
+      "ingredient_images": ""
     },
     {
       "term": "Pudding bowls",
@@ -195,7 +217,8 @@
       "amazon_monetization_angle": "Dessert cups, ramekins",
       "active": true,
       "blog_url": "https://chefexotic.com/pudding-bowl-recipe-creamy-vanilla-pudding-in-a-cozy-bowl/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/pudding_bowls"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/pudding_bowls",
+      "ingredient_images": ""
     },
     {
       "term": "Coconut pancakes",
@@ -203,7 +226,8 @@
       "amazon_monetization_angle": "Coconut flour, griddles",
       "active": true,
       "blog_url": "https://chefexotic.com/coconut-pancakes-recipe-fluffy-tropical-coconut-pancakes-for-breakfast/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/coconut_pancakes"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/coconut_pancakes",
+      "ingredient_images": ""
     },
     {
       "term": "Chilli shrimps cups",
@@ -211,7 +235,8 @@
       "amazon_monetization_angle": "Mini cup molds, chilli flakes",
       "active": true,
       "blog_url": "https://chefexotic.com/chili-shrimp-cups-easy-crispy-shrimp-bites-recipe-for-parties/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/chili_shrimp_cups"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/chili_shrimp_cups",
+      "ingredient_images": ""
     },
     {
       "term": "Jackfruit wraps",
@@ -219,7 +244,8 @@
       "amazon_monetization_angle": "Canned jackfruit, tortilla press",
       "active": true,
       "blog_url": "https://chefexotic.com/jackfruit-wraps-flavorful-plant-based-wrap-recipe-for-cozy-weeknights/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/jackfruit_wraps"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/jackfruit_wraps",
+      "ingredient_images": ""
     },
     {
       "term": "Lava cake",
@@ -227,7 +253,8 @@
       "amazon_monetization_angle": "Ramekins, chocolate melts",
       "active": true,
       "blog_url": "https://chefexotic.com/lava-cake-recipe-quick-gooey-molten-chocolate-cakes-for-family-dinners/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/lava_cake"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/lava_cake",
+      "ingredient_images": ""
     },
     {
       "term": "Rum pudding",
@@ -235,7 +262,8 @@
       "amazon_monetization_angle": "Pudding molds, rum extract",
       "active": true,
       "blog_url": "https://chefexotic.com/rum-pudding-creamy-caribbean-style-comfort-in-every-bite/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/rum_pudding"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/rum_pudding",
+      "ingredient_images": ""
     },
     {
       "term": "Chia pudding",
@@ -243,7 +271,8 @@
       "amazon_monetization_angle": "Chia seeds, mason jars",
       "active": true,
       "blog_url": "https://chefexotic.com/chia-pudding-bowl-recipe-creamy-overnight-chia-pudding-bowl/",
-      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/chia_pudding_bowl"
+      "reference_images": "/Users/rhamblin/Desktop/content-engine/images/recipes/chia_pudding_bowl",
+      "ingredient_images": ""
     }
   ]
 }

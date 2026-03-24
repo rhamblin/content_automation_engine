@@ -34,6 +34,7 @@ class PinMakerService:
         blog_url: str = "",
         product: bool = False,
         image_base64: str | None = None,
+        ingredient_image: Image.Image | None = None,
     ) -> PinResult:
         """Generate text via LLM, render pin, return result."""
         text_data = self.llm.generate(
@@ -56,6 +57,7 @@ class PinMakerService:
             style=style,
             brand_text=brand_text,
             product=product,
+            ingredient_image=ingredient_image,
         )
         if product:
             src_w, src_h = source_image.size

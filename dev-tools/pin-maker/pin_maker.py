@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
 from common.providers.distribution_channel.pinterest import PinterestChannel
 from common.providers.llm.azure_foundry import AzureFoundryLLMProvider
+from common.utils.images import collect_images
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from common.workflows.pin_maker import PinMakerService
@@ -28,11 +29,33 @@ logger = AppLogger(__name__)
 IMAGE_EXTENSIONS = {"*.jpg", "*.jpeg", "*.png", "*.webp", "*.JPG", "*.JPEG", "*.PNG", "*.WEBP"}
 
 
+def _load_ingredient_images(kw: dict) -> list[Path]:
+    """Load ingredient images for a keyword, returning empty list if unavailable."""
+    ingredient_path = kw.get("ingredient_images", "")
+    if not ingredient_path:
+        return []
+    img_dir = Path(ingredient_path)
+    if not img_dir.is_dir():
+        return []
+    return collect_images(str(img_dir))
+
+
+def _pick_ingredient_image(ingredient_images: list[Path], style) -> Image.Image | None:
+    """Pick a random ingredient image if the style requires it, else None."""
+    if not getattr(style, "use_ingredient_image", False):
+        return None
+    if not ingredient_images:
+        return None
+    chosen = random.choice(ingredient_images)
+    return Image.open(chosen).convert("RGB")
+
+
 def _process_keyword(kw, service, styles, style_names, config, request, output_folder):
     """Process a single keyword: iterate all reference images, run LLM + render for each."""
     term = kw["term"]
     blog_url = kw.get("blog_url", "")
     reference_images = kw.get("reference_images", "")
+    ingredient_images = _load_ingredient_images(kw)
     saved, errors = 0, 0
     results = []
 
@@ -62,6 +85,7 @@ def _process_keyword(kw, service, styles, style_names, config, request, output_f
         try:
             source_image = Image.open(img_path).convert("RGB")
             image_b64 = base64.b64encode(img_path.read_bytes()).decode()
+            ingredient_img = _pick_ingredient_image(ingredient_images, style)
             result = service.make_pin(
                 source_image=source_image,
                 keyword=term,
@@ -74,6 +98,7 @@ def _process_keyword(kw, service, styles, style_names, config, request, output_f
                 blog_url=blog_url,
                 product=config.product,
                 image_base64=image_b64,
+                ingredient_image=ingredient_img,
             )
 
             slug = term.lower().replace(" ", "_")

@@ -56,6 +56,7 @@ class PinterestChannel(IDistributionChannel):
         width: int = 1000,
         height: int = 1500,
         product: bool = False,
+        ingredient_image: Image.Image | None = None,
     ) -> Image.Image:
         """Render Pinterest pin image.
 
@@ -67,6 +68,7 @@ class PinterestChannel(IDistributionChannel):
             width: Output width (default 1000)
             height: Output height (default 1500)
             product: If True, scale-to-fit instead of crop/zoom
+            ingredient_image: Optional secondary image for split_reveal layout
 
         Returns:
             PIL Image with text overlay
@@ -76,7 +78,10 @@ class PinterestChannel(IDistributionChannel):
         else:
             canvas = PINTEREST_CANVAS
 
-        return render_image(source, canvas, style, text_data, brand_text, product=product)
+        return render_image(
+            source, canvas, style, text_data, brand_text,
+            product=product, ingredient_image=ingredient_image,
+        )
 
     @retry(
         stop=stop_after_attempt(3),

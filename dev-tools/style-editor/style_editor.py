@@ -162,13 +162,18 @@ elif DEFAULT_IMAGE.exists():
 else:
     source_img = Image.new("RGB", (1000, 1500), "#8B4513")
 
+uploaded_ingredient = st.sidebar.file_uploader(
+    "Ingredient image (for split_reveal)", type=["jpg", "jpeg", "png"], key="ingredient_upload",
+)
+ingredient_img = Image.open(uploaded_ingredient).convert("RGB") if uploaded_ingredient else None
+
 # Controls and Preview
 col1, col2 = st.columns([1, 1])
 
 with col1:
     # Layout
     st.subheader("Layout")
-    LAYOUT_TYPES = ["single", "split_duplicate", "split_horizontal", "grid_2x2", "image_over_color", "color_over_image"]
+    LAYOUT_TYPES = ["single", "split_duplicate", "split_reveal", "split_horizontal", "grid_2x2", "image_over_color", "color_over_image"]
     FOCUS_OPTIONS = ["top", "center", "bottom"]
     base_layout = base_style.layout
 
@@ -192,6 +197,14 @@ with col1:
         for k in ("lay_split", "lay_gap", "lay_color", "lay_ftop", "lay_fbot"):
             st.session_state.pop(k, None)
         new_layout = Layout()
+
+    # Ingredient image flag
+    use_ingredient = st.checkbox(
+        "Use ingredient image",
+        value=getattr(base_style, "use_ingredient_image", False),
+        key="use_ingredient",
+        help="When enabled, a secondary ingredient image is composited into split_reveal layouts.",
+    )
 
     # Overlays (multiple)
     st.subheader("Overlays")
@@ -346,7 +359,8 @@ with col1:
 # Build modified style
 modified_style = VisualStyle(
     name=base_style.name, description=base_style.description,
-    layout=new_layout, overlays=new_overlays, **new_elements
+    layout=new_layout, overlays=new_overlays,
+    use_ingredient_image=use_ingredient, **new_elements,
 )
 
 with col2:
@@ -379,6 +393,8 @@ with col2:
     spec: dict = {}
     if new_layout.type != "single":
         spec["layout"] = _layout_to_dict(new_layout)
+    if use_ingredient:
+        spec["use_ingredient_image"] = True
     for k, el in new_elements.items():
         if el:
             spec[k] = _el_to_dict(el)
@@ -398,7 +414,10 @@ with col2:
 with _preview_container:
     st.header("Preview")
     try:
-        preview = render_image(source_img, CANVAS, modified_style, text_data, _brand_watermark)
+        preview = render_image(
+            source_img, CANVAS, modified_style, text_data, _brand_watermark,
+            ingredient_image=ingredient_img,
+        )
         st.image(preview, width=420)
     except Exception as e:
         st.error(f"Error: {e}")

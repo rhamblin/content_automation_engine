@@ -2,6 +2,7 @@
 
 import base64
 import json
+import random
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -85,7 +86,9 @@ def main():
 
     all_results: list[dict] = []
     failed = []
-    for kw_dict in config.keywords:
+    keywords = list(config.keywords)
+    random.shuffle(keywords)
+    for kw_dict in keywords:
         keyword = kw_dict["term"]
         blog_url = kw_dict.get("blog_url", "")
         source_folder = kw_dict.get("reference_images")
@@ -98,6 +101,7 @@ def main():
                 logger.warning("No images for '%s', skipping", keyword)
                 failed.append(keyword)
                 continue
+            random.shuffle(images)
             for img_path in images:
                 b64 = base64.b64encode(img_path.read_bytes()).decode()
                 image_items.append((b64, img_path.name))

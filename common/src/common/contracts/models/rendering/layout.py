@@ -10,6 +10,8 @@ class Layout:
     Layout types:
         single           - Default full-canvas crop (current behavior).
         split_duplicate  - Same image cropped into top + bottom regions.
+        split_reveal     - Two-image vertical split (secondary on top, primary on bottom).
+                           Falls back to split_duplicate if no secondary image provided.
         split_horizontal - Left/right split (single source).
         grid_2x2         - 2x2 grid of the same image.
         image_over_color - Image on top, solid color on bottom.

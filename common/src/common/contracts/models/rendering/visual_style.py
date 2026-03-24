@@ -20,6 +20,7 @@ class VisualStyle:
     tagline: TextElement | None = None
     layout: Layout = field(default_factory=Layout)
     overlays: list[ImageOverlay] = field(default_factory=list)
+    use_ingredient_image: bool = False
 
     @classmethod
     def from_dict(cls, data: dict) -> "VisualStyle":
@@ -42,6 +43,7 @@ class VisualStyle:
             description=data.get("description", ""),
             layout=layout,
             overlays=overlays,
+            use_ingredient_image=bool(spec.get("use_ingredient_image", False)),
             **elements,
         )
 

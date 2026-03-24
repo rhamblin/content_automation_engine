@@ -4,7 +4,7 @@
   "description": "Split duplicate layout — same photo top and bottom with a bold green banner and title in the center.",
   "spec": {
     "layout": {
-      "type": "split_duplicate",
+      "type": "split_reveal",
       "split_pct": 0.45,
       "gap": 160,
       "color": "#2D6A4F",
