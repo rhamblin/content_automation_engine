@@ -58,8 +58,13 @@ def load_request(path: Path, niche: str, status: str) -> WpUploaderRequest:
     if not keywords:
         raise ValueError("keywords must not be empty")
 
+    active_keywords = [
+        k for k in keywords
+        if isinstance(k, str) or k.get("active", True)
+    ]
+
     return WpUploaderRequest(
-        keywords=tuple(_normalize_keyword(k) for k in keywords),
+        keywords=tuple(_normalize_keyword(k) for k in active_keywords),
         niche=niche,
         status=status,
     )
