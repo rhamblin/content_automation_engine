@@ -33,14 +33,22 @@ def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
     return value
 
 
-def _load_styles(tenant: str, channel: str) -> dict[str, VisualStyle]:
-    """Load all style JSONs from config/tenants/{tenant}/styles/{channel}/."""
+def _load_styles(
+    tenant: str, channel: str, *, include_inactive: bool = False
+) -> dict[str, VisualStyle]:
+    """Load style JSONs from config/tenants/{tenant}/styles/{channel}/.
+
+    By default only active styles are returned.  Pass *include_inactive=True*
+    to return all styles (used by the style editor).
+    """
     styles_dir = CONFIG_ROOT / tenant / "styles" / channel
     if not styles_dir.exists():
         return {}
     styles: dict[str, VisualStyle] = {}
     for f in sorted(styles_dir.glob("*.json")):
         data = json.loads(f.read_text())
+        if not include_inactive and data.get("active", True) is False:
+            continue
         styles[data["name"]] = VisualStyle.from_dict(data)
     return styles
 
@@ -112,6 +120,11 @@ def load_config(path: Path, tenant: str = "dev-tenant") -> PinMakerConfig:
     )
 
 
-def load_styles(tenant: str = "dev-tenant", channel: str = "pinterest") -> dict[str, VisualStyle]:
+def load_styles(
+    tenant: str = "dev-tenant",
+    channel: str = "pinterest",
+    *,
+    include_inactive: bool = False,
+) -> dict[str, VisualStyle]:
     """Public helper for orchestrator to load resolved VisualStyle objects."""
-    return _load_styles(tenant, channel)
+    return _load_styles(tenant, channel, include_inactive=include_inactive)

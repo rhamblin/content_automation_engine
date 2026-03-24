@@ -1,6 +1,7 @@
 {
   "name": "split_reveal_ingredients",
   "channel": "pinterest",
+  "active": true,
   "description": "Split reveal layout — ingredient photo on top, finished dish on bottom, with bold banner and title in center.",
   "spec": {
     "use_ingredient_image": true,

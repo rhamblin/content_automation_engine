@@ -1,6 +1,7 @@
 {
   "name": "slab_script",
   "channel": "pinterest",
+  "active": true,
   "description": "Full-width cream band with bold brown slab-serif title and a warm script accent line below.",
   "spec": {
     "title": {

@@ -1,6 +1,7 @@
 {
   "name": "ribbon_box",
   "channel": "pinterest",
+  "active": true,
   "description": "White card with red ribbon banner above a bold serif title and tagline.",
   "spec": {
     "prefix": {

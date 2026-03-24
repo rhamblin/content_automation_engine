@@ -1,6 +1,7 @@
 {
   "name": "bold_band",
   "channel": "pinterest",
+  "active": true,
   "description": "Full-width white band with gold border lines, massive bold title in the center.",
   "spec": {
     "prefix": {

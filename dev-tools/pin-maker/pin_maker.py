@@ -143,13 +143,15 @@ def main():
         raw = json.loads(args.data_file.read_text())
         tenant = raw.get("tenant", "dev-tenant")
 
-    # Load styles from tenant config
+    # Load styles from tenant config (active only for generation)
     styles = load_styles(tenant=tenant)
 
-    # --list-styles: no API call needed
+    # --list-styles: show all styles (including inactive) with status
     if args.list_styles:
-        for name, style in styles.items():
-            print(f"  {name}: {style.description}")
+        all_styles = load_styles(tenant=tenant, include_inactive=True)
+        for name, style in all_styles.items():
+            status = "active" if name in styles else "inactive"
+            print(f"  [{status}] {name}: {style.description}")
         sys.exit(0)
 
     # Load + validate request + niche config (keywords come from niche config)

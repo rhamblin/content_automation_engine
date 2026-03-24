@@ -39,16 +39,22 @@ def _list_tenants() -> list[str]:
     return sorted(d.name for d in STYLES_ROOT.iterdir() if d.is_dir())
 
 
-def _load_styles(tenant: str, channel: str) -> dict[str, VisualStyle]:
-    """Load all style JSONs from config/tenants/{tenant}/styles/{channel}/."""
+def _load_styles(tenant: str, channel: str) -> tuple[dict[str, VisualStyle], dict[str, bool]]:
+    """Load all style JSONs (including inactive) from config/tenants/{tenant}/styles/{channel}/.
+
+    Returns (styles_dict, active_flags_dict).
+    """
     styles_dir = STYLES_ROOT / tenant / "styles" / channel
     if not styles_dir.exists():
-        return {}
+        return {}, {}
     styles: dict[str, VisualStyle] = {}
+    active_flags: dict[str, bool] = {}
     for f in sorted(styles_dir.glob("*.json")):
         data = json.loads(f.read_text())
-        styles[data["name"]] = VisualStyle.from_dict(data)
-    return styles
+        name = data["name"]
+        styles[name] = VisualStyle.from_dict(data)
+        active_flags[name] = data.get("active", True)
+    return styles, active_flags
 
 
 SHAPES = ["rectangle", "ribbon", "pill", "sticker"]
@@ -99,7 +105,7 @@ tenant_name = st.sidebar.selectbox(
     key="tenant_sel",
 )
 
-STYLES = _load_styles(tenant_name, channel_name)
+STYLES, STYLE_ACTIVE = _load_styles(tenant_name, channel_name)
 CANVAS = CHANNEL_CANVAS.get(channel_name, CanvasSpec(width=1000, height=1500, format="RGB"))
 
 def _list_niches(tenant: str) -> list[str]:
@@ -126,7 +132,12 @@ if not STYLES:
     st.stop()
 
 st.sidebar.header("Style")
-style_name = st.sidebar.selectbox("Base style", list(STYLES.keys()))
+_style_labels = {
+    name: f"{name} (inactive)" if not STYLE_ACTIVE.get(name, True) else name
+    for name in STYLES
+}
+style_label = st.sidebar.selectbox("Base style", list(_style_labels.values()))
+style_name = next(n for n, lbl in _style_labels.items() if lbl == style_label)
 
 # Reset widget state when style changes
 if "current_style" not in st.session_state:

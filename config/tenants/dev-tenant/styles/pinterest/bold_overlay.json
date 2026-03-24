@@ -1,6 +1,7 @@
 {
   "name": "bold_overlay",
   "channel": "pinterest",
+  "active": true,
   "description": "Full-bleed image with large chunky white title and heavy black outline at top, gold tagline near bottom.",
   "spec": {
     "title": {

@@ -1,6 +1,7 @@
 {
   "name": "split_reveal",
   "channel": "pinterest",
+  "active": true,
   "description": "Split duplicate layout — same photo top and bottom with a bold green banner and title in the center.",
   "spec": {
     "layout": {
