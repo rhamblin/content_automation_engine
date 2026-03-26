@@ -200,6 +200,11 @@ class PinterestChannel(IDistributionChannel):
             ConnectionError: When Pinterest API is unreachable.
             RuntimeError: When Pinterest API returns an error response.
         """
+        tags = kwargs.get("tags", [])
+        if tags:
+            hashtags = " ".join(f"#{t}" for t in tags)
+            description = f"{description}\n\n{hashtags}"
+
         return self.create_pin(
             board_id=kwargs["board_id"],
             image_b64=content,

@@ -660,7 +660,7 @@ def generate_period_content(
 
     organic_sorted = sorted(
         organic_leaderboard_for_period(pin_daily, days),
-        key=lambda x: x["impressions"],
+        key=lambda x: x["ctr"],
         reverse=True,
     )[:10]
     organic_rows = ""

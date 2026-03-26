@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from common.app_logger import AppLogger
 from common.utils.images import collect_images
+from common.utils.string_utils import to_camel_case
 from openai import AzureOpenAI
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -128,12 +129,20 @@ def main():
                 failed.append(keyword)
                 continue
 
+            tags = [to_camel_case(t) for t in [config.niche_title, keyword]]
+            hashtags = " ".join(f"#{t}" for t in tags)
+
             all_results.append({
                 "keyword": keyword,
                 "blog_url": blog_url,
                 "source_image": source_image,
                 "options": [
-                    {"title": o.title, "description": o.description, "alt_text": o.alt_text, "reasoning": o.reasoning}
+                    {
+                        "title": o.title,
+                        "description": f"{o.description}\n\n{hashtags}",
+                        "alt_text": o.alt_text,
+                        "reasoning": o.reasoning,
+                    }
                     for o in result.options
                 ],
             })

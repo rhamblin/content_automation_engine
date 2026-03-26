@@ -21,6 +21,7 @@ class TitleGenConfig:
     channel_prompt: str
     audience_prompt: str
     keywords: list[dict]  # active keyword dicts from niche config (with blog_url)
+    niche_title: str  # display title for hashtag generation
 
 
 def _resolve_prompt(value: str | None, base_dir: Path) -> str | None:
@@ -90,4 +91,5 @@ def load_config(path: Path) -> TitleGenConfig:
         channel_prompt=channel_prompt,
         audience_prompt=audience_prompt,
         keywords=keywords_with_blog,
+        niche_title=niche_data.get("title", niche),
     )
