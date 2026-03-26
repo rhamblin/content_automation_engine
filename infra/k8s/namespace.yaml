@@ -1,9 +1,0 @@
-# Namespace: Logical isolation for all content automation resources
-# This keeps all your services, configs, and secrets in one place
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: content-automation
-  labels:
-    app: content-engine
-    environment: development

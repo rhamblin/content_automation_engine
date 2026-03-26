@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 import common.providers as providers
 from common.app_logger import AppLogger
@@ -28,7 +29,8 @@ async def main(logger: AppLogger):
         llm_providers = {}
         distribution_channels = {}
         if settings.app_environment == ENVIRONMENT_LOCAL:
-            redis_instance = Redis(host="redis", port=6379)
+            redis_url = os.environ.get("REDIS_URL", "redis://redis:6379")
+            redis_instance = Redis.from_url(redis_url)
             message_broker = RedisMessageBroker(redis_instance)
 
             database = SQLAlchemyDatabaseProvider(settings.database_url)

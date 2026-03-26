@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-uploader pin-maker style-editor account-analytics title-generator logs tests k8s-deploy k8s-status k8s-logs k8s-clean help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-uploader pin-maker style-editor account-analytics title-generator logs tests az-setup-entra az-deploy az-init-db az-build-push az-seed az-status az-logs az-destroy help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -101,28 +101,47 @@ tests:  ## Run tests in Docker container
 	docker compose --env-file ./config/local/variables.env --profile test run --rm --build test-runner
 
 # ==========================================
-# Kubernetes
+# Azure Container Apps
 # ==========================================
 
-k8s-deploy:  ## Deploy K8s infrastructure and services
-	@echo "Deploying K8s infrastructure..."
-	kubectl apply -f infra/k8s/
-	@echo "Deploying services with Helm..."
-	helm upgrade --install content-engine ./infra/helm/content-engine
-	@echo "✓ Deployment complete!"
+az-setup-entra:  ## Create Azure Entra app registration (run once)
+	@bash infra/azure/scripts/setup-entra.sh \
+		$$(az deployment sub show --name cae-deployment --query properties.outputs.keyVaultName.value -o tsv 2>/dev/null || echo "KEYVAULT_NAME") \
+		$$(az deployment sub show --name management-api-deployment --query properties.outputs.managementApiUrl.value -o tsv 2>/dev/null || echo "API_URL")
 
-k8s-status:  ## Show status of pods and services
-	kubectl get pods -n content-automation
-	@echo ""
-	kubectl get svc -n content-automation
+az-deploy:  ## Deploy/update all Azure infrastructure
+	@bash infra/azure/scripts/deploy.sh --postgres-password "$${POSTGRES_ADMIN_PASSWORD:?Set POSTGRES_ADMIN_PASSWORD env var}"
 
-k8s-logs:  ## Tail logs from all pods
-	kubectl logs -l app.kubernetes.io/name=content-engine -n content-automation -f --tail=50
+az-init-db:  ## Run database init scripts against Azure PostgreSQL
+	@bash infra/azure/scripts/init-database.sh \
+		$$(az deployment sub show --name postgres-deployment --query properties.outputs.postgresFqdn.value -o tsv) \
+		pgadmin \
+		"$${POSTGRES_ADMIN_PASSWORD:?Set POSTGRES_ADMIN_PASSWORD env var}" \
+		contentengine_dev
 
-k8s-clean:  ## Delete all K8s resources
-	helm uninstall content-engine || true
-	kubectl delete namespace content-automation || true
-	@echo "✓ Cleanup complete!"
+az-build-push:  ## Build all Docker images and push to ACR
+	@ACR=$$(az deployment sub show --name acr-deployment --query properties.outputs.acrLoginServer.value -o tsv) && \
+	az acr login --name $${ACR%%.*} && \
+	for svc in management-api template-service promotion-orchestrator scheduler channel-worker activity-reporter analytics-collector seed-worker; do \
+		echo "Building $${svc}..." && \
+		docker build -t "$${ACR}/$${svc}:latest" -f services/$${svc}/Dockerfile services/$${svc} && \
+		docker push "$${ACR}/$${svc}:latest"; \
+	done
+
+az-seed:  ## Trigger seed-worker job
+	az containerapp job start \
+		--name content-engine-dev-seed-worker \
+		--resource-group rg-content-engine-dev
+
+az-status:  ## Show Container App status
+	az containerapp list --resource-group rg-content-engine-dev --output table
+
+az-logs:  ## Tail logs from Container Apps
+	@echo "Use: az containerapp logs show --name <app-name> --resource-group rg-content-engine-dev --follow"
+
+az-destroy:  ## Delete resource group (removes everything)
+	az group delete --name rg-content-engine-dev --yes --no-wait
+	@echo "Resource group deletion initiated (runs in background)"
 
 # ==========================================
 # Help
@@ -150,8 +169,12 @@ help:  ## Show this help message
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"
 	@echo ""
-	@echo "Kubernetes:"
-	@echo "  make k8s-deploy     - Deploy everything to K8s"
-	@echo "  make k8s-status     - Show pods and services"
-	@echo "  make k8s-logs       - Tail logs from all pods"
-	@echo "  make k8s-clean      - Delete all K8s resources"
+	@echo "Azure Container Apps:"
+	@echo "  make az-setup-entra - Create Entra app registration (run once)"
+	@echo "  make az-deploy      - Deploy/update all Azure infrastructure"
+	@echo "  make az-init-db     - Run DB init scripts against Azure PostgreSQL"
+	@echo "  make az-build-push  - Build all Docker images and push to ACR"
+	@echo "  make az-seed        - Trigger seed-worker job"
+	@echo "  make az-status      - Show Container App status"
+	@echo "  make az-logs        - Tail logs from Container Apps"
+	@echo "  make az-destroy     - Delete resource group (removes everything)"

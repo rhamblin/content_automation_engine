@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from common.app_logger import AppLogger
@@ -26,7 +27,8 @@ async def main(logger: AppLogger):
         database = None
         message_broker = None
 
-        redis_instance = Redis(host="redis", port=6379)
+        redis_url = os.environ.get("REDIS_URL", "redis://redis:6379")
+        redis_instance = Redis.from_url(redis_url)
         message_broker = RedisMessageBroker(redis_instance)
 
         database = SQLAlchemyDatabaseProvider(settings.database_url)
