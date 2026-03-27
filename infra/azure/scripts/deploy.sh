@@ -38,29 +38,26 @@ echo "============================================"
 echo " Content Engine — Azure Deployment (${ENV})"
 echo "============================================"
 
-# ─── 1. Deploy infrastructure via Bicep ────────────────────────
+# ─── 1. Deploy infrastructure (no Container Apps yet) ─────────
 echo ""
-echo "==> Deploying infrastructure with Bicep..."
-DEPLOY_OUTPUT=$(az deployment sub create \
+echo "==> Phase 1: Deploying infrastructure (ACR, PG, Redis, Storage, Foundry, KV, CAE)..."
+INFRA_OUTPUT=$(az deployment sub create \
   --location "${LOCATION}" \
-  --template-file "${INFRA_DIR}/main.bicep" \
-  --parameters "@${INFRA_DIR}/parameters/${ENV}.bicepparam" \
+  --parameters "${INFRA_DIR}/parameters/${ENV}.bicepparam" \
   --parameters postgresAdminPassword="${PG_PASSWORD}" \
+  --parameters deployApps=false \
   --query properties.outputs \
   --output json)
 
-# Extract outputs
-ACR_LOGIN_SERVER=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['acrLoginServer']['value'])")
-RG_NAME=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['resourceGroupName']['value'])")
-API_URL=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['managementApiUrl']['value'])")
-FRONTEND_URL=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['frontendUrl']['value'])")
-KV_NAME=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['keyVaultName']['value'])")
-PG_FQDN=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['postgresFqdn']['value'])")
+# Extract outputs from infra phase
+ACR_LOGIN_SERVER=$(echo "${INFRA_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['acrLoginServer']['value'])")
+RG_NAME=$(echo "${INFRA_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['resourceGroupName']['value'])")
+KV_NAME=$(echo "${INFRA_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['keyVaultName']['value'])")
+PG_FQDN=$(echo "${INFRA_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['postgresFqdn']['value'])")
+DEFAULT_DOMAIN=$(echo "${INFRA_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['defaultDomain']['value'])")
 
 echo "    Resource Group:    ${RG_NAME}"
 echo "    ACR:               ${ACR_LOGIN_SERVER}"
-echo "    Management API:    ${API_URL}"
-echo "    Frontend:          ${FRONTEND_URL}"
 echo "    Key Vault:         ${KV_NAME}"
 echo "    PostgreSQL FQDN:   ${PG_FQDN}"
 
@@ -98,6 +95,7 @@ done
 echo "    Building frontend..."
 VITE_CLIENT_ID=$(az keyvault secret show --vault-name "${KV_NAME}" --name "azure-entra-client-id" --query value --output tsv 2>/dev/null || echo "")
 VITE_TENANT_ID=$(az keyvault secret show --vault-name "${KV_NAME}" --name "azure-entra-tenant-id" --query value --output tsv 2>/dev/null || echo "")
+API_URL="https://content-engine-${ENV}-management-api.${DEFAULT_DOMAIN}"
 
 docker build \
   --build-arg VITE_MANAGEMENT_API_URL="${API_URL}" \
@@ -108,14 +106,28 @@ docker build \
   "${PROJECT_ROOT}/frontend"
 docker push "${ACR_LOGIN_SERVER}/frontend:latest"
 
-# ─── 4. Optional: Init database ───────────────────────────────
+# ─── 4. Deploy Container Apps (images now exist in ACR) ───────
+echo ""
+echo "==> Phase 2: Deploying Container Apps..."
+DEPLOY_OUTPUT=$(az deployment sub create \
+  --location "${LOCATION}" \
+  --parameters "${INFRA_DIR}/parameters/${ENV}.bicepparam" \
+  --parameters postgresAdminPassword="${PG_PASSWORD}" \
+  --parameters deployApps=true \
+  --query properties.outputs \
+  --output json)
+
+API_URL=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['managementApiUrl']['value'])")
+FRONTEND_URL=$(echo "${DEPLOY_OUTPUT}" | python3 -c "import sys,json; print(json.load(sys.stdin)['frontendUrl']['value'])")
+
+# ─── 6. Optional: Init database ───────────────────────────────
 if [[ "${INIT_DB}" == "true" ]]; then
   echo ""
   echo "==> Initializing database..."
   "${SCRIPT_DIR}/init-database.sh" "${PG_FQDN}" "pgadmin" "${PG_PASSWORD}" "contentengine_${ENV}"
 fi
 
-# ─── 5. Optional: Trigger seed worker ─────────────────────────
+# ─── 7. Optional: Trigger seed worker ─────────────────────────
 if [[ "${RUN_SEED}" == "true" ]]; then
   echo ""
   echo "==> Triggering seed-worker job..."

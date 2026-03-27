@@ -10,6 +10,9 @@ param databaseUrl string
 param redisUrl string
 @secure()
 param blobStorageConnectionString string
+@secure()
+param foundryApiKey string
+param foundryEndpoint string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: name
@@ -62,18 +65,27 @@ resource secretBlobStorage 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
+// Auto-populated from Foundry module
+resource secretAzureFoundryApiKey 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'azure-foundry-api-key'
+  properties: {
+    value: foundryApiKey
+  }
+}
+
+resource secretAzureFoundryEndpoint 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'azure-foundry-endpoint'
+  properties: {
+    value: foundryEndpoint
+  }
+}
+
 // Placeholder secrets — set real values via deploy script or Azure Portal
 resource secretOpenaiApiKey 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
   name: 'openai-api-key'
-  properties: {
-    value: 'REPLACE_ME'
-  }
-}
-
-resource secretAzureFoundryApiKey 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: keyVault
-  name: 'azure-foundry-api-key'
   properties: {
     value: 'REPLACE_ME'
   }

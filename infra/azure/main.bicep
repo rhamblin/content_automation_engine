@@ -14,6 +14,12 @@ param projectName string
 @description('PostgreSQL admin password')
 param postgresAdminPassword string
 
+@description('Region for AI Foundry (model availability varies by region)')
+param foundryLocation string
+
+@description('Deploy Container Apps (set false for infra-only phase before images are pushed)')
+param deployApps bool = true
+
 // ─── Derived Names ────────────────────────────────────────────
 var resourceGroupName = 'rg-${projectName}-${environment}'
 var baseName = '${projectName}-${environment}'
@@ -79,6 +85,31 @@ module storage 'modules/storage.bicep' = {
   }
 }
 
+// ─── AI Foundry (OpenAI) ──────────────────────────────────────
+module foundry 'modules/foundry.bicep' = {
+  scope: rg
+  name: 'foundry-deployment'
+  params: {
+    name: '${baseName}-foundry'
+    location: foundryLocation
+    tags: tags
+    deployments: [
+      {
+        name: 'gpt-4o'
+        model: 'gpt-4o'
+        version: '2024-08-06'
+        capacity: 10
+      }
+      {
+        name: 'gpt-4o-mini'
+        model: 'gpt-4o-mini'
+        version: '2024-07-18'
+        capacity: 10
+      }
+    ]
+  }
+}
+
 // ─── Container Apps Environment ───────────────────────────────
 module cae 'modules/container-apps-env.bicep' = {
   scope: rg
@@ -102,10 +133,12 @@ module keyVault 'modules/key-vault.bicep' = {
     databaseUrl: postgres.outputs.connectionString
     redisUrl: redis.outputs.connectionString
     blobStorageConnectionString: storage.outputs.connectionString
+    foundryApiKey: foundry.outputs.apiKey
+    foundryEndpoint: foundry.outputs.endpoint
   }
 }
 
-// ─── Worker Services (6x) ─────────────────────────────────────
+// ─── Worker Services (6x) — only deployed when images exist ───
 var workerServices = [
   { name: 'template-service', image: 'template-service:latest' }
   { name: 'promotion-orchestrator', image: 'promotion-orchestrator:latest' }
@@ -116,7 +149,7 @@ var workerServices = [
 ]
 
 module workers 'modules/container-app-service.bicep' = [
-  for svc in workerServices: {
+  for svc in workerServices: if (deployApps) {
     scope: rg
     name: '${svc.name}-deployment'
     params: {
@@ -136,7 +169,7 @@ module workers 'modules/container-app-service.bicep' = [
 ]
 
 // ─── Management API ───────────────────────────────────────────
-module api 'modules/container-app-api.bicep' = {
+module api 'modules/container-app-api.bicep' = if (deployApps) {
   scope: rg
   name: 'management-api-deployment'
   params: {
@@ -157,7 +190,7 @@ module api 'modules/container-app-api.bicep' = {
 }
 
 // ─── Frontend ─────────────────────────────────────────────────
-module frontend 'modules/container-app-frontend.bicep' = {
+module frontend 'modules/container-app-frontend.bicep' = if (deployApps) {
   scope: rg
   name: 'frontend-deployment'
   params: {
@@ -173,7 +206,7 @@ module frontend 'modules/container-app-frontend.bicep' = {
 }
 
 // ─── Seed Worker Job ──────────────────────────────────────────
-module seedJob 'modules/container-app-job.bicep' = {
+module seedJob 'modules/container-app-job.bicep' = if (deployApps) {
   scope: rg
   name: 'seed-worker-deployment'
   params: {
@@ -194,8 +227,9 @@ module seedJob 'modules/container-app-job.bicep' = {
 // ─── Outputs ──────────────────────────────────────────────────
 output resourceGroupName string = rg.name
 output acrLoginServer string = acr.outputs.loginServer
-output managementApiUrl string = api.outputs.url
-output frontendUrl string = frontend.outputs.url
+output managementApiUrl string = deployApps ? api.outputs.url : ''
+output frontendUrl string = deployApps ? frontend.outputs.url : ''
 output defaultDomain string = cae.outputs.defaultDomain
 output keyVaultName string = keyVault.outputs.vaultName
 output postgresFqdn string = postgres.outputs.fqdn
+output foundryEndpoint string = foundry.outputs.endpoint

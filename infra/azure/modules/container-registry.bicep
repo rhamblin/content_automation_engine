@@ -19,6 +19,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
 output loginServer string = acr.properties.loginServer
 
 @description('ACR admin username')
+#disable-next-line outputs-should-not-contain-secrets
 output adminUsername string = acr.listCredentials().username
 
 @description('ACR admin password')
