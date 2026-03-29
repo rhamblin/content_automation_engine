@@ -1,4 +1,4 @@
-.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-uploader pin-maker style-editor account-analytics title-generator logs tests az-setup-entra az-deploy az-init-db az-build-push az-seed az-status az-logs az-destroy help
+.PHONY: frontend setup infra seed-images services local cleanup publish consume wp-uploader pin-maker style-editor account-analytics title-generator bg-remover logs tests az-setup-entra az-deploy az-init-db az-build-push az-seed az-status az-logs az-destroy help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -90,6 +90,9 @@ account-analytics:
 title-generator:
 	. dev-tools/dev-shell.sh && cd dev-tools && python title-generator/title_generator.py
 
+bg-remover:
+	. dev-tools/dev-shell.sh && cd dev-tools && python bg-remover/bg_remover.py bg-remover/data/input.json
+
 logs:
 	docker compose logs -f
 
@@ -165,6 +168,7 @@ help:  ## Show this help message
 	@echo "  make style-editor   - Visual style editor (add ?channel=name in URL, default: pinterest)"
 	@echo "  make account-analytics - Generate account-wide analytics report"
 	@echo "  make title-generator  - Generate titles (edit data/input.json)"
+	@echo "  make bg-remover       - Remove backgrounds and place on colored canvas"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make tests          - Run all tests in Docker"
