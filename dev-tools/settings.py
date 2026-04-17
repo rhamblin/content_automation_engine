@@ -39,6 +39,7 @@ class DevToolSettings:
     azure_foundry_endpoint: str
     azure_foundry_api_key: str
     azure_foundry_api_version: str = "2024-12-01-preview"
+    azure_ai_project_endpoint: str = ""
 
     wp_niche: str = "food"
     wp_credentials: dict[str, WpNicheCredential] = field(default_factory=dict)
@@ -90,6 +91,7 @@ def load_dev_settings() -> DevToolSettings:
         azure_foundry_api_version=os.getenv(
             "AZURE_FOUNDRY_API_VERSION", "2024-12-01-preview"
         ),
+        azure_ai_project_endpoint=os.getenv("AZURE_AI_PROJECT_ENDPOINT", ""),
         wp_niche=os.getenv("WP_NICHE", "food"),
         wp_credentials=_load_wp_niche_credentials(),
     )

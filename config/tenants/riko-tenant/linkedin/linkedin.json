@@ -1,0 +1,31 @@
+{
+  "title": "LinkedIn Strategy",
+  "news_sources": [
+    {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/feed/",
+      "category": "tech_news"
+    },
+    {
+      "name": "Hacker News Best",
+      "url": "https://hnrss.org/best",
+      "category": "tech_community"
+    },
+    {
+      "name": "Harvard Business Review",
+      "url": "https://hbr.org/resources/rss",
+      "category": "business_strategy"
+    },
+    {
+      "name": "First Round Review",
+      "url": "https://review.firstround.com/feed.xml",
+      "category": "startup_leadership"
+    },
+    {
+      "name": "The Pragmatic Engineer",
+      "url": "https://feeds.feedburner.com/ThePragmaticEngineer",
+      "category": "engineering_leadership"
+    }
+  ],
+  "linkedin_users": []
+}
