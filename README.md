@@ -1,16 +1,22 @@
 # Content Automation Engine
 
-A modular, multi-tenant platform for AI-driven publications to distribution channel
+Content Automation Engine is a multi-tenant platform that turns keywords into published content — automatically. You give it a niche (like "budget home decor" or "easy weeknight recipes"), configure your brand voice and target audiences, and the system handles the rest: generating text with LLMs, rendering images with your visual style, and publishing to channels like Pinterest and WordPress on a schedule.
 
-See system diagram for full context of system design. [Doc](./doc_assets/system-diagram.png)
+The architecture is built around loosely-coupled microservices that communicate via message queues. A scheduler triggers content generation jobs, workers render images and apply brand overlays, and a publication service posts to external APIs. Analytics collectors pull engagement metrics back in, and an activity reporter aggregates everything for reporting. Each tenant's data is isolated, and each niche can have its own credentials, prompts, and visual styles.
+
+This started as a personal project to automate content for a few niche sites, but evolved into a more general-purpose system that could onboard new tenants and niches through configuration rather than code changes.
+
+![System Architecture](./doc-assets/system-diagram.png)
+
+---
 
 ## Dev Onboarding
 
-The following applications are requirements
-- (VS Code)[https://code.visualstudio.com/download]
-- (Docker Desktop)[https://docs.docker.com/desktop/#next-steps]
-- (Microsoft Azure Storage Explorer)[https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4]
-- Git e.g. (GitHub Desktop)[https://github.com/apps/desktop]
+The following applications are requirements:
+- [VS Code](https://code.visualstudio.com/download)
+- [Docker Desktop](https://docs.docker.com/desktop/#next-steps)
+- [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4)
+- Git e.g. [GitHub Desktop](https://github.com/apps/desktop)
 
 Install Recommended Extensions when VS Code opens
 
@@ -64,7 +70,7 @@ images/
 ## Getting Started For Local Development
 
 1. **Download and install Docker Desktop**
-    Visit Docker (website)[https://www.docker.com/products/docker-desktop/]
+    Visit the [Docker website](https://www.docker.com/products/docker-desktop/)
 
 2. **Ensure the following API keys / secrets are in place under <<APP ROOT>>/secrets**
     azure-foundry-proj-default-api-key.txt

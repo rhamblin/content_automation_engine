@@ -24,3 +24,7 @@ __pycache__/
 
 ## For frontend
 node_modules
+frontend/.env
+
+## Local config (use .example files as templates)
+config/local/variables.env
